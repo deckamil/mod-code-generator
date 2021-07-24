@@ -136,7 +136,7 @@ def read_nodes_inputs(file_content, node_list, signal_list):
                         if "SUB" in action_name:
 
                             # find first input signal in file content
-                            first_input_signal = mcg_cc_supporter.find_first_input_signal(action_uid,file_content)
+                            first_input_signal = mcg_cc_supporter.find_first_input_signal(action_uid, file_content)
 
                             # if first input signal is same as current node signal
                             if signal_name in first_input_signal:
@@ -302,7 +302,7 @@ def read_interfaces(path, component_name):
                         # append signal name to signal
                         signal.append(signal_name)
                     # if given line contain definition of signal type
-                    if ("<FOREIGNID name=" in line) and ("Standard.DataType" in line):
+                    if ("<ID name=" in line) and ("Standard.DataType" in line):
                         # get signal type
                         signal_type = mcg_cc_supporter.get_name(line)
                         # append signal type to signal
@@ -340,7 +340,7 @@ def read_interfaces(path, component_name):
                         # append signal name to signal
                         signal.append(signal_name)
                     # if given line contain definition of signal type
-                    if ("<FOREIGNID name=" in line) and ("Standard.DataType" in line):
+                    if ("<ID name=" in line) and ("Standard.DataType" in line):
                         # get signal type
                         signal_type = mcg_cc_supporter.get_name(line)
                         # append signal type to signal
@@ -378,7 +378,7 @@ def read_interfaces(path, component_name):
                         # append signal name to signal
                         signal.append(signal_name)
                     # if given line contain definition of signal type
-                    if ("<FOREIGNID name=" in line) and ("Standard.DataType" in line):
+                    if ("<ID name=" in line) and ("Standard.DataType" in line):
                         # get signal type
                         signal_type = mcg_cc_supporter.get_name(line)
                         # append signal type to signal
@@ -509,4 +509,4 @@ def read_component(path):
 
     # return list of nodes, actions, signals and errors
     return node_list, action_list, signal_list, input_interface_list, output_interface_list, local_parameter_list, \
-                component_source, component_name
+        component_source, component_name

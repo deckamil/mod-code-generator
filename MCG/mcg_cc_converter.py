@@ -36,7 +36,7 @@ from mcg_cc_parameters import TARGET_OFFSET
 from mcg_cc_parameters import ACTION_UID_OFFSET
 
 # Project path
-project_path = ""
+project_path = "C:\\Workspace\\General\\Python\\Projects\\Mod-Code-Generator\\Examples\\Simple_Calc\\data\\fragments\\Simple_Calc\\model"
 
 
 # Function:
