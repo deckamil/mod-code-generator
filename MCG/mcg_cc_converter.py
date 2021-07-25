@@ -317,6 +317,18 @@ def convert_model(path):
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance
+
+# display short notice
+print()
+print("Mod Code Generator (MCG)")
+print("Copyright (C) 2021 Kamil Deć github.com/deckamil")
+print("This is Converter Component (CC) of Mod Code Generator (MCG)")
+print()
+print("License GPLv3+: GNU GPL version 3 or later.")
+print("This is free software; see the source for copying conditions. There is NO")
+print("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
+print()
+
 # check if number of command line arguments is correct
 if len(argv) - 1 == NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
@@ -328,4 +340,4 @@ if len(argv) - 1 == NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
 # else display info and exit
 else:
-    print("Incorrect number of command line arguments")
+    print("Incorrect number of command line arguments, MCG CC process cancelled.")
