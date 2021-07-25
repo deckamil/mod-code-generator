@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2021
+#   DATE:           25 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,6 +27,7 @@
 
 
 from os import listdir
+from sys import argv
 import mcg_cc_error_handler
 import mcg_cc_component_reader
 import mcg_cc_component_sorter
@@ -34,9 +35,10 @@ import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import TARGET_OFFSET
 from mcg_cc_parameters import ACTION_UID_OFFSET
+from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
 
-# Project path
-project_path = "C:\\Workspace\\General\\Python\\Projects\\Mod-Code-Generator\\Examples\\Simple_Calc\\data\\fragments\\Simple_Calc\\model"
+# Model path
+model_path = ""
 
 
 # Function:
@@ -314,4 +316,16 @@ def convert_model(path):
     process_components(path)
 
 
-convert_model(project_path)
+# Mod Code Generator (MCG) Converter Component (CC) entrance
+# check if number of command line arguments is correct
+if len(argv) - 1 == NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
+
+    # set model path to cmd line argument
+    model_path = str(argv[1])
+
+    # convert model
+    convert_model(model_path)
+
+# else display info and exit
+else:
+    print("Incorrect number of command line arguments")

@@ -5,7 +5,7 @@
 #       modules of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2021
+#   DATE:           25 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -75,3 +75,8 @@ UID_START_OFFSET = 5
 # number of characters before end of .exml file line occurrence, where end of uid element occurs, an example:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 UID_END_OFFSET = -3
+
+# This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
+# Converter Component (CC), i.e. list of arguments:
+#       - model path
+NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 1
