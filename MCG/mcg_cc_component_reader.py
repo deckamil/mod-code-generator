@@ -282,7 +282,7 @@ def read_interfaces(path, component_name):
         for i in range(0, len(file_content)):
 
             # if given line contains definition of input interface
-            if ("InputInterface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
+            if ("Input Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
                     component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
 
                 # print details of input interface file
@@ -320,7 +320,7 @@ def read_interfaces(path, component_name):
                 break
 
             # else if given line contains definition of output interface
-            elif ("OutputInterface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
+            elif ("Output Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
                     component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
 
                 # print details of output interface file
@@ -358,7 +358,7 @@ def read_interfaces(path, component_name):
                 break
 
             # else if given line contains definition of local parameters
-            elif ("LocalParameters" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
+            elif ("Local Parameters" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
                     component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
 
                 # print details of local parameters file
