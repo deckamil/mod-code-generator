@@ -187,7 +187,7 @@ def find_first_input_signal(action_uid, file_content):
                     # find end marker of first input signal
                     first_input_end = line.rfind("*FIRST*")
                     # check if *FIRST* marker is found
-                    if (first_input_start == -1) or (first_input_end == -1):
+                    if (first_input_start == -1) or (first_input_end == -1) or (first_input_start == first_input_end):
                         # set empty first input signal
                         first_input_signal = ""
                     else:
