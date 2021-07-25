@@ -165,6 +165,9 @@ def read_nodes_inputs(file_content, node_list, signal_list):
                     # exit "for j in range" loop
                     break
 
+    # remove duplicates from signal_list
+    signal_list = list(set(signal_list))
+
     return node_list, signal_list
 
 

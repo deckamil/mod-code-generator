@@ -6,7 +6,7 @@
 #       of nodes for conversion into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2021
+#   DATE:           25 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -381,9 +381,6 @@ def sort_component(node_list, action_list, signal_list, local_parameter_list, co
     # print component details
     print("Component Source:    " + str(component_source))
     print("Component Name:      " + str(component_name))
-
-    # remove duplicates from signal_list
-    signal_list = list(set(signal_list))
 
     print("*** SORT NODES ***")
 
