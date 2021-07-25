@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2021
+#   DATE:           25 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,7 +57,7 @@ def check_signals_correctness(signal_list, node_list):
         # if keyword has more than one occurrence
         if keyword_occurrence > 1:
             # record error
-            mcg_cc_error_handler.record_error(2, s)
+            mcg_cc_error_handler.record_error(1, s)
 
 
 # Function:
@@ -73,7 +73,7 @@ def check_actions_correctness(action_list, node_list):
     for a in action_list:
         if ("ADD" not in a) and ("SUB" not in a):
             # record error
-            mcg_cc_error_handler.record_error(3, a)
+            mcg_cc_error_handler.record_error(51, a)
 
 
 # Function:
@@ -209,7 +209,7 @@ def read_nodes_outputs(file_content, node_list, action_list):
                 # if line contains </DEPENDENCIES> and action does not have any target
                 if ("</DEPENDENCIES>" in file_content[j]) and (not action_has_targets):
                     # record error
-                    mcg_cc_error_handler.record_error(1, action)
+                    mcg_cc_error_handler.record_error(80, action)
                     # exit "for j in range" loop
                     break
 
@@ -218,7 +218,7 @@ def read_nodes_outputs(file_content, node_list, action_list):
                     # if action is target of given action
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.OpaqueAction" in file_content[j + 2]):
                         # record error
-                        mcg_cc_error_handler.record_error(5, action)
+                        mcg_cc_error_handler.record_error(81, action)
 
                     # if signal is target of given action
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):

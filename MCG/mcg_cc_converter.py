@@ -37,7 +37,7 @@ from mcg_cc_parameters import TARGET_OFFSET
 from mcg_cc_parameters import ACTION_UID_OFFSET
 from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
 
-# Model path
+# empty model path placeholder
 model_path = ""
 
 

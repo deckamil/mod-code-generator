@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2021
+#   DATE:           25 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -55,7 +55,7 @@ def get_name(line):
     # check if <name> and <mc> position is found
     if (name_position == -1) or (mc_position == -1):
         # record error
-        mcg_cc_error_handler.record_error(6, "none")
+        mcg_cc_error_handler.record_error(102, "none")
         # set error name
         name = "ERROR_NAME"
     else:
@@ -84,7 +84,7 @@ def get_uid(line):
     # check if <uid> position is found
     if uid_position == -1:
         # record error
-        mcg_cc_error_handler.record_error(7, "none")
+        mcg_cc_error_handler.record_error(103, "none")
         # set error uid
         uid = "ERROR_UID"
     else:
@@ -141,7 +141,7 @@ def find_model_element(file_content):
     # if model element name or type is not found
     if (model_element_name == "") or (model_element_type == ""):
         # record error
-        mcg_cc_error_handler.record_error(8, "none")
+        mcg_cc_error_handler.record_error(101, "none")
         # set error model element name and type
         model_element_name = "ERROR_MODEL_ELEMENT_NAME"
         model_element_type = "ERROR_MODEL_ELEMENT_TYPE"
@@ -197,7 +197,7 @@ def find_first_input_signal(action_uid, file_content):
     # if signal is not found
     if first_input_signal == "":
         # record error
-        mcg_cc_error_handler.record_error(9, action_uid)
+        mcg_cc_error_handler.record_error(31, action_uid)
         # set error signal
         first_input_signal = "ERROR_SIGNAL"
 
@@ -244,7 +244,7 @@ def find_target_signal(signal_uid, file_content):
     # if signal is not found
     if target_signal == "":
         # record error
-        mcg_cc_error_handler.record_error(4, signal_uid)
+        mcg_cc_error_handler.record_error(30, signal_uid)
         # set error signal
         target_signal = "ERROR_SIGNAL"
 

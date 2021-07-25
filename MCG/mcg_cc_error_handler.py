@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2021
+#   DATE:           25 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,74 +39,76 @@ error_list = []
 # This function does not return anything.
 def record_error(error_code, info):
 
-    # for given error code
+    # SIGNAL errors, range 1-50
     if error_code == 1:
         # set error notification
-        display = "ERROR 1: Action " + str(info) + " does not have target signal"
+        display = "ERROR " + str(error_code) + ": Signal " + str(info) + " has more than one source"
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 2:
+    elif error_code == 30:
         # set error notification
-        display = "ERROR 2: Signal " + str(info) + " has more than one source"
+        display = "ERROR " + str(error_code) + ": Could not find target signal with uid=" + str(info)
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 3:
+    elif error_code == 31:
         # set error notification
-        display = "ERROR 3: Action " + str(info) + " is not recognized as valid"
+        display = "ERROR " + str(error_code) + ": Could not find first input signal for action uid=" + str(info)
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 4:
+    # ACTIONS errors, range 51-100
+    elif error_code == 51:
         # set error notification
-        display = "ERROR 4: Could not find target signal with uid=" + str(info)
+        display = "ERROR " + str(error_code) + ": Action " + str(info) + " is not recognized as valid"
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 5:
+    elif error_code == 80:
         # set error notification
-        display = "ERROR 5: Action " + str(info) + " has another action as target"
+        display = "ERROR " + str(error_code) + ": Action " + str(info) + " does not have target signal"
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 6:
+    elif error_code == 81:
         # set error notification
-        display = "ERROR 6: <name> element has not been found"
+        display = "ERROR " + str(error_code) + ": Action " + str(info) + " has another action as target"
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 7:
+    # GENERAL errors, range 101-150
+    elif error_code == 101:
         # set error notification
-        display = "ERROR 7: <uid> element has not been found"
+        display = "ERROR " + str(error_code) + ": Model element name or type has not been found"
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 8:
+    elif error_code == 102:
         # set error notification
-        display = "ERROR 8: Model element name or type has not been found"
+        display = "ERROR " + str(error_code) + ": <name> element has not been found"
         # display error notification
         print(display)
         # append error to error list
         error_list.append(display)
 
-    elif error_code == 9:
+    elif error_code == 103:
         # set error notification
-        display = "ERROR 9: Could not find first input signal for action uid=" + str(info)
+        display = "ERROR " + str(error_code) + ": <uid> element has not been found"
         # display error notification
         print(display)
         # append error to error list
