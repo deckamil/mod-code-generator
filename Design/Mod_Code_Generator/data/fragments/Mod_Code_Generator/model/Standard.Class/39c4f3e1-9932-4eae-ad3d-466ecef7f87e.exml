@@ -2,7 +2,7 @@
 <!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="mcg_cc_converter" version="4">
   <OBJECT>
     <ID name="mcg_cc_converter" mc="Standard.Class" uid="39c4f3e1-9932-4eae-ad3d-466ecef7f87e"/>
-    <PID name="Mod Code Generator (MCG) Converter Component (CC)" mc="Standard.Package" uid="086515f5-4542-469d-a748-7afcb418a8ef"/>
+    <PID name="Mod Code Generator (MCG) Converter Component (CC)" mc="Standard.Component" uid="083e8806-dea8-42e2-af9d-f3fcd3669013"/>
     <ATTRIBUTES>
       <ATT name="IsActive">false</ATT>
       <ATT name="IsMain">false</ATT>

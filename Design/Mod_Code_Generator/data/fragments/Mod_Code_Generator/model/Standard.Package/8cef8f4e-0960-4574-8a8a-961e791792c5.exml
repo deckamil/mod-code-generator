@@ -14,8 +14,8 @@
     </ATTRIBUTES>
     <DEPENDENCIES>
       <COMP relation="OwnedElement">
-        <COMPID name="Mod Code Generator (MCG) Converter Component (CC)" mc="Standard.Package" uid="086515f5-4542-469d-a748-7afcb418a8ef"/>
-        <COMPID name="Mod Code Generator (MCG) Code Generator Component (CGC)" mc="Standard.Package" uid="b4044827-4df0-45c8-ae25-b2fc728653ed"/>
+        <COMPID name="Mod Code Generator (MCG) Converter Component (CC)" mc="Standard.Component" uid="083e8806-dea8-42e2-af9d-f3fcd3669013"/>
+        <COMPID name="Mod Code Generator (MCG) Code Generator Component (CGC)" mc="Standard.Component" uid="4fbc6d7a-cb2a-44b9-903a-41b7425745c4"/>
       </COMP>
     </DEPENDENCIES>
   </OBJECT>

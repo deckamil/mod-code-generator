@@ -1,10 +1,12 @@
 <?xml version="1.0" ?>
 <!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Mod Code Generator (MCG) Converter Component (CC)" version="4">
   <OBJECT>
-    <ID name="Mod Code Generator (MCG) Converter Component (CC)" mc="Standard.Package" uid="086515f5-4542-469d-a748-7afcb418a8ef"/>
+    <ID name="Mod Code Generator (MCG) Converter Component (CC)" mc="Standard.Component" uid="083e8806-dea8-42e2-af9d-f3fcd3669013"/>
     <PID name="Mod_Code_Generator" mc="Standard.Package" uid="8cef8f4e-0960-4574-8a8a-961e791792c5"/>
     <ATTRIBUTES>
-      <ATT name="IsInstantiable">false</ATT>
+      <ATT name="IsActive">false</ATT>
+      <ATT name="IsMain">false</ATT>
+      <ATT name="IsElementary">false</ATT>
       <ATT name="IsAbstract">false</ATT>
       <ATT name="IsLeaf">false</ATT>
       <ATT name="IsRoot">false</ATT>
