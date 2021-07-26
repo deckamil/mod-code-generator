@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Mod_Code_Generator" version="4">
+  <OBJECT>
+    <ID name="Mod_Code_Generator" mc="Standard.Project" uid="bbe6c513-8e74-44b5-8d74-be326988ff4d"/>
+    <ATTRIBUTES>
+      <ATT name="ProjectContext"></ATT>
+      <ATT name="ProjectDescr"></ATT>
+      <ATT name="Name"><![CDATA[Mod_Code_Generator]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="Model">
+        <COMPID name="mod_code_generator" mc="Standard.Package" uid="8cef8f4e-0960-4574-8a8a-961e791792c5"/>
+      </COMP>
+      <COMP relation="DiagramRoot">
+        <COMPID name="Mod_Code_Generator" mc="Infrastructure.DiagramSet" uid="858d27e6-e02b-4e3e-8de1-103558f5154d"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>
