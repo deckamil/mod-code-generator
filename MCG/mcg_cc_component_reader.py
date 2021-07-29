@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 JUL 2021
+#   DATE:           29 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -259,6 +259,11 @@ def read_interfaces(path, component_name):
     local_parameter_list = []
     signal = []
 
+    # interface markers show whether interface was found of not
+    input_interface_found = False
+    output_interface_found = False
+    local_parameters_found = False
+
     # find position of standard activity within the path
     standard_activity_position = path.find("\\Standard.Activity")
     # get interface directory path
@@ -287,6 +292,9 @@ def read_interfaces(path, component_name):
             # if given line contains definition of input interface
             if ("Input Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
                     component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
+
+                # input interface is found
+                input_interface_found = True
 
                 # print details of input interface file
                 interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
@@ -326,6 +334,9 @@ def read_interfaces(path, component_name):
             elif ("Output Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
                     component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
 
+                # output interface is found
+                output_interface_found = True
+
                 # print details of output interface file
                 interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
                 print("Interface Source:    " + str(interface_source))
@@ -364,6 +375,9 @@ def read_interfaces(path, component_name):
             elif ("Local Parameters" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
                     component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
 
+                # local parameters are found
+                local_parameters_found = True
+
                 # print details of local parameters file
                 interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
                 print("Interface Source:    " + str(interface_source))
@@ -397,6 +411,21 @@ def read_interfaces(path, component_name):
 
                 # exit "for i in range" loop
                 break
+
+    # if input interface element was not found
+    if not input_interface_found:
+        # record error
+        mcg_cc_error_handler.record_error(40, component_name)
+
+    # if output interface element was not found
+    if not output_interface_found:
+        # record error
+        mcg_cc_error_handler.record_error(41, component_name)
+
+    # if local parameters element was not found
+    if not local_parameters_found:
+        # record error
+        mcg_cc_error_handler.record_error(42, component_name)
 
     return input_interface_list, output_interface_list, local_parameter_list
 
