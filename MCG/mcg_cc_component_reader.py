@@ -537,6 +537,6 @@ def read_component(path):
         print("************************* END OF COMPONENT READING *************************")
         print()
 
-    # return list of nodes, actions, signals and errors
+    # return collected data
     return node_list, action_list, signal_list, input_interface_list, output_interface_list, local_parameter_list, \
         component_source, component_name
