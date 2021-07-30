@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 JUL 2021
+#   DATE:           30 JUL 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -77,15 +77,14 @@ def check_actions_correctness(action_list, node_list):
 
 
 # Function:
-# read_nodes_inputs()
+# read_signal_targets()
 #
 # Description:
-# This function looks for nodes inputs, i.e. signals and their targets,
-# which are either actions or other signals.
+# This function looks for signals and their targets, i.e. actions or signals.
 #
 # Returns:
 # This function returns list of nodes and signals.
-def read_nodes_inputs(file_content, node_list, signal_list):
+def read_signal_targets(file_content, node_list, signal_list):
     # search for signals in file content
     for i in range(0, len(file_content)):
 
@@ -172,15 +171,14 @@ def read_nodes_inputs(file_content, node_list, signal_list):
 
 
 # Function:
-# read_nodes_outputs()
+# read_action_targets()
 #
 # Description:
-# This function looks for nodes outputs, i.e. actions and their targets,
-# which are other signals.
+# This function looks for actions and their targets, i.e. signals.
 #
 # Returns:
 # This function returns list of nodes and actions.
-def read_nodes_outputs(file_content, node_list, action_list):
+def read_action_targets(file_content, node_list, action_list):
     # search for actions in file content
     for i in range(0, len(file_content)):
 
@@ -439,7 +437,7 @@ def read_interfaces(path, component_name):
 #
 # Returns:
 # This function returns list of nodes, actions, signals, input interfaces,
-# output interfaces, local parameters, file name and diagram name.
+# output interfaces, local parameters, component source and component name.
 def read_component(path):
     # empty placeholders
     node_list = []
@@ -484,11 +482,11 @@ def read_component(path):
         # record list of nodes
         print("*** RECORD NODES ***")
 
-        # search for nodes inputs within diagram content, i.e. signals and their targets
-        node_list, signal_list = read_nodes_inputs(file_content, node_list, signal_list)
+        # search for signals targets within diagram content
+        node_list, signal_list = read_signal_targets(file_content, node_list, signal_list)
 
-        # search for nodes outputs within diagram content, i.e. actions and their targets
-        node_list, action_list = read_nodes_outputs(file_content, node_list, action_list)
+        # search for action targets within diagram content
+        node_list, action_list = read_action_targets(file_content, node_list, action_list)
 
         # list of nodes recorded
         print("*** NODES RECORDED ***")
