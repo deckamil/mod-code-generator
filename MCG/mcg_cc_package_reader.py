@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           30 JUL 2021
+#   DATE:           13 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,7 +35,7 @@ from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 # read_interface_targets()
 #
 # Description:
-# This function looks for interfaces and their targets, i.e. components.
+# This function looks for interfaces and their targets.
 #
 # Returns:
 # This function returns list of nodes and interfaces.
@@ -48,7 +48,7 @@ def read_interface_targets():
 # read_component_targets()
 #
 # Description:
-# This function looks for components and their targets, i.e. interfaces or components.
+# This function looks for components and their targets.
 #
 # Returns:
 # This function returns list of nodes and components.
@@ -85,7 +85,7 @@ def read_package(path):
     # empty placeholders
     node_list = []
     interface_list = []
-    components_list = []
+    component_list = []
     input_interface_list = []
     output_interface_list = []
     package_source = ""
@@ -128,7 +128,7 @@ def read_package(path):
         # node_list, interface_list = read_interface_targets(file_content, node_list, interface_list)
 
         # search for component targets within diagram content
-        # node_list, components_list = read_component_targets(file_content, node_list, components_list)
+        # node_list, component_list = read_component_targets(file_content, node_list, component_list)
 
         # list of nodes recorded
         print("*** NODES RECORDED ***")
@@ -143,7 +143,7 @@ def read_package(path):
             # shuffle lists
             random.shuffle(node_list)
             random.shuffle(interface_list)
-            random.shuffle(components_list)
+            random.shuffle(component_list)
             random.shuffle(input_interface_list)
             random.shuffle(output_interface_list)
 
@@ -155,7 +155,7 @@ def read_package(path):
             for i in interface_list:
                 print("          " + str(i))
             print("Components:")
-            for c in components_list:
+            for c in component_list:
                 print("          " + str(c))
             print("Input Interface:")
             for ii in input_interface_list:
@@ -166,9 +166,9 @@ def read_package(path):
             print()
 
         # end of component reading
-        print("************************* END OF COMPONENT READING *************************")
+        print("************************** END OF PACKAGE READING **************************")
         print()
 
     # return collected data
-    return node_list, interface_list, components_list, input_interface_list, output_interface_list, \
+    return node_list, interface_list, component_list, input_interface_list, output_interface_list, \
         package_source, package_name

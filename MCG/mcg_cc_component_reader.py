@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           30 JUL 2021
+#   DATE:           13 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -80,7 +80,7 @@ def check_actions_correctness(action_list, node_list):
 # read_signal_targets()
 #
 # Description:
-# This function looks for signals and their targets, i.e. actions or signals.
+# This function looks for signals and their targets.
 #
 # Returns:
 # This function returns list of nodes and signals.
@@ -174,7 +174,7 @@ def read_signal_targets(file_content, node_list, signal_list):
 # read_action_targets()
 #
 # Description:
-# This function looks for actions and their targets, i.e. signals.
+# This function looks for actions and their targets.
 #
 # Returns:
 # This function returns list of nodes and actions.
