@@ -39,9 +39,43 @@ from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 #
 # Returns:
 # This function returns list of nodes and interfaces.
-def read_interface_targets():
-    tmpvar = ""
-    # TBC
+def read_interface_targets(file_content, node_list, interface_list):
+    # search for signals in file content
+    for i in range(0, len(file_content)):
+
+        # if given line contains definition of interface type
+        if ("<ID name=" in file_content[i]) and ("Standard.Interface" in file_content[i]):
+            # get copy of line
+            line = file_content[i]
+            # get interface type
+            interface_type = mcg_cc_supporter.get_name(line)
+            # append interface type to list of interfaces
+            interface_list.append(interface_type)
+
+            # interface does not have any target
+            interface_has_targets = False
+
+            # search for targets
+            for j in range(i, len(file_content)):
+
+                # if line contains <COMP that means the interface has some targets
+                if "<COMP" in file_content[j]:
+                    # interface has some target
+                    interface_has_targets = True
+
+                # if line contains </DEPENDENCIES> and interface does not have any target
+                if ("</DEPENDENCIES>" in file_content[j]) and (not interface_has_targets):
+                    # append node to list of nodes
+                    node_list.append(str(interface_type) + " target empty")
+                    # exit "for j in range" loop
+                    break
+
+                # if line contains </COMP> that means end of targets for given interface
+                if "</COMP>" in file_content[j]:
+                    # exit "for j in range" loop
+                    break
+
+    return node_list, interface_list
 
 
 # Function:

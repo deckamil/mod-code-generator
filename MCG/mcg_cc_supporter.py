@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 JUL 2021
+#   DATE:           13 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,8 +39,8 @@ from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 #
 # Description:
 # This function looks for <name> element within line of .exml file, which define name of action,
-# signal, signal type or model element (name of model component or package), an example of .exml
-# file line:
+# signal, signal type, interface type or model element (name of model component or package), an
+# example of .exml file line:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 #
 # Returns:
