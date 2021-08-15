@@ -96,6 +96,22 @@ def record_error(error_code, info):
         # append error to error list
         error_list.append(display)
 
+    elif error_code == 43:
+        # set error notification
+        display = "ERROR " + str(error_code) + ": Could not find Input Interface element for package=" + str(info)
+        # display error notification
+        print(display)
+        # append error to error list
+        error_list.append(display)
+
+    elif error_code == 44:
+        # set error notification
+        display = "ERROR " + str(error_code) + ": Could not find Output Interface element for package=" + str(info)
+        # display error notification
+        print(display)
+        # append error to error list
+        error_list.append(display)
+
     # ACTIONS errors, range 51-100
     elif error_code == 51:
         # set error notification

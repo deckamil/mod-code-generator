@@ -25,6 +25,7 @@
 
 
 import random
+from os import listdir
 import mcg_cc_error_handler
 import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
@@ -72,7 +73,7 @@ def read_interface_targets(file_content, node_list, interface_list):
 
                 # if line contain <LINK relation="Target"> that means target for given interface
                 if ("<LINK relation=" in file_content[j]) and ("Target" in file_content[j]):
-                    # if component is target of given action
+                    # if component is target of given interface
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
                         # get line
                         line = file_content[j + 2]
@@ -113,9 +114,134 @@ def read_component_targets():
 #
 # Returns:
 # This function returns list of input interfaces and output interfaces.
-def read_interfaces():
-    tmpvar = ""
-    # TBC
+def read_interfaces(path, package_name):
+    # empty placeholders
+    input_interface_list = []
+    output_interface_list = []
+    signal = []
+
+    # interface markers show whether interface was found of not
+    input_interface_found = False
+    output_interface_found = False
+
+    # find position of standard activity within the path
+    standard_activity_position = path.find("\\Standard.Activity")
+    # get interface directory path
+    interface_dir_path = path[0:standard_activity_position] + str("\\Standard.Interface")
+
+    # get list of interfaces
+    interface_list = listdir(interface_dir_path)
+
+    # create list of paths to interfaces
+    interface_path_list = []
+    for il in interface_list:
+        interface_path_list.append(interface_dir_path + str("\\") + str(il))
+
+    # read interface details
+    for ipl in interface_path_list:
+
+        # open file and read content, then close file
+        file = open(ipl, "r")
+        file_content = file.readlines()
+        file_content = [x.strip() for x in file_content]
+        file.close()
+
+        # search for interface details in file content
+        for i in range(0, len(file_content)):
+
+            # if given line contains definition of input interface
+            if ("Input Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
+                    package_name in file_content[i + 1]) and ("Standard.Package" in file_content[i + 1]):
+
+                # input interface is found
+                input_interface_found = True
+
+                # print details of input interface file
+                interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
+                print("Interface Source:    " + str(interface_source))
+                print("Interface Type:      Input Interface")
+
+                # record list of input interface signals
+                print("*** RECORD INPUT INTERFACE ***")
+
+                # search for input interface signals
+                for line in file_content:
+                    # if given line contains definition of signal name
+                    if ("<ID name=" in line) and ("Standard.Attribute" in line):
+                        # get signal name
+                        signal_name = mcg_cc_supporter.get_name(line)
+                        # append signal name to signal
+                        signal.append(signal_name)
+                    # if given line contain definition of signal type
+                    if ("<ID name=" in line) and ("Standard.DataType" in line):
+                        # get signal type
+                        signal_type = mcg_cc_supporter.get_name(line)
+                        # append signal type to signal
+                        signal.append(signal_type)
+                        # append signal to input interface list
+                        input_interface_list.append(signal)
+                        # clear signal placeholder
+                        signal = []
+
+                # list of input interface signals recorded
+                print("*** INPUT INTERFACE RECORDED ***")
+                print()
+
+                # exit "for i in range" loop
+                break
+
+            # else if given line contains definition of output interface
+            elif ("Output Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
+                    package_name in file_content[i + 1]) and ("Standard.Package" in file_content[i + 1]):
+
+                # output interface is found
+                output_interface_found = True
+
+                # print details of output interface file
+                interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
+                print("Interface Source:    " + str(interface_source))
+                print("Interface Type:      Output Interface")
+
+                # record list of output interface signals
+                print("*** RECORD OUTPUT INTERFACE ***")
+
+                # search for output interface signals
+                for line in file_content:
+                    # if given line contains definition of signal name
+                    if ("<ID name=" in line) and ("Standard.Attribute" in line):
+                        # get signal name
+                        signal_name = mcg_cc_supporter.get_name(line)
+                        # append signal name to signal
+                        signal.append(signal_name)
+                    # if given line contain definition of signal type
+                    if ("<ID name=" in line) and ("Standard.DataType" in line):
+                        # get signal type
+                        signal_type = mcg_cc_supporter.get_name(line)
+                        # append signal type to signal
+                        signal.append(signal_type)
+                        # append signal to output interface list
+                        output_interface_list.append(signal)
+                        # clear signal placeholder
+                        signal = []
+
+                # list of output interface signals recorded
+                print("*** OUTPUT INTERFACE RECORDED ***")
+                print()
+
+                # exit "for i in range" loop
+                break
+
+    # if input interface element was not found
+    if not input_interface_found:
+        # record error
+        mcg_cc_error_handler.record_error(43, package_name)
+
+    # if output interface element was not found
+    if not output_interface_found:
+        # record error
+        mcg_cc_error_handler.record_error(44, package_name)
+
+    return input_interface_list, output_interface_list
 
 
 # Function:
@@ -182,7 +308,7 @@ def read_package(path):
         print()
 
         # open and read interface file
-        # input_interface_list, output_interface_list = read_interfaces(path, package_name)
+        input_interface_list, output_interface_list = read_interfaces(path, package_name)
 
         # display additional details after component reading for test run
         if MCG_CC_TEST_RUN:
