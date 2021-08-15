@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 JUL 2021
+#   DATE:           15 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -43,6 +43,14 @@ def record_error(error_code, info):
     if error_code == 1:
         # set error notification
         display = "ERROR " + str(error_code) + ": Signal " + str(info) + " has more than one source"
+        # display error notification
+        print(display)
+        # append error to error list
+        error_list.append(display)
+
+    elif error_code == 29:
+        # set error notification
+        display = "ERROR " + str(error_code) + ": Could not find target component with uid=" + str(info)
         # display error notification
         print(display)
         # append error to error list

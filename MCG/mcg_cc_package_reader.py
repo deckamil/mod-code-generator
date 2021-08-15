@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           13 AUG 2021
+#   DATE:           15 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,7 +40,7 @@ from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 # Returns:
 # This function returns list of nodes and interfaces.
 def read_interface_targets(file_content, node_list, interface_list):
-    # search for signals in file content
+    # search for interfaces in file content
     for i in range(0, len(file_content)):
 
         # if given line contains definition of interface type
@@ -69,6 +69,19 @@ def read_interface_targets(file_content, node_list, interface_list):
                     node_list.append(str(interface_type) + " target empty")
                     # exit "for j in range" loop
                     break
+
+                # if line contain <LINK relation="Target"> that means target for given interface
+                if ("<LINK relation=" in file_content[j]) and ("Target" in file_content[j]):
+                    # if component is target of given action
+                    if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
+                        # get line
+                        line = file_content[j + 2]
+                        # get component uid
+                        component_uid = mcg_cc_supporter.get_uid(line)
+                        # find target component
+                        target_component = mcg_cc_supporter.find_target_component(component_uid, file_content)
+                        # append node to list of nodes
+                        node_list.append(str(interface_type) + " target " + str(target_component))
 
                 # if line contains </COMP> that means end of targets for given interface
                 if "</COMP>" in file_content[j]:
@@ -159,7 +172,7 @@ def read_package(path):
         print("*** RECORD NODES ***")
 
         # search for interface targets within diagram content
-        # node_list, interface_list = read_interface_targets(file_content, node_list, interface_list)
+        node_list, interface_list = read_interface_targets(file_content, node_list, interface_list)
 
         # search for component targets within diagram content
         # node_list, component_list = read_component_targets(file_content, node_list, component_list)
