@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           15 AUG 2021
+#   DATE:           16 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -123,7 +123,7 @@ def record_error(error_code, info):
 
     elif error_code == 80:
         # set error notification
-        display = "ERROR " + str(error_code) + ": Action " + str(info) + " does not have target signal"
+        display = "ERROR " + str(error_code) + ": Action " + str(info) + " does not have any target"
         # display error notification
         print(display)
         # append error to error list
@@ -157,6 +157,23 @@ def record_error(error_code, info):
     elif error_code == 103:
         # set error notification
         display = "ERROR " + str(error_code) + ": <uid> element has not been found"
+        # display error notification
+        print(display)
+        # append error to error list
+        error_list.append(display)
+
+    # COMPONENTS errors, range 151-200
+    elif error_code == 180:
+        # set error notification
+        display = "ERROR " + str(error_code) + ": Component " + str(info) + " does not have any target"
+        # display error notification
+        print(display)
+        # append error to error list
+        error_list.append(display)
+
+    elif error_code == 181:
+        # set error notification
+        display = "ERROR " + str(error_code) + ": Component target with uid=" + str(info) + " was not found"
         # display error notification
         print(display)
         # append error to error list

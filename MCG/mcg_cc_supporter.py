@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           15 AUG 2021
+#   DATE:           16 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -256,12 +256,12 @@ def find_target_signal(signal_uid, file_content):
 # find_target_component()
 #
 # Description:
-# This function looks for target component of given interface, basing on component uid, within
+# This function looks for target component of given interface or component, basing on component uid, within
 # line of .exml file, an example of .exml file line:
 # <ID name="" mc="Standard.InstanceNode" uid="e531e463-60f0-49ad-aca8-270c6d97f1d4"/>
 #
 # Returns:
-# This function returns target component name of given interface.
+# This function returns target component of given interface.
 def find_target_component(component_uid, file_content):
     # empty placeholder
     target_component = ""
@@ -281,7 +281,7 @@ def find_target_component(component_uid, file_content):
                     # get copy of line
                     line = file_content[j]
                     # get target component
-                    target_component= get_name(line)
+                    target_component = get_name(line)
                     # exit "for j in range" loop
                     break
 
@@ -290,13 +290,56 @@ def find_target_component(component_uid, file_content):
 
     # if component is not found
     if target_component == "":
-        # record error
-        mcg_cc_error_handler.record_error(29, component_uid)
-        # set error signal
-        target_component = "ERROR_COMPONENT"
+        # set error component
+        target_component = "$##TARGET##COMPONENT##NOT##FOUND##$"
 
     # return component
     return target_component
+
+
+# Function:
+# find_target_interface()
+#
+# Description:
+# This function looks for target interface of given component, basing on interface uid, within
+# line of .exml file, an example of .exml file line:
+# <ID name="" mc="Standard.InstanceNode" uid="e531e463-60f0-49ad-aca8-270c6d97f1d4"/>
+#
+# Returns:
+# This function returns target interface of given component.
+def find_target_interface(interface_uid, file_content):
+    # empty placeholder
+    target_interface = ""
+
+    # search for uid in file content
+    for i in range(0, len(file_content)):
+
+        # if uid within the line
+        if ("<OBJECT>" in file_content[i]) and ("<ID name=" in file_content[i + 1]) and\
+                (interface_uid in file_content[i + 1]):
+
+            # search for component definition
+            for j in range(i + 1, len(file_content)):
+
+                # if given line contains definition of component name
+                if ("<ID name=" in file_content[j]) and ("Standard.Interface" in file_content[j]):
+                    # get copy of line
+                    line = file_content[j]
+                    # get target interface
+                    target_interface = get_name(line)
+                    # exit "for j in range" loop
+                    break
+
+            # exit "for i in range" loop
+            break
+
+    # if interface is not found
+    if target_interface == "":
+        # set error interface
+        target_interface = "$##TARGET##INTERFACE##NOT##FOUND##$"
+
+    # return interface
+    return target_interface
 
 
 # Function:

@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           15 AUG 2021
+#   DATE:           16 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -64,7 +64,7 @@ def read_interface_targets(file_content, node_list, interface_list):
                     # interface has some target
                     interface_has_targets = True
 
-                # if line contains </DEPENDENCIES> and interface does not have any target
+                # if line contains </DEPENDENCIES> then interface does not have any target
                 if ("</DEPENDENCIES>" in file_content[j]) and (not interface_has_targets):
                     # append node to list of nodes
                     node_list.append(str(interface_type) + " target empty")
@@ -81,6 +81,10 @@ def read_interface_targets(file_content, node_list, interface_list):
                         component_uid = mcg_cc_supporter.get_uid(line)
                         # find target component
                         target_component = mcg_cc_supporter.find_target_component(component_uid, file_content)
+                        # check if target component was found
+                        if "$##TARGET##COMPONENT##NOT##FOUND##$" in target_component:
+                            # record error
+                            mcg_cc_error_handler.record_error(29, component_uid)
                         # append node to list of nodes
                         node_list.append(str(interface_type) + " target " + str(target_component))
 
@@ -100,9 +104,68 @@ def read_interface_targets(file_content, node_list, interface_list):
 #
 # Returns:
 # This function returns list of nodes and components.
-def read_component_targets():
-    tmpvar = ""
-    # TBC
+def read_component_targets(file_content, node_list, component_list):
+    # search for components in file content
+    for i in range(0, len(file_content)):
+
+        # if given line contains definition of component name
+        if ("<ID name=" in file_content[i]) and ("Standard.Component" in file_content[i]):
+            # get copy of line
+            line = file_content[i]
+            # get interface type
+            component_name = mcg_cc_supporter.get_name(line)
+            # append component name to list of components
+            component_list.append(component_name)
+
+            # component does not have any target
+            component_has_targets = False
+
+            # search for targets
+            for j in range(i, len(file_content)):
+
+                # if line contains <COMP that means the interface has some targets
+                if "<COMP" in file_content[j]:
+                    # interface has some target
+                    interface_has_targets = True
+
+                # if line contains </DEPENDENCIES> then component does not have any target
+                if ("</DEPENDENCIES>" in file_content[j]) and (not component_has_targets):
+                    # record error
+                    mcg_cc_error_handler.record_error(180, component_name)
+                    # exit "for j in range" loop
+                    break
+
+                # if line contain <LINK relation="Target"> that means target for given interface
+                if ("<LINK relation=" in file_content[j]) and ("Target" in file_content[j]):
+                    # if line contains uid of target element
+                    if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
+                        # get line
+                        line = file_content[j + 2]
+                        # get target uid
+                        target_uid = mcg_cc_supporter.get_uid(line)
+                        # find target component
+                        target_component = mcg_cc_supporter.find_target_component(target_uid, file_content)
+                        # find target interface
+                        target_interface = mcg_cc_supporter.find_target_interface(target_uid, file_content)
+                        # check if target element was found
+                        if ("$##TARGET##COMPONENT##NOT##FOUND##$" in target_component) and \
+                                ("$##TARGET##INTERFACE##NOT##FOUND##$" in target_interface):
+                            # record error
+                            mcg_cc_error_handler.record_error(181, target_uid)
+                        # select target element for node
+                        if "$##TARGET##COMPONENT##NOT##FOUND##$" in target_component:
+                            target_element = target_interface
+                        else:
+                            target_element = target_component
+                        # append node to list of nodes
+                        node_list.append(str(component_name) + " target " + str(target_element))
+
+                # if line contains </COMP> that means end of targets for given interface
+                if "</COMP>" in file_content[j]:
+                    # exit "for j in range" loop
+                    break
+
+    return node_list, component_list
 
 
 # Function:

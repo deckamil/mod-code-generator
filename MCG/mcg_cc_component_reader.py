@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           13 AUG 2021
+#   DATE:           16 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -108,7 +108,7 @@ def read_signal_targets(file_content, node_list, signal_list):
                     # signal has some target
                     signal_has_targets = True
 
-                # if line contains </DEPENDENCIES> and signal does not have any target
+                # if line contains </DEPENDENCIES> then signal does not have any target
                 if ("</DEPENDENCIES>" in file_content[j]) and (not signal_has_targets):
                     # append node to list of nodes
                     node_list.append(str(signal_name) + " target empty")
@@ -207,7 +207,7 @@ def read_action_targets(file_content, node_list, action_list):
                     # action has some target
                     action_has_targets = True
 
-                # if line contains </DEPENDENCIES> and action does not have any target
+                # if line contains </DEPENDENCIES> then action does not have any target
                 if ("</DEPENDENCIES>" in file_content[j]) and (not action_has_targets):
                     # record error
                     mcg_cc_error_handler.record_error(80, action)
