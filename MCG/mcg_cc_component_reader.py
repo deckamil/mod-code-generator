@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           16 AUG 2021
+#   DATE:           17 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -155,9 +155,14 @@ def read_signal_targets(file_content, node_list, signal_list):
                         # get signal uid
                         signal_uid = mcg_cc_supporter.get_uid(line)
                         # find target signal
-                        target_signal = mcg_cc_supporter.find_target_signal(signal_uid, file_content)
+                        target_signal_list = mcg_cc_supporter.find_target_element(signal_uid, "Standard.Attribute",
+                                                                                  file_content)
+                        # if target signal was not found
+                        if "NOT_FOUND" in target_signal_list[0]:
+                            # record error
+                            mcg_cc_error_handler.record_error(30, signal_uid)
                         # append node to list of nodes
-                        node_list.append(str(signal_name) + " target " + str(target_signal))
+                        node_list.append(str(signal_name) + " target " + str(target_signal_list[1]))
 
                 # if line contains </COMP> that means end of targets for given signal
                 if "</COMP>" in file_content[j]:
@@ -228,9 +233,14 @@ def read_action_targets(file_content, node_list, action_list):
                         # get signal uid
                         signal_uid = mcg_cc_supporter.get_uid(line)
                         # find target signal
-                        target_signal = mcg_cc_supporter.find_target_signal(signal_uid, file_content)
+                        target_signal_list = mcg_cc_supporter.find_target_element(signal_uid, "Standard.Attribute",
+                                                                                  file_content)
+                        # if target signal was not found
+                        if "NOT_FOUND" in target_signal_list[0]:
+                            # record error
+                            mcg_cc_error_handler.record_error(30, signal_uid)
                         # append node to list of nodes
-                        node_list.append(str(action) + " target " + str(target_signal))
+                        node_list.append(str(action) + " target " + str(target_signal_list[1]))
 
                 # if line contains </COMP> that means end of targets for given signal
                 if "</COMP>" in file_content[j]:

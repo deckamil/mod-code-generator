@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           16 AUG 2021
+#   DATE:           17 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -206,140 +206,57 @@ def find_first_input_signal(action_uid, file_content):
 
 
 # Function:
-# find_target_signal()
+# find_target_element()
 #
 # Description:
-# This function looks for target signal of given action or another signal, basing on signal uid, within
+# This function looks for name of target element, basing on target element type and its uid, within
 # line of .exml file, an example of .exml file line:
-# <ID name="" mc="Standard.InstanceNode" uid="91282ffc-e076-41c7-99e6-9aed64f5a02d"/>
+# <ID name="input3" mc="Standard.Attribute" uid="338540aa-439c-4dc7-8414-a275ba3c08e1"/>
 #
 # Returns:
-# This function returns target signal name of given action or another signal.
-def find_target_signal(signal_uid, file_content):
-    # empty placeholder
-    target_signal = ""
+# This function returns list of target elements.
+def find_target_element(target_element_uid, target_element_type, file_content):
+    # empty placeholders
+    target_element_name = ""
+    target_element_list = []
 
     # search for uid in file content
     for i in range(0, len(file_content)):
 
         # if uid within the line
         if ("<OBJECT>" in file_content[i]) and ("<ID name=" in file_content[i + 1]) and\
-                (signal_uid in file_content[i + 1]):
+                (target_element_uid in file_content[i + 1]):
 
-            # search for signal definition
+            # search for target element definition
             for j in range(i + 1, len(file_content)):
 
-                # if given line contains definition of signal name
-                if ("<ID name=" in file_content[j]) and ("Standard.Attribute" in file_content[j]):
+                # if given line contains definition of target element
+                if ("<ID name=" in file_content[j]) and (target_element_type in file_content[j]):
                     # get copy of line
                     line = file_content[j]
-                    # get target signal
-                    target_signal = get_name(line)
+                    # get target element name
+                    target_element_name = get_name(line)
+                    # append "found" info to list of target elements
+                    target_element_list.append("FOUND")
+                    # append target element name to list of target elements
+                    target_element_list.append(target_element_name)
                     # exit "for j in range" loop
                     break
 
             # exit "for i in range" loop
             break
 
-    # if signal is not found
-    if target_signal == "":
-        # record error
-        mcg_cc_error_handler.record_error(30, signal_uid)
-        # set error signal
-        target_signal = "ERROR_SIGNAL"
+    # if target element name is not found
+    if target_element_name == "":
+        # set target element name
+        target_element_name = "TARGET_ELEMENT_NOT_FOUND"
+        # append "not found" info to list of target elements
+        target_element_list.append("NOT_FOUND")
+        # append target element name to list of target elements
+        target_element_list.append(target_element_name)
 
-    # return signal
-    return target_signal
-
-
-# Function:
-# find_target_component()
-#
-# Description:
-# This function looks for target component of given interface or component, basing on component uid, within
-# line of .exml file, an example of .exml file line:
-# <ID name="" mc="Standard.InstanceNode" uid="e531e463-60f0-49ad-aca8-270c6d97f1d4"/>
-#
-# Returns:
-# This function returns target component of given interface.
-def find_target_component(component_uid, file_content):
-    # empty placeholder
-    target_component = ""
-
-    # search for uid in file content
-    for i in range(0, len(file_content)):
-
-        # if uid within the line
-        if ("<OBJECT>" in file_content[i]) and ("<ID name=" in file_content[i + 1]) and\
-                (component_uid in file_content[i + 1]):
-
-            # search for component definition
-            for j in range(i + 1, len(file_content)):
-
-                # if given line contains definition of component name
-                if ("<ID name=" in file_content[j]) and ("Standard.Component" in file_content[j]):
-                    # get copy of line
-                    line = file_content[j]
-                    # get target component
-                    target_component = get_name(line)
-                    # exit "for j in range" loop
-                    break
-
-            # exit "for i in range" loop
-            break
-
-    # if component is not found
-    if target_component == "":
-        # set error component
-        target_component = "$##TARGET##COMPONENT##NOT##FOUND##$"
-
-    # return component
-    return target_component
-
-
-# Function:
-# find_target_interface()
-#
-# Description:
-# This function looks for target interface of given component, basing on interface uid, within
-# line of .exml file, an example of .exml file line:
-# <ID name="" mc="Standard.InstanceNode" uid="e531e463-60f0-49ad-aca8-270c6d97f1d4"/>
-#
-# Returns:
-# This function returns target interface of given component.
-def find_target_interface(interface_uid, file_content):
-    # empty placeholder
-    target_interface = ""
-
-    # search for uid in file content
-    for i in range(0, len(file_content)):
-
-        # if uid within the line
-        if ("<OBJECT>" in file_content[i]) and ("<ID name=" in file_content[i + 1]) and\
-                (interface_uid in file_content[i + 1]):
-
-            # search for component definition
-            for j in range(i + 1, len(file_content)):
-
-                # if given line contains definition of component name
-                if ("<ID name=" in file_content[j]) and ("Standard.Interface" in file_content[j]):
-                    # get copy of line
-                    line = file_content[j]
-                    # get target interface
-                    target_interface = get_name(line)
-                    # exit "for j in range" loop
-                    break
-
-            # exit "for i in range" loop
-            break
-
-    # if interface is not found
-    if target_interface == "":
-        # set error interface
-        target_interface = "$##TARGET##INTERFACE##NOT##FOUND##$"
-
-    # return interface
-    return target_interface
+    # return list of target elements
+    return target_element_list
 
 
 # Function:

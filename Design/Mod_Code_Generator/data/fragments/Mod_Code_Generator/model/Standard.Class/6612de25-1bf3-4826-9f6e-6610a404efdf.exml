@@ -59,20 +59,6 @@
           <DEPENDENCIES></DEPENDENCIES>
         </OBJECT>
         <OBJECT>
-          <ID name="find_target_signal" mc="Standard.Operation" uid="8703098d-4e49-4b19-9a27-1f2f5f6c2dc1"/>
-          <ATTRIBUTES>
-            <ATT name="Concurrency">false</ATT>
-            <ATT name="Final">false</ATT>
-            <ATT name="Passing">MethodOut</ATT>
-            <ATT name="Visibility">Public</ATT>
-            <ATT name="IsClass">false</ATT>
-            <ATT name="IsAbstract">false</ATT>
-            <ATT name="Name"><![CDATA[find_target_signal]]></ATT>
-            <ATT name="status">1970354901745664</ATT>
-          </ATTRIBUTES>
-          <DEPENDENCIES></DEPENDENCIES>
-        </OBJECT>
-        <OBJECT>
           <ID name="get_name" mc="Standard.Operation" uid="3922907e-40b7-415f-aa00-b4496e71d817"/>
           <ATTRIBUTES>
             <ATT name="Concurrency">false</ATT>
@@ -101,7 +87,7 @@
           <DEPENDENCIES></DEPENDENCIES>
         </OBJECT>
         <OBJECT>
-          <ID name="find_target_component" mc="Standard.Operation" uid="c0683232-f7ef-4a1b-84e2-a83a8bf61f5f"/>
+          <ID name="find_target_element" mc="Standard.Operation" uid="c0683232-f7ef-4a1b-84e2-a83a8bf61f5f"/>
           <ATTRIBUTES>
             <ATT name="Concurrency">false</ATT>
             <ATT name="Final">false</ATT>
@@ -109,21 +95,7 @@
             <ATT name="Visibility">Public</ATT>
             <ATT name="IsClass">false</ATT>
             <ATT name="IsAbstract">false</ATT>
-            <ATT name="Name"><![CDATA[find_target_component]]></ATT>
-            <ATT name="status">1970354901745664</ATT>
-          </ATTRIBUTES>
-          <DEPENDENCIES></DEPENDENCIES>
-        </OBJECT>
-        <OBJECT>
-          <ID name="find_target_interface" mc="Standard.Operation" uid="535e98a0-d30e-4032-acf5-5928bdec7268"/>
-          <ATTRIBUTES>
-            <ATT name="Concurrency">false</ATT>
-            <ATT name="Final">false</ATT>
-            <ATT name="Passing">MethodOut</ATT>
-            <ATT name="Visibility">Public</ATT>
-            <ATT name="IsClass">false</ATT>
-            <ATT name="IsAbstract">false</ATT>
-            <ATT name="Name"><![CDATA[find_target_interface]]></ATT>
+            <ATT name="Name"><![CDATA[find_target_element]]></ATT>
             <ATT name="status">1970354901745664</ATT>
           </ATTRIBUTES>
           <DEPENDENCIES></DEPENDENCIES>

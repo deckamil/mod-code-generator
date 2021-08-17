@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           16 AUG 2021
+#   DATE:           17 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -80,13 +80,15 @@ def read_interface_targets(file_content, node_list, interface_list):
                         # get component uid
                         component_uid = mcg_cc_supporter.get_uid(line)
                         # find target component
-                        target_component = mcg_cc_supporter.find_target_component(component_uid, file_content)
-                        # check if target component was found
-                        if "$##TARGET##COMPONENT##NOT##FOUND##$" in target_component:
+                        target_component_list = mcg_cc_supporter.find_target_element(component_uid,
+                                                                                     "Standard.Component",
+                                                                                     file_content)
+                        # if target component was not found
+                        if "NOT_FOUND" in target_component_list[0]:
                             # record error
                             mcg_cc_error_handler.record_error(29, component_uid)
                         # append node to list of nodes
-                        node_list.append(str(interface_type) + " target " + str(target_component))
+                        node_list.append(str(interface_type) + " target " + str(target_component_list[1]))
 
                 # if line contains </COMP> that means end of targets for given interface
                 if "</COMP>" in file_content[j]:
@@ -144,19 +146,22 @@ def read_component_targets(file_content, node_list, component_list):
                         # get target uid
                         target_uid = mcg_cc_supporter.get_uid(line)
                         # find target component
-                        target_component = mcg_cc_supporter.find_target_component(target_uid, file_content)
+                        target_component_list = mcg_cc_supporter.find_target_element(target_uid,
+                                                                                     "Standard.Component",
+                                                                                     file_content)
                         # find target interface
-                        target_interface = mcg_cc_supporter.find_target_interface(target_uid, file_content)
-                        # check if target element was found
-                        if ("$##TARGET##COMPONENT##NOT##FOUND##$" in target_component) and \
-                                ("$##TARGET##INTERFACE##NOT##FOUND##$" in target_interface):
+                        target_interface_list = mcg_cc_supporter.find_target_element(target_uid,
+                                                                                     "Standard.Interface",
+                                                                                     file_content)
+                        # if target element was not found
+                        if ("NOT_FOUND" in target_component_list[0]) and ("NOT_FOUND" in target_interface_list[0]):
                             # record error
                             mcg_cc_error_handler.record_error(181, target_uid)
                         # select target element for node
-                        if "$##TARGET##COMPONENT##NOT##FOUND##$" in target_component:
-                            target_element = target_interface
+                        if "NOT_FOUND" in target_component_list[0]:
+                            target_element = target_interface_list[1]
                         else:
-                            target_element = target_component
+                            target_element = target_component_list[1]
                         # append node to list of nodes
                         node_list.append(str(component_name) + " target " + str(target_element))
 
