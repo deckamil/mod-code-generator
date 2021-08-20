@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 JUL 2021
+#   DATE:           20 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -280,7 +280,7 @@ def process_components(path):
             component_source, component_name = mcg_cc_component_reader.read_component(adpl)
 
         # check errors
-        mcg_cc_error_handler.check_errors()
+        mcg_cc_error_handler.check_errors(component_source, component_name)
 
         # if node list is not empty, then sort nodes
         if len(node_list) > 0:
@@ -291,7 +291,7 @@ def process_components(path):
                                                                       component_name)
 
             # check errors
-            mcg_cc_error_handler.check_errors()
+            mcg_cc_error_handler.check_errors(component_source, component_name)
 
             # if sorted list of nodes is not empty, then convert nodes
             if len(sorted_node_list) > 0:

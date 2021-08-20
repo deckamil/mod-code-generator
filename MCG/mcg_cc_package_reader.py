@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 AUG 2021
+#   DATE:           20 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -46,10 +46,12 @@ def read_interface_targets(file_content, node_list, interface_list):
 
         # if given line contains definition of interface type
         if ("<ID name=" in file_content[i]) and ("Standard.Interface" in file_content[i]):
-            # get copy of line
+            # get line
             line = file_content[i]
+            # get line number
+            line_number = i + 1
             # get interface type
-            interface_type = mcg_cc_supporter.get_name(line)
+            interface_type = mcg_cc_supporter.get_name(line, line_number)
             # append interface type to list of interfaces
             interface_list.append(interface_type)
 
@@ -77,8 +79,10 @@ def read_interface_targets(file_content, node_list, interface_list):
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
                         # get line
                         line = file_content[j + 2]
+                        # get line number
+                        line_number = j + 3
                         # get component uid
-                        component_uid = mcg_cc_supporter.get_uid(line)
+                        component_uid = mcg_cc_supporter.get_uid(line, line_number)
                         # find target component
                         target_component_list = mcg_cc_supporter.find_target_element(component_uid,
                                                                                      "Standard.Component",
@@ -86,7 +90,7 @@ def read_interface_targets(file_content, node_list, interface_list):
                         # if target component was not found
                         if "NOT_FOUND" in target_component_list[0]:
                             # record error
-                            mcg_cc_error_handler.record_error(29, component_uid)
+                            mcg_cc_error_handler.record_error(172, component_uid, interface_type)
                         # append node to list of nodes
                         node_list.append(str(interface_type) + " target " + str(target_component_list[1]))
 
@@ -112,10 +116,12 @@ def read_component_targets(file_content, node_list, component_list):
 
         # if given line contains definition of component name
         if ("<ID name=" in file_content[i]) and ("Standard.Component" in file_content[i]):
-            # get copy of line
+            # get line
             line = file_content[i]
+            # get line number
+            line_number = i + 1
             # get interface type
-            component_name = mcg_cc_supporter.get_name(line)
+            component_name = mcg_cc_supporter.get_name(line, line_number)
             # append component name to list of components
             component_list.append(component_name)
 
@@ -133,7 +139,7 @@ def read_component_targets(file_content, node_list, component_list):
                 # if line contains </DEPENDENCIES> then component does not have any target
                 if ("</DEPENDENCIES>" in file_content[j]) and (not component_has_targets):
                     # record error
-                    mcg_cc_error_handler.record_error(180, component_name)
+                    mcg_cc_error_handler.record_error(170, component_name, "none")
                     # exit "for j in range" loop
                     break
 
@@ -143,8 +149,10 @@ def read_component_targets(file_content, node_list, component_list):
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
                         # get line
                         line = file_content[j + 2]
+                        # get line number
+                        line_number = j + 3
                         # get target uid
-                        target_uid = mcg_cc_supporter.get_uid(line)
+                        target_uid = mcg_cc_supporter.get_uid(line, line_number)
                         # find target component
                         target_component_list = mcg_cc_supporter.find_target_element(target_uid,
                                                                                      "Standard.Component",
@@ -156,7 +164,7 @@ def read_component_targets(file_content, node_list, component_list):
                         # if target element was not found
                         if ("NOT_FOUND" in target_component_list[0]) and ("NOT_FOUND" in target_interface_list[0]):
                             # record error
-                            mcg_cc_error_handler.record_error(181, target_uid)
+                            mcg_cc_error_handler.record_error(171, target_uid, component_name)
                         # select target element for node
                         if "NOT_FOUND" in target_component_list[0]:
                             target_element = target_interface_list[1]
@@ -237,13 +245,13 @@ def read_interfaces(path, package_name):
                     # if given line contains definition of signal name
                     if ("<ID name=" in line) and ("Standard.Attribute" in line):
                         # get signal name
-                        signal_name = mcg_cc_supporter.get_name(line)
+                        signal_name = mcg_cc_supporter.get_name(line, "unknown")
                         # append signal name to signal
                         signal.append(signal_name)
                     # if given line contain definition of signal type
                     if ("<ID name=" in line) and ("Standard.DataType" in line):
                         # get signal type
-                        signal_type = mcg_cc_supporter.get_name(line)
+                        signal_type = mcg_cc_supporter.get_name(line, "unknown")
                         # append signal type to signal
                         signal.append(signal_type)
                         # append signal to input interface list
@@ -278,13 +286,13 @@ def read_interfaces(path, package_name):
                     # if given line contains definition of signal name
                     if ("<ID name=" in line) and ("Standard.Attribute" in line):
                         # get signal name
-                        signal_name = mcg_cc_supporter.get_name(line)
+                        signal_name = mcg_cc_supporter.get_name(line, "unknown")
                         # append signal name to signal
                         signal.append(signal_name)
                     # if given line contain definition of signal type
                     if ("<ID name=" in line) and ("Standard.DataType" in line):
                         # get signal type
-                        signal_type = mcg_cc_supporter.get_name(line)
+                        signal_type = mcg_cc_supporter.get_name(line, "unknown")
                         # append signal type to signal
                         signal.append(signal_type)
                         # append signal to output interface list
@@ -302,12 +310,12 @@ def read_interfaces(path, package_name):
     # if input interface element was not found
     if not input_interface_found:
         # record error
-        mcg_cc_error_handler.record_error(43, package_name)
+        mcg_cc_error_handler.record_error(123, "none", "none")
 
     # if output interface element was not found
     if not output_interface_found:
         # record error
-        mcg_cc_error_handler.record_error(44, package_name)
+        mcg_cc_error_handler.record_error(124, "none", "none")
 
     return input_interface_list, output_interface_list
 
@@ -329,8 +337,6 @@ def read_package(path):
     component_list = []
     input_interface_list = []
     output_interface_list = []
-    package_source = ""
-    package_name = ""
 
     # activity diagram path
     activity_diagram_path = path
@@ -341,26 +347,28 @@ def read_package(path):
     file_content = [x.strip() for x in file_content]
     file.close()
 
-    # search for model element name and type in file content, i.e. find out if file content contains component data
-    model_element_name, model_element_type = mcg_cc_supporter.find_model_element(file_content)
-
-    # if file content contains package data
-    if "Standard.Package" in model_element_type:
-
-        # find package source, i.e. name of exml file
-        package_source = activity_diagram_path[
+    # find model element source, i.e. name of exml file
+    model_element_source = activity_diagram_path[
                            len(activity_diagram_path) - EXML_FILE_NAME_LENGTH:len(activity_diagram_path)]
 
-        # package name is same as model element name
-        package_name = model_element_name
+    # search for model element name and type in file content, i.e. find out if file content contains package data
+    model_element_list = mcg_cc_supporter.find_model_element(file_content)
+
+    # extract data from model element list
+    model_element_found = model_element_list[0]
+    model_element_name = model_element_list[1]
+    model_element_type = model_element_list[2]
+
+    # if file content contains package data
+    if ("NOT_FOUND" not in model_element_found) and ("Standard.Package" in model_element_type):
 
         # package reading
         print("****************************** PACKAGE READING *****************************")
         print()
 
         # print component details
-        print("Package Source:      " + str(package_source))
-        print("Package Name:        " + str(package_name))
+        print("Package Source:      " + str(model_element_source))
+        print("Package Name:        " + str(model_element_name))
 
         # record list of nodes
         print("*** RECORD NODES ***")
@@ -369,14 +377,14 @@ def read_package(path):
         node_list, interface_list = read_interface_targets(file_content, node_list, interface_list)
 
         # search for component targets within diagram content
-        # node_list, component_list = read_component_targets(file_content, node_list, component_list)
+        node_list, component_list = read_component_targets(file_content, node_list, component_list)
 
         # list of nodes recorded
         print("*** NODES RECORDED ***")
         print()
 
         # open and read interface file
-        input_interface_list, output_interface_list = read_interfaces(path, package_name)
+        input_interface_list, output_interface_list = read_interfaces(path, model_element_name)
 
         # display additional details after component reading for test run
         if MCG_CC_TEST_RUN:
@@ -410,6 +418,11 @@ def read_package(path):
         print("************************** END OF PACKAGE READING **************************")
         print()
 
+    # else if neither component nor package data was found in file content
+    elif "NOT_FOUND" in model_element_found:
+        # record error
+        mcg_cc_error_handler.record_error(270, "none", "none", model_element_source)
+
     # return collected data
     return node_list, interface_list, component_list, input_interface_list, output_interface_list, \
-        package_source, package_name
+        model_element_source, model_element_name

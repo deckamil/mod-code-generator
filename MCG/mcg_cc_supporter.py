@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 AUG 2021
+#   DATE:           20 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -45,7 +45,7 @@ from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 #
 # Returns:
 # This function returns name of action, signal, signal type or model element.
-def get_name(line):
+def get_name(line, line_number):
 
     # find position of name within the line
     name_position = line.find("name")
@@ -55,9 +55,9 @@ def get_name(line):
     # check if <name> and <mc> position is found
     if (name_position == -1) or (mc_position == -1):
         # record error
-        mcg_cc_error_handler.record_error(102, "none")
+        mcg_cc_error_handler.record_error(271, line_number, "none")
         # set error name
-        name = "ERROR_NAME"
+        name = "NAME_NOT_FOUND"
     else:
         # get name
         name = line[name_position + NAME_START_OFFSET:mc_position + NAME_END_OFFSET]
@@ -76,7 +76,7 @@ def get_name(line):
 #
 # Returns:
 # This function returns uid of action or signal.
-def get_uid(line):
+def get_uid(line, line_number):
 
     # find position of uid within the line
     uid_position = line.find("uid")
@@ -84,9 +84,9 @@ def get_uid(line):
     # check if <uid> position is found
     if uid_position == -1:
         # record error
-        mcg_cc_error_handler.record_error(103, "none")
+        mcg_cc_error_handler.record_error(272, line_number, "none")
         # set error uid
-        uid = "ERROR_UID"
+        uid = "UID_NOT_FOUND"
     else:
         # get uid
         uid = line[uid_position + UID_START_OFFSET:len(line) + UID_END_OFFSET]
@@ -107,9 +107,10 @@ def get_uid(line):
 # Returns:
 # This function returns model element name and model element type.
 def find_model_element(file_content):
-    # empty model element name and type placeholders
+    # empty placeholders
     model_element_name = ""
     model_element_type = ""
+    model_element_list = []
 
     # search for model element name and type in file content
     for i in range(0, len(file_content)):
@@ -118,8 +119,10 @@ def find_model_element(file_content):
         if ("Standard.Activity" in file_content[i]) and ("Standard.Component" in file_content[i+1]):
             # get line
             line = file_content[i+1]
+            # get line number
+            line_number = i + 2
             # get model element name
-            model_element_name = get_name(line)
+            model_element_name = get_name(line, line_number)
             # set model element type
             model_element_type = "Standard.Component"
             # exit "for i in range" loop
@@ -127,8 +130,10 @@ def find_model_element(file_content):
         elif ("Standard.Activity" in file_content[i]) and ("Standard.Package" in file_content[i+1]):
             # get line
             line = file_content[i+1]
+            # get line number
+            line_number = i + 2
             # get model element name
-            model_element_name = get_name(line)
+            model_element_name = get_name(line, line_number)
             # set model element type
             model_element_type = "Standard.Package"
             # exit "for i in range" loop
@@ -140,14 +145,23 @@ def find_model_element(file_content):
 
     # if model element name or type is not found
     if (model_element_name == "") or (model_element_type == ""):
-        # record error
-        mcg_cc_error_handler.record_error(101, "none")
-        # set error model element name and type
-        model_element_name = "ERROR_MODEL_ELEMENT_NAME"
-        model_element_type = "ERROR_MODEL_ELEMENT_TYPE"
+        # set model element name
+        model_element_name = "MODEL_ELEMENT_NAME_NOT_FOUND"
+        # set model element type
+        model_element_type = "MODEL_ELEMENT_TYPE_NOT_FOUND"
+        # append "not found" info to list of model elements
+        model_element_list.append("NOT_FOUND")
+    else:
+        # append "found" info to list of model elements
+        model_element_list.append("FOUND")
+
+    # append model element name to list of model elements
+    model_element_list.append(model_element_name)
+    # append model element type to list of model elements
+    model_element_list.append(model_element_type)
 
     # return element type and name
-    return model_element_name, model_element_type
+    return model_element_list
 
 
 # Function:
@@ -197,9 +211,9 @@ def find_first_input_signal(action_uid, file_content):
     # if signal is not found
     if first_input_signal == "":
         # record error
-        mcg_cc_error_handler.record_error(31, action_uid)
+        mcg_cc_error_handler.record_error(22, action_uid)
         # set error signal
-        first_input_signal = "ERROR_SIGNAL"
+        first_input_signal = "FIRST_INPUT_SIGNAL_NOT_FOUND"
 
     # return first input signal
     return first_input_signal
@@ -232,10 +246,12 @@ def find_target_element(target_element_uid, target_element_type, file_content):
 
                 # if given line contains definition of target element
                 if ("<ID name=" in file_content[j]) and (target_element_type in file_content[j]):
-                    # get copy of line
+                    # get line
                     line = file_content[j]
+                    # get line number
+                    line_number = j + 1
                     # get target element name
-                    target_element_name = get_name(line)
+                    target_element_name = get_name(line, line_number)
                     # append "found" info to list of target elements
                     target_element_list.append("FOUND")
                     # append target element name to list of target elements
