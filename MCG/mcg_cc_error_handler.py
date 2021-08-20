@@ -63,12 +63,10 @@ def record_error(error_code, info1, info2):
 
     elif error_code == 22:
         # set error notification
-        display = "ERROR " + str(error_code) + ": Could not find first input signal for action with uid=" + \
+        error = "ERROR " + str(error_code) + ": Could not find first input signal for action with uid=" + \
                   str(info1) + " within component content"
-        # display error notification
-        print(display)
         # append error to error list
-        error_list.append(display)
+        error_list.append(error)
 
     # ACTIONS errors, range 51-100
     elif error_code == 51:
