@@ -131,8 +131,8 @@ def record_error(error_code, error_info1, error_info2):
 
     elif error_code == 171:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target element with uid=" + str(error_info1) + \
-                " for component " + str(error_info2) + " within package content"
+        error = "ERROR " + str(error_code) + ": Could not find target component or interface with uid=" + \
+                str(error_info1) + " for component " + str(error_info2) + " within package content"
         # append error to error list
         error_list.append(error)
 
