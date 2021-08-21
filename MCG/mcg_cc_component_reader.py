@@ -30,19 +30,21 @@ import mcg_cc_error_handler
 import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
+from mcg_cc_parameters import ACTION_UID_OFFSET
 
 actions_with_first_input_signals = "SUB - "
+allowed_actions = "ADD - SUB - "
 
 
 # Function:
-# check_signals_correctness()
+# check_component_correctness()
 #
 # Description:
-# This function checks correctness of signals from signal list.
+# This function checks correctness of component data.
 #
 # Returns:
 # This function does not return anything.
-def check_signals_correctness(signal_list, node_list):
+def check_component_correctness(signal_list, action_list, node_list):
     # check is some signal has more tha one source
     for s in signal_list:
         keyword = "target " + str(s)
@@ -61,19 +63,9 @@ def check_signals_correctness(signal_list, node_list):
             # record error
             mcg_cc_error_handler.record_error(1, s, "none")
 
-
-# Function:
-# check_actions_correctness()
-#
-# Description:
-# This function checks correctness of actions from action list.
-#
-# Returns:
-# This function does not return anything.
-def check_actions_correctness(action_list, node_list):
     # check if some actions are not recognized
     for a in action_list:
-        if ("ADD" not in a) and ("SUB" not in a):
+        if a[0:len(a) + ACTION_UID_OFFSET] not in allowed_actions:
             # record error
             mcg_cc_error_handler.record_error(51, a, "none")
 
@@ -431,11 +423,8 @@ def read_component(path):
         # open and read interface file
         input_interface_list, output_interface_list, local_parameter_list = read_interfaces(path, model_element_name)
 
-        # check signals correctness
-        check_signals_correctness(signal_list, node_list)
-
-        # check actions correctness
-        check_actions_correctness(action_list, node_list)
+        # check component correctness
+        check_component_correctness(signal_list, action_list, node_list)
 
         # display additional details after component reading for test run
         if MCG_CC_TEST_RUN:
