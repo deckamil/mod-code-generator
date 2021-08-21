@@ -291,7 +291,7 @@ def process_components(path):
                                                                       component_name)
 
             # check errors
-            mcg_cc_error_handler.check_errors(component_source, component_name)
+            mcg_cc_error_handler.check_errors(component_source, component_name, component_type)
 
             # if sorted list of nodes is not empty, then convert nodes
             if len(sorted_node_list) > 0:
