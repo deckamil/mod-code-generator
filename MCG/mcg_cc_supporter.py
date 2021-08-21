@@ -99,9 +99,8 @@ def get_uid(line, line_number):
 # find_model_element()
 #
 # Description:
-# This function looks for <name> and <mc> elements within line of .exml file, which define
-# model element name and model element type (i.e. information whether file content contains
-# data of model component or model package), an example of .exml file line:
+# This function looks model element name and model element type (i.e. information whether file content
+# contains data of model component or model package) within content of .exml file, an example of .exml file line:
 # <PID name="DataSeparator" mc="Standard.Component" uid="a291290d-4d60-4daa-b606-1eda25d2ecda"/>
 #
 # Returns:
@@ -159,8 +158,8 @@ def find_model_element(file_content):
 # find_first_input_signal()
 #
 # Description:
-# This function looks for first input signal, recognized by *FIRST* marker, of given action uid within
-# line of .exml file. In case of some type of actions the order of input signals, which take part in action
+# This function looks for first input signal, recognized by *FIRST* marker, of given target action within
+# content of .exml file. In case of some type of actions the order of input signals, which take part in action
 # calculation can influence on action results. In such case it is important to distinguish first input
 # signal of given action, therefore this function is responsible for finding of such signal in .exml file,
 # an example of .exml file line:
@@ -215,7 +214,7 @@ def find_first_input_signal(target_action, target_action_uid, file_content):
 #
 # Description:
 # This function looks for name of target element, basing on target element type and its uid, within
-# line of .exml file, an example of .exml file line:
+# content of .exml file, an example of .exml file line:
 # <ID name="input3" mc="Standard.Attribute" uid="338540aa-439c-4dc7-8414-a275ba3c08e1"/>
 #
 # Returns:
@@ -271,7 +270,7 @@ def find_target_element(target_element_uid, target_element_type, file_content):
 #
 # Description:
 # This function looks for name and type of interface signals for given component or package, within
-# line of .exml file, an example of .exml file line:
+# content of .exml file, an example of .exml file line:
 # <ID name="loc_add_result" mc="Standard.Attribute" uid="47398f97-728c-4e18-aa19-d36a5c099ba7"/>
 # <ID name="INT16" mc="Standard.DataType" uid="e7213c05-8c48-4585-8bc5-cc8690ffd6be"/>
 #
