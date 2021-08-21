@@ -415,4 +415,4 @@ def read_package(path):
 
     # return collected data
     return node_list, interface_list, component_list, input_interface_list, output_interface_list, \
-        model_element_source, model_element_name
+        model_element_source, model_element_name, model_element_type

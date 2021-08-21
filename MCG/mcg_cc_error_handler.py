@@ -182,15 +182,16 @@ def record_error(error_code, error_info1, error_info2):
 #
 # Returns:
 # This function does not return anything.
-def check_errors(model_element_source, model_element_name):
+def check_errors(model_element_source, model_element_name, model_element_type):
 
     # check errors
     print("******************************** ERROR CHECK *******************************")
     print()
 
     # print model element details
-    print("Component Source:    " + str(model_element_source))
-    print("Component Name:      " + str(model_element_name))
+    print("Model Element Source:    " + str(model_element_source))
+    print("Model Element Name:      " + str(model_element_name))
+    print("Model Element Type:      " + str(model_element_type))
 
     # if any error was recorded
     print("*** CHECK ERRORS ***")

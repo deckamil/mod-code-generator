@@ -557,4 +557,4 @@ def read_component(path):
 
     # return collected data
     return node_list, action_list, signal_list, input_interface_list, output_interface_list, local_parameter_list, \
-        model_element_source, model_element_name
+        model_element_source, model_element_name, model_element_type
