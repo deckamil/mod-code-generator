@@ -274,11 +274,10 @@ def read_action_targets(file_content, node_list, action_list):
 # This function returns list of input interfaces, output interfaces and local
 # parameters.
 def read_interfaces(path, component_name):
-    # empty placeholders
+    # locals
     input_interface_list = []
     output_interface_list = []
     local_parameter_list = []
-    signal = []
 
     # interface markers show whether interface was found of not
     input_interface_found = False
@@ -307,131 +306,50 @@ def read_interfaces(path, component_name):
         file_content = [x.strip() for x in file_content]
         file.close()
 
-        # search for interface details in file content
-        for i in range(0, len(file_content)):
+        # find interface source, i.e. name of exml file
+        interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
 
-            # if given line contains definition of input interface
-            if ("Input Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
-                    component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
+        # if input interface element has not been found yet
+        if not input_interface_found:
+            # find input interface
+            input_interface_list = mcg_cc_supporter.find_interface_signals("Input Interface", interface_source,
+                                                                           component_name, "Standard.Component",
+                                                                           file_content)
 
-                # input interface is found
+            # if input interface element was found:
+            if "NOT_FOUND" not in input_interface_list[0]:
+                # change input interface marker
                 input_interface_found = True
+                # remove "found" info from list of input interface
+                input_interface_list.remove(input_interface_list[0])
 
-                # print details of input interface file
-                interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
-                print("Interface Source:    " + str(interface_source))
-                print("Interface Type:      Input Interface")
+        # if output interface element has not been found yet
+        if not output_interface_found:
+            # find output interface
+            output_interface_list = mcg_cc_supporter.find_interface_signals("Output Interface", interface_source,
+                                                                            component_name, "Standard.Component",
+                                                                            file_content)
 
-                # record list of input interface signals
-                print("*** RECORD INPUT INTERFACE ***")
-
-                # search for input interface signals
-                for line in file_content:
-                    # if given line contains definition of signal name
-                    if ("<ID name=" in line) and ("Standard.Attribute" in line):
-                        # get signal name
-                        signal_name = mcg_cc_supporter.get_name(line, "unknown")
-                        # append signal name to signal
-                        signal.append(signal_name)
-                    # if given line contain definition of signal type
-                    if ("<ID name=" in line) and ("Standard.DataType" in line):
-                        # get signal type
-                        signal_type = mcg_cc_supporter.get_name(line, "unknown")
-                        # append signal type to signal
-                        signal.append(signal_type)
-                        # append signal to input interface list
-                        input_interface_list.append(signal)
-                        # clear signal placeholder
-                        signal = []
-
-                # list of input interface signals recorded
-                print("*** INPUT INTERFACE RECORDED ***")
-                print()
-
-                # exit "for i in range" loop
-                break
-
-            # else if given line contains definition of output interface
-            elif ("Output Interface" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
-                    component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
-
-                # output interface is found
+            # if output interface element was found:
+            if "NOT_FOUND" not in output_interface_list[0]:
+                # change output interface marker
                 output_interface_found = True
+                # remove "found" info from list of output interface
+                output_interface_list.remove(output_interface_list[0])
 
-                # print details of output interface file
-                interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
-                print("Interface Source:    " + str(interface_source))
-                print("Interface Type:      Output Interface")
+        # if local parameters element has not been found yet
+        if not local_parameters_found:
+            # find local parameters
+            local_parameter_list = mcg_cc_supporter.find_interface_signals("Local Parameters", interface_source,
+                                                                           component_name, "Standard.Component",
+                                                                           file_content)
 
-                # record list of output interface signals
-                print("*** RECORD OUTPUT INTERFACE ***")
-
-                # search for output interface signals
-                for line in file_content:
-                    # if given line contains definition of signal name
-                    if ("<ID name=" in line) and ("Standard.Attribute" in line):
-                        # get signal name
-                        signal_name = mcg_cc_supporter.get_name(line, "unknown")
-                        # append signal name to signal
-                        signal.append(signal_name)
-                    # if given line contain definition of signal type
-                    if ("<ID name=" in line) and ("Standard.DataType" in line):
-                        # get signal type
-                        signal_type = mcg_cc_supporter.get_name(line, "unknown")
-                        # append signal type to signal
-                        signal.append(signal_type)
-                        # append signal to output interface list
-                        output_interface_list.append(signal)
-                        # clear signal placeholder
-                        signal = []
-
-                # list of output interface signals recorded
-                print("*** OUTPUT INTERFACE RECORDED ***")
-                print()
-
-                # exit "for i in range" loop
-                break
-
-            # else if given line contains definition of local parameters
-            elif ("Local Parameters" in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
-                    component_name in file_content[i + 1]) and ("Standard.Component" in file_content[i + 1]):
-
-                # local parameters are found
+            # if local parameters element was found:
+            if "NOT_FOUND" not in local_parameter_list[0]:
+                # change local parameters marker
                 local_parameters_found = True
-
-                # print details of local parameters file
-                interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
-                print("Interface Source:    " + str(interface_source))
-                print("Interface Type:      Local Parameters")
-
-                # record list of local signals
-                print("*** RECORD LOCAL PARAMETERS ***")
-
-                # search for local signals
-                for line in file_content:
-                    # if given line contains definition of signal name
-                    if ("<ID name=" in line) and ("Standard.Attribute" in line):
-                        # get signal name
-                        signal_name = mcg_cc_supporter.get_name(line, "unknown")
-                        # append signal name to signal
-                        signal.append(signal_name)
-                    # if given line contain definition of signal type
-                    if ("<ID name=" in line) and ("Standard.DataType" in line):
-                        # get signal type
-                        signal_type = mcg_cc_supporter.get_name(line, "unknown")
-                        # append signal type to signal
-                        signal.append(signal_type)
-                        # append signal to local parameters list
-                        local_parameter_list.append(signal)
-                        # clear signal placeholder
-                        signal = []
-
-                # list of local signals recorded
-                print("*** LOCAL PARAMETERS RECORDED ***")
-                print()
-
-                # exit "for i in range" loop
-                break
+                # remove "found" info from list of local parameters
+                local_parameter_list.remove(local_parameter_list[0])
 
     # if input interface element was not found
     if not input_interface_found:

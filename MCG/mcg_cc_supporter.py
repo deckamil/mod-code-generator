@@ -267,6 +267,79 @@ def find_target_element(target_element_uid, target_element_type, file_content):
 
 
 # Function:
+# find_interface_signals()
+#
+# Description:
+# This function looks for name and type of interface signals for given component or package, within
+# line of .exml file, an example of .exml file line:
+# <ID name="loc_add_result" mc="Standard.Attribute" uid="47398f97-728c-4e18-aa19-d36a5c099ba7"/>
+# <ID name="INT16" mc="Standard.DataType" uid="e7213c05-8c48-4585-8bc5-cc8690ffd6be"/>
+#
+# Returns:
+# This function returns list of interface signals.
+def find_interface_signals(interface_type, interface_source, model_element_name, model_element_type, file_content):
+    # locals
+    interface_found = False
+    interface_signal = []
+    interface_signal_list = []
+
+    # search for interface details in file content
+    for i in range(0, len(file_content)):
+
+        # if given line contains definition of input interface
+        if (interface_type in file_content[i]) and ("Standard.Interface" in file_content[i]) and (
+                model_element_name in file_content[i + 1]) and (model_element_type in file_content[i + 1]):
+
+            # if interface is found
+            if not interface_found:
+                # change interface found marker
+                interface_found = True
+                # append "found" info to list of interface signals
+                interface_signal_list.append("FOUND")
+
+            # print details of interface file
+            print("Interface Source:    " + str(interface_source))
+            print("Interface Type:      " + str(interface_type))
+
+            # record list of interface signals
+            print("*** RECORD INTERFACE ***")
+
+            # search for input interface signals
+            for line in file_content:
+                # if given line contains definition of signal name
+                if ("<ID name=" in line) and ("Standard.Attribute" in line):
+                    # get signal name
+                    signal_name = get_name(line, "unknown")
+                    # append signal name to signal
+                    interface_signal.append(signal_name)
+                # if given line contain definition of signal type
+                if ("<ID name=" in line) and ("Standard.DataType" in line):
+                    # get signal type
+                    signal_type = get_name(line, "unknown")
+                    # append signal type to signal
+                    interface_signal.append(signal_type)
+                    # append interface signal to interface list
+                    interface_signal_list.append(interface_signal)
+                    # clear interface signal
+                    interface_signal = []
+
+            # list of interface signals recorded
+            print("*** INTERFACE RECORDED ***")
+            print()
+
+            # exit "for i in range" loop
+            break
+
+    # if interface is not found
+    if not interface_found:
+        # append "not found" info to list of interface signals
+        interface_signal_list.append("NOT_FOUND")
+
+    # return list of interface signals
+    return interface_signal_list
+
+
+# Function:
 # find_output_signal()
 #
 # Description:
