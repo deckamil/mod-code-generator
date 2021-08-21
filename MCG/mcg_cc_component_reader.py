@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 AUG 2021
+#   DATE:           21 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,6 +30,8 @@ import mcg_cc_error_handler
 import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
+
+actions_with_first_input_signals = "SUB - "
 
 
 # Function:
@@ -136,10 +138,11 @@ def read_signal_targets(file_content, node_list, signal_list):
                         first_input_signal_needed = False
 
                         # if it is SUB action then find first input signal in SUB arithmetic operation
-                        if "SUB" in action_name:
+                        if action_name in actions_with_first_input_signals:
 
                             # find first input signal in file content
-                            first_input_signal = mcg_cc_supporter.find_first_input_signal(action_uid, file_content)
+                            first_input_signal = mcg_cc_supporter.find_first_input_signal(target_action,
+                                                                                          action_uid, file_content)
 
                             # if first input signal is same as current node signal
                             if signal_name in first_input_signal:
@@ -232,7 +235,7 @@ def read_action_targets(file_content, node_list, action_list):
                     # if action is target of given action
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.OpaqueAction" in file_content[j + 2]):
                         # record error
-                        mcg_cc_error_handler.record_error(81, action, "none")
+                        mcg_cc_error_handler.record_error(80, action, "none")
 
                     # if signal is target of given action
                     if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):

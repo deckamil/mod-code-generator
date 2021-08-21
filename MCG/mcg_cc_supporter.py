@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 AUG 2021
+#   DATE:           21 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -177,7 +177,7 @@ def find_model_element(file_content):
 #
 # Returns:
 # This function returns first input signal name of given action.
-def find_first_input_signal(action_uid, file_content):
+def find_first_input_signal(target_action, target_action_uid, file_content):
     # empty placeholder
     first_input_signal = ""
 
@@ -187,7 +187,7 @@ def find_first_input_signal(action_uid, file_content):
         # if given line contains definition of action
         if ("<OBJECT>" in file_content[k]) and ("<ID name=" in file_content[k + 1]) and (
                 "Standard.OpaqueAction" in file_content[k + 1]) and (
-                action_uid in file_content[k + 1]):
+                target_action_uid in file_content[k + 1]):
 
             # search for first input signal to above action
             for l in range(k, len(file_content)):
@@ -211,7 +211,7 @@ def find_first_input_signal(action_uid, file_content):
     # if signal is not found
     if first_input_signal == "":
         # record error
-        mcg_cc_error_handler.record_error(22, action_uid)
+        mcg_cc_error_handler.record_error(22, target_action, "none")
         # set error signal
         first_input_signal = "FIRST_INPUT_SIGNAL_NOT_FOUND"
 

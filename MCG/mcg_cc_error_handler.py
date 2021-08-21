@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 AUG 2021
+#   DATE:           21 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -37,56 +37,56 @@ error_list = []
 #
 # Returns:
 # This function does not return anything.
-def record_error(error_code, info1, info2):
+def record_error(error_code, error_info1, error_info2):
 
     # SIGNAL errors, range 1-50
     if error_code == 1:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Signal " + str(info1) + " has more than one source within " \
+        error = "ERROR " + str(error_code) + ": Signal " + str(error_info1) + " has more than one source within " \
                                                                         "component content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 20:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target signal with uid=" + str(info1) + \
-                " for signal " + str(info2) + " within component content"
+        error = "ERROR " + str(error_code) + ": Could not find target signal with uid=" + str(error_info1) + \
+                " for signal " + str(error_info2) + " within component content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 21:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target signal with uid=" + str(info1) + \
-                " for action " + str(info2) + " within component content"
+        error = "ERROR " + str(error_code) + ": Could not find target signal with uid=" + str(error_info1) + \
+                " for action " + str(error_info2) + " within component content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 22:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find first input signal for action with uid=" + \
-                  str(info1) + " within component content"
+        error = "ERROR " + str(error_code) + ": Could not find first input signal for action " + \
+                  str(error_info1) + " within component content"
         # append error to error list
         error_list.append(error)
 
     # ACTIONS errors, range 51-100
     elif error_code == 51:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Action " + str(info1) + " is not recognized as valid one within " \
-                                                                        "component content"
+        error = "ERROR " + str(error_code) + ": Action " + str(error_info1) + \
+                " is not recognized as valid one within component content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 70:
         # set error notification
         error = "ERROR " + str(error_code) + ": Could not find any target for action " + \
-                str(info1) + " within component content"
+                str(error_info1) + " within component content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 80:
         # set error notification
         error = "ERROR " + str(error_code) + ": Another action is target of action " + \
-                str(info1) + " within component content"
+                str(error_info1) + " within component content"
         # append error to error list
         error_list.append(error)
 
@@ -125,21 +125,21 @@ def record_error(error_code, info1, info2):
     elif error_code == 170:
         # set error notification
         error = "ERROR " + str(error_code) + ": Could not find any target for component " + \
-                str(info1) + " within package content"
+                str(error_info1) + " within package content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 171:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target element with uid=" + str(info1) + \
-                " for component " + str(info2) + " within package content"
+        error = "ERROR " + str(error_code) + ": Could not find target element with uid=" + str(error_info1) + \
+                " for component " + str(error_info2) + " within package content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 172:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target component with uid=" + str(info1) + \
-                " for interface " + str(info2) + " within package content"
+        error = "ERROR " + str(error_code) + ": Could not find target component with uid=" + str(error_info1) + \
+                " for interface " + str(error_info2) + " within package content"
         # append error to error list
         error_list.append(error)
 
@@ -155,22 +155,22 @@ def record_error(error_code, info1, info2):
     elif error_code == 271:
         # set error notification
         error = "ERROR " + str(error_code) + ": Could not find <name> element at line " + \
-                str(info1) + " within file content"
+                str(error_info1) + " within file content"
         # append error to error list
         error_list.append(error)
 
     elif error_code == 272:
         # set error notification
         error = "ERROR " + str(error_code) + ": Could not find <uid> element at line " + \
-                str(info1) + " within file content"
+                str(error_info1) + " within file content"
         # append error to error list
         error_list.append(error)
 
     else:
-        # display error notification
-        print("UNKNOWN ERROR: Error code not recognized")
+        # set error notification
+        error = "UNKNOWN ERROR " + str(error_code) + ": Error code not recognized"
         # append error to error list
-        error_list.append(-1)
+        error_list.append(error)
 
 
 # Function:
