@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 AUG 2021
+#   DATE:           21 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -352,15 +352,10 @@ def read_package(path):
                            len(activity_diagram_path) - EXML_FILE_NAME_LENGTH:len(activity_diagram_path)]
 
     # search for model element name and type in file content, i.e. find out if file content contains package data
-    model_element_list = mcg_cc_supporter.find_model_element(file_content)
-
-    # extract data from model element list
-    model_element_found = model_element_list[0]
-    model_element_name = model_element_list[1]
-    model_element_type = model_element_list[2]
+    model_element_name, model_element_type = mcg_cc_supporter.find_model_element(file_content)
 
     # if file content contains package data
-    if ("NOT_FOUND" not in model_element_found) and ("Standard.Package" in model_element_type):
+    if "Standard.Package" in model_element_type:
 
         # package reading
         print("****************************** PACKAGE READING *****************************")
@@ -417,11 +412,6 @@ def read_package(path):
         # end of component reading
         print("************************** END OF PACKAGE READING **************************")
         print()
-
-    # else if neither component nor package data was found in file content
-    elif "NOT_FOUND" in model_element_found:
-        # record error
-        mcg_cc_error_handler.record_error(270, "none", "none", model_element_source)
 
     # return collected data
     return node_list, interface_list, component_list, input_interface_list, output_interface_list, \

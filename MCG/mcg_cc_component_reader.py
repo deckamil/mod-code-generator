@@ -484,15 +484,10 @@ def read_component(path):
                            len(activity_diagram_path) - EXML_FILE_NAME_LENGTH:len(activity_diagram_path)]
 
     # search for model element name and type in file content, i.e. find out if file content contains component data
-    model_element_list = mcg_cc_supporter.find_model_element(file_content)
-
-    # extract data from model element list
-    model_element_found = model_element_list[0]
-    model_element_name = model_element_list[1]
-    model_element_type = model_element_list[2]
+    model_element_name, model_element_type = mcg_cc_supporter.find_model_element(file_content)
 
     # if file content contains component data
-    if ("NOT_FOUND" not in model_element_found) and ("Standard.Component" in model_element_type):
+    if "Standard.Component" in model_element_type:
 
         # component reading
         print("***************************** COMPONENT READING ****************************")
@@ -559,11 +554,6 @@ def read_component(path):
         # end of component reading
         print("************************* END OF COMPONENT READING *************************")
         print()
-
-    # else if neither component nor package data was found in file content
-    elif "NOT_FOUND" in model_element_found:
-        # record error
-        mcg_cc_error_handler.record_error(270, "none", "none")
 
     # return collected data
     return node_list, action_list, signal_list, input_interface_list, output_interface_list, local_parameter_list, \

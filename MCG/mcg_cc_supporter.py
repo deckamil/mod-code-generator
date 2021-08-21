@@ -110,7 +110,6 @@ def find_model_element(file_content):
     # empty placeholders
     model_element_name = ""
     model_element_type = ""
-    model_element_list = []
 
     # search for model element name and type in file content
     for i in range(0, len(file_content)):
@@ -145,23 +144,15 @@ def find_model_element(file_content):
 
     # if model element name or type is not found
     if (model_element_name == "") or (model_element_type == ""):
+        # record error
+        mcg_cc_error_handler.record_error(270, "none", "none")
         # set model element name
         model_element_name = "MODEL_ELEMENT_NAME_NOT_FOUND"
         # set model element type
         model_element_type = "MODEL_ELEMENT_TYPE_NOT_FOUND"
-        # append "not found" info to list of model elements
-        model_element_list.append("NOT_FOUND")
-    else:
-        # append "found" info to list of model elements
-        model_element_list.append("FOUND")
 
-    # append model element name to list of model elements
-    model_element_list.append(model_element_name)
-    # append model element type to list of model elements
-    model_element_list.append(model_element_type)
-
-    # return element type and name
-    return model_element_list
+    # return element name and type
+    return model_element_name, model_element_type
 
 
 # Function:
