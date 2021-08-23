@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           21 AUG 2021
+#   DATE:           23 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -304,17 +304,25 @@ def find_interface_signals(interface_type, interface_source, model_element_name,
             print("*** RECORD INTERFACE ***")
 
             # search for input interface signals
-            for line in file_content:
+            for j in range(0, len(file_content)):
                 # if given line contains definition of signal name
-                if ("<ID name=" in line) and ("Standard.Attribute" in line):
+                if ("<ID name=" in file_content[j]) and ("Standard.Attribute" in file_content[j]):
+                    # get line
+                    line = file_content[j]
+                    # get line number
+                    line_number = j + 1
                     # get signal name
-                    signal_name = get_name(line, "unknown")
+                    signal_name = get_name(line, line_number)
                     # append signal name to signal
                     interface_signal.append(signal_name)
                 # if given line contain definition of signal type
-                if ("<ID name=" in line) and ("Standard.DataType" in line):
+                if ("<ID name=" in file_content[j]) and ("Standard.DataType" in file_content[j]):
+                    # get line
+                    line = file_content[j]
+                    # get line number
+                    line_number = j +1
                     # get signal type
-                    signal_type = get_name(line, "unknown")
+                    signal_type = get_name(line, line_number)
                     # append signal type to signal
                     interface_signal.append(signal_type)
                     # append interface signal to interface list
