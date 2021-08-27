@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           23 AUG 2021
+#   DATE:           27 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -38,13 +38,14 @@ from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 # get_name()
 #
 # Description:
-# This function looks for <name> element within line of .exml file, which define name of action,
-# signal, signal type, interface type or model element (name of model component or package), an
+# This function looks for <name> element within line of .exml file, which defines action type,
+# signal name, signal type, interface type, model element name (name of model component or
+# package), depending on the context where <name> element occurs within the .exml file, an
 # example of .exml file line:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 #
 # Returns:
-# This function returns name of action, signal, signal type or model element.
+# This function returns <name> element.
 def get_name(line, line_number):
 
     # find position of name within the line
@@ -70,12 +71,12 @@ def get_name(line, line_number):
 # get_uid()
 #
 # Description:
-# This function looks for <uid> element within line of .exml file, which define uid of action
-# or signal, an example of .exml file line:
+# This function looks for <uid> element within line of .exml file, which defines action uid
+# or signal uid, an example of .exml file line:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 #
 # Returns:
-# This function returns uid of action or signal.
+# This function returns <uid>.
 def get_uid(line, line_number):
 
     # find position of uid within the line
@@ -172,20 +173,20 @@ def find_first_input_signal(target_action, target_action_uid, file_content):
     first_input_signal = ""
 
     # search for above actions in file content
-    for k in range(0, len(file_content)):
+    for i in range(0, len(file_content)):
 
         # if given line contains definition of action
-        if ("<OBJECT>" in file_content[k]) and ("<ID name=" in file_content[k + 1]) and (
-                "Standard.OpaqueAction" in file_content[k + 1]) and (
-                target_action_uid in file_content[k + 1]):
+        if ("<OBJECT>" in file_content[i]) and ("<ID name=" in file_content[i + 1]) and (
+                "Standard.OpaqueAction" in file_content[i + 1]) and (
+                target_action_uid in file_content[i + 1]):
 
             # search for first input signal to above action
-            for l in range(k, len(file_content)):
+            for j in range(i, len(file_content)):
 
                 # if given line contains details about first input signal
-                if ("<ATT name=" in file_content[l]) and ("*FIRST*" in file_content[l]):
+                if ("<ATT name=" in file_content[j]) and ("*FIRST*" in file_content[j]):
                     # get line
-                    line = file_content[l]
+                    line = file_content[j]
                     # find start marker of first input signal
                     first_input_start = line.find("*FIRST*")
                     # find end marker of first input signal
@@ -320,7 +321,7 @@ def find_interface_signals(interface_type, interface_source, model_element_name,
                     # get line
                     line = file_content[j]
                     # get line number
-                    line_number = j +1
+                    line_number = j + 1
                     # get signal type
                     signal_type = get_name(line, line_number)
                     # append signal type to signal
