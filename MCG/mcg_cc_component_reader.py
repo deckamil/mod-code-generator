@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           21 AUG 2021
+#   DATE:           27 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,8 +32,8 @@ from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 from mcg_cc_parameters import ACTION_UID_OFFSET
 
-actions_with_first_input_signals = "SUB - "
-allowed_actions = "ADD - SUB - "
+action_types_with_first_input_signal = "SUB - "
+allowed_action_types = "ADD - SUB - "
 
 
 # Function:
@@ -45,29 +45,32 @@ allowed_actions = "ADD - SUB - "
 # Returns:
 # This function does not return anything.
 def check_component_correctness(signal_list, action_list, node_list):
-    # check is some signal has more tha one source
-    for s in signal_list:
-        keyword = "target " + str(s)
+    # check is some signal has more than one source
+    for signal in signal_list:
+        keyword = "target " + str(signal)
         keyword_occurrence = 0
 
         # go through all nodes for each signal on signal_list
-        for n in node_list:
+        for node in node_list:
 
             # if keyword within the node
-            if keyword in n:
+            if keyword in node:
                 # increment keyword counter
                 keyword_occurrence = keyword_occurrence + 1
 
         # if keyword has more than one occurrence
         if keyword_occurrence > 1:
             # record error
-            mcg_cc_error_handler.record_error(1, s, "none")
+            mcg_cc_error_handler.record_error(1, signal, "none")
 
     # check if some actions are not recognized
-    for a in action_list:
-        if a[0:len(a) + ACTION_UID_OFFSET] not in allowed_actions:
+    for action in action_list:
+        # get action type
+        action_type = action[0:len(action) + ACTION_UID_OFFSET]
+        # if action type is not allowed
+        if action_type not in allowed_action_types:
             # record error
-            mcg_cc_error_handler.record_error(51, a, "none")
+            mcg_cc_error_handler.record_error(51, action, "none")
 
 
 # Function:
@@ -119,22 +122,23 @@ def read_signal_targets(file_content, node_list, signal_list):
                         line = file_content[j + 2]
                         # get line number
                         line_number = j + 3
-                        # get action name
-                        action_name = mcg_cc_supporter.get_name(line, line_number)
-                        # get action uid
-                        action_uid = mcg_cc_supporter.get_uid(line, line_number)
+                        # get target action type
+                        target_action_type = mcg_cc_supporter.get_name(line, line_number)
+                        # get target action uid
+                        target_action_uid = mcg_cc_supporter.get_uid(line, line_number)
                         # get target action
-                        target_action = str(action_name) + " " + str(action_uid)
+                        target_action = str(target_action_type) + " " + str(target_action_uid)
 
                         # first input signal is not needed
                         first_input_signal_needed = False
 
-                        # if it is SUB action then find first input signal in SUB arithmetic operation
-                        if action_name in actions_with_first_input_signals:
+                        # if this type of action requires first input signal
+                        if target_action_type in action_types_with_first_input_signal:
 
                             # find first input signal in file content
                             first_input_signal = mcg_cc_supporter.find_first_input_signal(target_action,
-                                                                                          action_uid, file_content)
+                                                                                          target_action_uid,
+                                                                                          file_content)
 
                             # if first input signal is same as current node signal
                             if signal_name in first_input_signal:
@@ -153,15 +157,16 @@ def read_signal_targets(file_content, node_list, signal_list):
                         line = file_content[j + 2]
                         # get line number
                         line_number = j + 3
-                        # get signal uid
-                        signal_uid = mcg_cc_supporter.get_uid(line, line_number)
+                        # get target signal uid
+                        target_signal_uid = mcg_cc_supporter.get_uid(line, line_number)
                         # find target signal
-                        target_signal_list = mcg_cc_supporter.find_target_element(signal_uid, "Standard.Attribute",
+                        target_signal_list = mcg_cc_supporter.find_target_element(target_signal_uid,
+                                                                                  "Standard.Attribute",
                                                                                   file_content)
                         # if target signal was not found
                         if "NOT_FOUND" in target_signal_list[0]:
                             # record error
-                            mcg_cc_error_handler.record_error(20, signal_uid, signal_name)
+                            mcg_cc_error_handler.record_error(20, target_signal_uid, signal_name)
                         # append node to list of nodes
                         node_list.append(str(signal_name) + " target " + str(target_signal_list[1]))
 
@@ -195,13 +200,13 @@ def read_action_targets(file_content, node_list, action_list):
             line = file_content[i + 1]
             # get line number
             line_number = i + 2
-            # get action name
-            action_name = mcg_cc_supporter.get_name(line, line_number)
+            # get action type
+            action_type = mcg_cc_supporter.get_name(line, line_number)
             # get action uid
             action_uid = mcg_cc_supporter.get_uid(line, line_number)
             # get action
-            action = str(action_name) + " " + str(action_uid)
-            # append action to list of signals
+            action = str(action_type) + " " + str(action_uid)
+            # append action to list of actions
             action_list.append(action)
 
             # action does not have any target
@@ -235,15 +240,16 @@ def read_action_targets(file_content, node_list, action_list):
                         line = file_content[j + 2]
                         # get line number
                         line_number = j + 3
-                        # get signal uid
-                        signal_uid = mcg_cc_supporter.get_uid(line, line_number)
+                        # get target signal uid
+                        target_signal_uid = mcg_cc_supporter.get_uid(line, line_number)
                         # find target signal
-                        target_signal_list = mcg_cc_supporter.find_target_element(signal_uid, "Standard.Attribute",
+                        target_signal_list = mcg_cc_supporter.find_target_element(target_signal_uid,
+                                                                                  "Standard.Attribute",
                                                                                   file_content)
                         # if target signal was not found
                         if "NOT_FOUND" in target_signal_list[0]:
                             # record error
-                            mcg_cc_error_handler.record_error(21, signal_uid, action)
+                            mcg_cc_error_handler.record_error(21, target_signal_uid, action)
                         # append node to list of nodes
                         node_list.append(str(action) + " target " + str(target_signal_list[1]))
 
@@ -265,8 +271,8 @@ def read_action_targets(file_content, node_list, action_list):
 # Returns:
 # This function returns list of input interfaces, output interfaces and local
 # parameters.
-def read_interfaces(path, component_name):
-    # locals
+def read_interfaces(activity_file_path, model_element_name):
+    # interface lists
     input_interface_list = []
     output_interface_list = []
     local_parameter_list = []
@@ -277,35 +283,28 @@ def read_interfaces(path, component_name):
     local_parameters_found = False
 
     # find position of standard activity within the path
-    standard_activity_position = path.find("\\Standard.Activity")
+    standard_activity_position = activity_file_path.find("\\Standard.Activity")
     # get interface directory path
-    interface_dir_path = path[0:standard_activity_position] + str("\\Standard.Interface")
-
-    # get list of interfaces
-    interface_list = listdir(interface_dir_path)
-
-    # create list of paths to interfaces
-    interface_path_list = []
-    for il in interface_list:
-        interface_path_list.append(interface_dir_path + str("\\") + str(il))
+    interface_dir_path = activity_file_path[0:standard_activity_position] + str("\\Standard.Interface")
+    # get list of interface sources, i.e. names of exml files
+    interface_source_list = listdir(interface_dir_path)
 
     # read interface details
-    for ipl in interface_path_list:
+    for interface_source in interface_source_list:
+        # get interface file path
+        interface_file_path = interface_dir_path + str("\\") + str(interface_source)
 
         # open file and read content, then close file
-        file = open(ipl, "r")
+        file = open(interface_file_path, "r")
         file_content = file.readlines()
-        file_content = [x.strip() for x in file_content]
+        file_content = [line.strip() for line in file_content]
         file.close()
-
-        # find interface source, i.e. name of exml file
-        interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
 
         # if input interface element has not been found yet
         if not input_interface_found:
             # find input interface
             input_interface_list = mcg_cc_supporter.find_interface_signals("Input Interface", interface_source,
-                                                                           component_name, "Standard.Component",
+                                                                           model_element_name, "Standard.Component",
                                                                            file_content)
 
             # if input interface element was found:
@@ -319,7 +318,7 @@ def read_interfaces(path, component_name):
         if not output_interface_found:
             # find output interface
             output_interface_list = mcg_cc_supporter.find_interface_signals("Output Interface", interface_source,
-                                                                            component_name, "Standard.Component",
+                                                                            model_element_name, "Standard.Component",
                                                                             file_content)
 
             # if output interface element was found:
@@ -333,7 +332,7 @@ def read_interfaces(path, component_name):
         if not local_parameters_found:
             # find local parameters
             local_parameter_list = mcg_cc_supporter.find_interface_signals("Local Parameters", interface_source,
-                                                                           component_name, "Standard.Component",
+                                                                           model_element_name, "Standard.Component",
                                                                            file_content)
 
             # if local parameters element was found:
@@ -369,10 +368,9 @@ def read_interfaces(path, component_name):
 # details from .exml files.
 #
 # Returns:
-# This function returns list of nodes, actions, signals, input interfaces,
-# output interfaces, local parameters, component source and component name.
-def read_component(path):
-    # empty lists
+# This function returns lists with component details.
+def read_component(activity_file_path):
+    # component lists
     node_list = []
     signal_list = []
     action_list = []
@@ -380,18 +378,14 @@ def read_component(path):
     output_interface_list = []
     local_parameter_list = []
 
-    # activity diagram path
-    activity_diagram_path = path
-
     # open file and read content, then close file
-    file = open(activity_diagram_path, "r")
+    file = open(activity_file_path, "r")
     file_content = file.readlines()
-    file_content = [x.strip() for x in file_content]
+    file_content = [line.strip() for line in file_content]
     file.close()
 
     # find model element source, i.e. name of exml file
-    model_element_source = activity_diagram_path[
-                           len(activity_diagram_path) - EXML_FILE_NAME_LENGTH:len(activity_diagram_path)]
+    model_element_source = activity_file_path[len(activity_file_path) - EXML_FILE_NAME_LENGTH:len(activity_file_path)]
 
     # search for model element name and type in file content, i.e. find out if file content contains component data
     model_element_name, model_element_type = mcg_cc_supporter.find_model_element(file_content)
@@ -421,7 +415,8 @@ def read_component(path):
         print()
 
         # open and read interface file
-        input_interface_list, output_interface_list, local_parameter_list = read_interfaces(path, model_element_name)
+        input_interface_list, output_interface_list, local_parameter_list = read_interfaces(activity_file_path,
+                                                                                            model_element_name)
 
         # check component correctness
         check_component_correctness(signal_list, action_list, node_list)
@@ -439,23 +434,23 @@ def read_component(path):
 
             # print component details
             print("Nodes:")
-            for n in node_list:
-                print("          " + str(n))
+            for node in node_list:
+                print("          " + str(node))
             print("Actions:")
-            for a in action_list:
-                print("          " + str(a))
+            for action in action_list:
+                print("          " + str(action))
             print("Signals:")
-            for s in signal_list:
-                print("          " + str(s))
+            for signal in signal_list:
+                print("          " + str(signal))
             print("Input Interface:")
-            for ii in input_interface_list:
-                print("          " + str(ii))
+            for input_interface in input_interface_list:
+                print("          " + str(input_interface))
             print("Output Interface:")
-            for oi in output_interface_list:
-                print("          " + str(oi))
+            for output_interface in output_interface_list:
+                print("          " + str(output_interface))
             print("Local Parameters:")
-            for lp in local_parameter_list:
-                print("          " + str(lp))
+            for local_parameter in local_parameter_list:
+                print("          " + str(local_parameter))
             print()
 
         # end of component reading
