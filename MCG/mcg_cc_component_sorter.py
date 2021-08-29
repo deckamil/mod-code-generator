@@ -36,7 +36,7 @@ from mcg_cc_parameters import action_type_list
 # sort_actions()
 #
 # Description:
-# This function sorts nodes of same action in one place of nodes list.
+# This function sorts nodes of same action in one place within list of nodes.
 #
 # Returns:
 # This function returns list of nodes with sorted actions.
@@ -45,12 +45,12 @@ def sort_actions(node_list, action_list):
     # this index tells where to put node (defines new position of node)
     index = 0
 
-    # repeat for each action recorded on action_list
-    # sort nodes of given action in one place of nodes list
+    # repeat for each action recorded on list of actions
+    # sort nodes of given action in one place within list of nodes
     # first, nodes with inputs to action are sorted (keyword "target + <action name>"),
     # then, node with output from action is placed after them (keyword "<action name> + target")
     for i in range(0, len(action_list)):
-        # go through all nodes for each action on action_list
+        # go through all nodes for each action on list of actions
         for node in node_list:
             keyword = "target " + str(action_list[i])
             # if keyword for given action is found
@@ -61,14 +61,19 @@ def sort_actions(node_list, action_list):
                 node_list.insert(index, node)
                 # increment index to put next node right after this node
                 index = index + 1
+        # go through all nodes for each action on list of actions
         for node in node_list:
             keyword = str(action_list[i]) + " target"
+            # if keyword for given action is found
             if keyword in node:
+                # remove action from current position on the list
                 node_list.remove(node)
+                # insert action under new position defined by index
                 node_list.insert(index, node)
+                # increment index to put next node right after this node
                 index = index + 1
 
-    # place nodes with empty target (keyword "target empty") at the end of node list
+    # place nodes with empty target (keyword "target empty") at the end of list of nodes
     for i in range(index, len(node_list)):
         # if signal does not have any target
         if "target empty" in node_list[index]:
@@ -78,9 +83,9 @@ def sort_actions(node_list, action_list):
             node_list.remove(node)
             # insert node at the end of list
             node_list.insert(len(node_list), node)
-            # decrement index for next iteration, as new node was pushed by one position
-            # from right to left, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A]
-            # A was pushed at the end and now B is under previous position of A
+            # decrement index for next iteration, as inserted node pushes by one position
+            # from right to left other nodes, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A]
+            # A was placed at the end and now B is under previous position of A,
             # so at next iteration the same index need to be checked to examine B
             index = index - 1
         index = index + 1
@@ -101,60 +106,73 @@ def sort_actions(node_list, action_list):
 # merge_nodes()
 #
 # Description:
-# This function merge nodes of same action on node list into one node on merged node list and merge
-# local parameters from list into one string. This function also simplifies nodes before merging by
+# This function merges nodes of same action from node list into one node on list of merged nodes and
+# merges local parameters from list into one string. This function also simplifies nodes before merging by
 # removing of redundant action and uid occurrences within node.
 #
 # Returns:
 # This function returns list of merged nodes and list of merged local parameters.
 def merge_nodes(node_list, action_list, local_parameter_list):
 
-    # empty placeholders
+    # list of merged nodes
     merged_node_list = []
     merged_local_parameter = ""
 
-    # merge nodes of same action on node list into one node on merged node list
-    for a in range(0, len(action_list)):
+    # merge nodes of same action from list of nodes into one node on list of merged nodes
+    for i in range(0, len(action_list)):
         merged_node = ""
         # go through all nodes for each action on action_list
-        for n in node_list:
+        for node in node_list:
             # if given action found in node
-            if action_list[a] in n:
-                keyword = "target " + str(action_list[a])
+            if action_list[i] in node:
+                keyword = "target " + str(action_list[i])
                 # if keyword for given action is found
-                if keyword in n:
+                if keyword in node:
                     # find target position
-                    target_position = n.find("target")
-                    # get signal
-                    signal = n[0:target_position-1]
+                    target_position = node.find("target")
+                    # get signal name
+                    signal_name = node[0:target_position-1]
                     # get simplified node
-                    n = signal + str(" target")
+                    node = signal_name + str(" target")
                 # append node of same action to temporary merged node
                 if merged_node == "":
-                    merged_node = merged_node + str(n)
+                    merged_node = merged_node + str(node)
                 else:
-                    merged_node = merged_node + " " + str(n)
+                    merged_node = merged_node + " " + str(node)
 
-        # append merged node to merged node list
+        # append merged node to list of merged nodes
         merged_node_list.append(merged_node)
 
-    # append "<signal name> target <signal name>" nodes to merged node list
-    for n in node_list:
-        if ("ADD" not in n) and ("SUB" not in n) and ("empty" not in n):
-            # append node to merged node list
-            merged_node_list.append(n)
+    # append "<signal name> target <signal name>" nodes to list of merged nodes
+    for node in node_list:
+        # action marker shows whether any action was found or not within node
+        action_found = False
 
-    # merge nodes with empty target on node list into one node on merged node list
+        # for all allowed type of actions
+        for action_type in action_type_list:
+            # if action type is found within node
+            if action_type in node:
+                # change action marker
+                action_found = True
+                # exit loop
+                break
+
+        # if any action was not found within node and node does not contain "empty" keyword
+        if (not action_found) and ("empty" not in node):
+            # append node to list of merged nodes
+            merged_node_list.append(node)
+
+    # merge nodes with empty target from list of nodes into one node on list of merged nodes
     merged_node = ""
-    for n in node_list:
-        if "target empty" in n:
+    for node in node_list:
+        if "target empty" in node:
             # append node of empty target to temporary merged node
             if merged_node == "":
-                merged_node = merged_node + str(n)
+                merged_node = merged_node + str(node)
             else:
-                merged_node = merged_node + " " + str(n)
+                merged_node = merged_node + " " + str(node)
 
-    # append merged node to merged node list
+    # append merged node to list of merged nodes
     merged_node_list.append(merged_node)
 
     # merge local parameter into one string
@@ -165,8 +183,8 @@ def merge_nodes(node_list, action_list, local_parameter_list):
     if MCG_CC_TEST_RUN:
 
         print("Merged Nodes:")
-        for n in merged_node_list:
-            print("          " + str(n))
+        for node in merged_node_list:
+            print("          " + str(node))
         print()
 
     return merged_node_list, merged_local_parameter
