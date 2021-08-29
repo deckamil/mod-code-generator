@@ -30,6 +30,7 @@ from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 from mcg_cc_parameters import CUT_FIRST_INPUT_SIGNAL_OFFSET
 from mcg_cc_parameters import action_type_list
+from mcg_cc_parameters import action_type_req_first_input_signal_list
 
 
 # Function:
@@ -111,7 +112,7 @@ def sort_actions(node_list, action_list):
 # occurrences within node.
 #
 # Returns:
-# This function returns list of merged nodes and list of merged local parameters.
+# This function returns list of merged nodes.
 def merge_nodes(node_list, action_list):
 
     # list of merged nodes
@@ -193,60 +194,74 @@ def merge_nodes(node_list, action_list):
 # node and removes *FIRST* marker from it.
 # In case of some type of actions the order of input signals, which take part in action calculation can
 # influence on action results. In such case it is important to distinguish first input signal of given
-# action and move it at beginning of action equation to get correct results of action calculation, which
-# is done by this function.
+# action and move it at beginning of action equation to get correct results.
 #
 # Returns:
 # This function returns list of merged nodes with sorted first input signals.
 def sort_first_input_signals(merged_node_list):
 
-    # placeholder
-    new_merged_node_list = []
+    # list of merged nodes, where *FIRST* marker was removed
+    merged_node_with_removed_first_marker_list = []
 
     # for each merged node check if it contains type of action where sorting of first input signal is required
-    for mnl in merged_node_list:
+    for merged_node in merged_node_list:
 
-        # if node contains SUB action
-        if "SUB" in mnl:
+        # action marker shows whether action requiring to distinguish first input signal was
+        # found or not within merged node
+        action_found = False
+
+        # for all type of actions, which require to distinguish first input signal
+        for action_type_req_first_input_signal in action_type_req_first_input_signal_list:
+            # if action type is found within merged node
+            if action_type_req_first_input_signal in merged_node:
+                # change action marker
+                action_found = True
+                # exit loop
+                break
+
+        # if merged node contains type of action, which requires to distinguish first input signal
+        if action_found:
 
             # find start marker of first input signal
-            first_input_start = mnl.find("*FIRST*")
+            first_input_start = merged_node.find("*FIRST*")
             # find end marker of first input signal
-            first_input_end = mnl.rfind("*FIRST*")
+            first_input_end = merged_node.rfind("*FIRST*")
             # get first input signal
-            first_input_signal = mnl[first_input_start + FIRST_INPUT_SIGNAL_OFFSET:
-                                     first_input_end - 1]
+            first_input_signal = merged_node[first_input_start + FIRST_INPUT_SIGNAL_OFFSET:
+                                             first_input_end - 1]
 
             # get node with first input signal, but without *FIRST* markers
             first_input_signal_node = str(first_input_signal) + str(" target")
 
             # cut rest of nodes from merged node, but without node which contains first input signal
             if first_input_start == 0:
-                cut_merged_node = mnl[len(first_input_signal) + CUT_FIRST_INPUT_SIGNAL_OFFSET + 1:len(mnl)]
+                cut_merged_node = merged_node[len(first_input_signal) + CUT_FIRST_INPUT_SIGNAL_OFFSET + 1:
+                                              len(merged_node)]
             else:
-                cut_merged_node = mnl[0:first_input_start-1] + mnl[first_input_start+len(first_input_signal)
-                                                                   + CUT_FIRST_INPUT_SIGNAL_OFFSET:len(mnl)]
+                cut_merged_node = merged_node[0:first_input_start-1] + \
+                                  merged_node[first_input_start+len(first_input_signal) +
+                                              CUT_FIRST_INPUT_SIGNAL_OFFSET:len(merged_node)]
 
-            # merge all nodes in correct order into new merged node without *FIRST* marker
-            new_merged_node = str(first_input_signal_node) + str(" ") + str(cut_merged_node)
+            # merge all nodes in correct order into temporary merged node without *FIRST* marker
+            merged_node_with_removed_first_marker = str(first_input_signal_node) + str(" ") + str(cut_merged_node)
 
             # remove old merged node which contain *FIRST* markers from list of merged nodes
-            merged_node_list.remove(mnl)
+            merged_node_list.remove(merged_node)
 
-            # append new merged node to list of new merged nodes
-            new_merged_node_list.append(new_merged_node)
+            # append merged node without *FIRST* marker to temporary list of such merged nodes
+            merged_node_with_removed_first_marker_list.append(merged_node_with_removed_first_marker)
 
-    # for each node on list of new merged nodes
-    for nmnl in new_merged_node_list:
-        # append new merged node at beginning of list of merged nodes
-        merged_node_list = [nmnl] + merged_node_list
+    # for each merged node, where *FIRST* markers were removed
+    for merged_node_with_removed_first_marker in merged_node_with_removed_first_marker_list:
+        # append merged node at beginning of list of merged nodes
+        merged_node_list = [merged_node_with_removed_first_marker] + merged_node_list
 
     # display additional details after component sorting for test run
     if MCG_CC_TEST_RUN:
 
         print("Sorted First Input Signals:")
-        for n in merged_node_list:
-            print("          " + str(n))
+        for merged_node in merged_node_list:
+            print("          " + str(merged_node))
         print()
 
     return merged_node_list
@@ -388,7 +403,7 @@ def sort_nodes(dependence_list, merged_node_list):
 # details from .exml files.
 #
 # Returns:
-# This function returns sorted list of nodes.
+# This function returns list of sorted nodes.
 def sort_component(node_list, action_list, local_parameter_list, component_source, component_name):
 
     # component sorting
@@ -401,19 +416,19 @@ def sort_component(node_list, action_list, local_parameter_list, component_sourc
 
     print("*** SORT NODES ***")
 
-    # sort nodes of same action in one place of nodes list
+    # sort nodes of same action in one place under list of nodes
     node_list = sort_actions(node_list, action_list)
 
-    # merge nodes of same action on node list into one node on merged node list
+    # merge nodes of same action into one merged node on list of merged nodes
     merged_node_list = merge_nodes(node_list, action_list)
 
-    # sort first input signals in merged node list
+    # sort first input signals within list of merged nodes
     merged_node_list = sort_first_input_signals(merged_node_list)
 
-    # count dependencies between nodes
+    # count dependencies between merged nodes
     dependency_list = count_dependencies(merged_node_list, local_parameter_list)
 
-    # sort nodes basing on their dependencies
+    # sort merged nodes basing on their dependencies
     sorted_node_list = sort_nodes(dependency_list, merged_node_list)
 
     print("*** NODES SORTED ***")

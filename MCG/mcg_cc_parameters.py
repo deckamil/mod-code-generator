@@ -85,5 +85,5 @@ NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 1
 # processing
 action_type_list = ["ADD", "SUB"]
 
-# This list defines all types of actions, which require to distinguish in addition name of first input signal
+# This list defines all types of actions, which require to distinguish in addition first input signal
 action_type_req_first_input_signal_list = ["SUB"]
