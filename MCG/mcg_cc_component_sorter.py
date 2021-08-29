@@ -85,7 +85,7 @@ def sort_actions(node_list, action_list):
             # insert node at the end of list
             node_list.insert(len(node_list), node)
             # decrement index for next iteration, as inserted node pushes by one position
-            # from right to left other nodes, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A]
+            # from right to left other nodes, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A];
             # A was placed at the end and now B is under previous position of A,
             # so at next iteration the same index need to be checked to examine B
             index = index - 1
@@ -282,8 +282,8 @@ def count_dependencies(merged_node_list, local_parameter_list):
     # count dependencies between nodes
     # each merged node (with exception for target empty node) has its own sublist under list of dependencies
     # the sublist starts with merged node under index 0 and local parameters required to compute the merged node
-    # are appended under further indexes of the sublist
-    # as result, length of sublist express number of local parameters needed to compute the merged node
+    # are appended under further indexes of the sublist;
+    # as result, length of sublist express number of local parameters needed to compute the merged node;
     # in special case, if merged node does not need any local parameter (i.e. only input interface signals are
     # inputs to merged node) the length of sublist is equal to 1
     dependency_list = []
@@ -326,69 +326,75 @@ def count_dependencies(merged_node_list, local_parameter_list):
 # sort_nodes()
 #
 # Description:
-# This function sort nodes basing on their dependencies from sublist of dependence_list.
+# This function sort nodes basing on their dependencies from sublist under list of dependencies.
 #
 # Returns:
 # This function returns list of sorted nodes.
-def sort_nodes(dependence_list, merged_node_list):
+def sort_nodes(merged_node_list, dependency_list):
 
-    # empty placeholder
+    # list of sorted nodes
     sorted_node_list = []
 
     # sort nodes basing on their dependencies
-    # first append to sorted_node_list nodes with no dependencies, i.e. nodes from sublist which length is equal to 1,
-    # which means that nodes do not consume any local parameters
-    # then refresh dependencies of the rest of nodes on dependence_list, i.e. remove signal dependence if signal
-    # comes from (is output from) appended node to sorted_node_list
+    # first append merged nodes without dependencies to list of sorted nodes, i.e. those merged nodes which sublist
+    # length is equal to 1, which means that given merged node does not consume any local parameters (or consume
+    # local parameter outputted by merged node, which was already appended to list of sorted nodes);
+    # then remove local parameter outputted by above merged node from each sublist under list of dependencies, which
+    # will lead to situation where some of sublist will have new length equal to 1;
+    # next repeat the cycle until all merged nodes are sorted
 
-    # dependence_list length
-    dependence_list_length = len(dependence_list)
-    # repeat as long dependence_list is not empty
-    while dependence_list_length > 0:
-        # go thorough all nodes on dependence_list
-        for dep in dependence_list:
-            # if given node does not have any dependencies
-            if len(dep) == 1:
-                # append node to sorted_node_list
-                sorted_node_list.append(dep[0])
-                # remove node from dependence_list
-                dependence_list.remove(dep)
-                # find output signal within appended node
-                output_signal = mcg_cc_supporter.find_output_signal(dep[0])
-                # compute new dependence_list_length
-                dependence_list_length = len(dependence_list)
-                # refresh dependencies of the rest of nodes on dependence_list
-                for ref in dependence_list:
-                    # if given node has dependencies
-                    if len(ref) > 1:
-                        # go through all dependencies of given node on dependence_list
+    # number of merged nodes to sort, i.e. length of list of dependencies
+    dependency_list_length = len(dependency_list)
+    # repeat until all merged nodes are sorted
+    while dependency_list_length > 0:
+        # go thorough each dependency sublist
+        for dependency in dependency_list:
+            # if given merged node under dependency sublist does not have any further dependencies
+            if len(dependency) == 1:
+
+                # append merged node to list of sorted nodes
+                sorted_node_list.append(dependency[0])
+                # remove dependency sublist from list of dependencies
+                dependency_list.remove(dependency)
+                # find output signal within merged node
+                output_signal = mcg_cc_supporter.find_output_signal(dependency[0])
+                # recalculate number of merged nodes to sort, i.e. length of list of dependencies
+                dependency_list_length = len(dependency_list)
+
+                # refresh each dependency sublist
+                for dependency in dependency_list:
+                    # if given merged node under dependency sublist does have further dependencies
+                    if len(dependency) > 1:
+                        # go through all further dependencies, i.e. local parameters under dependency sublist
                         index = 1
-                        for i in range(index, len(ref)):
-                            # if given node consumes signal, which comes from node appended to sorted_node_list
-                            if output_signal in ref[index]:
-                                # remove dependence from dependence_list
-                                ref.remove(ref[index])
+                        for i in range(index, len(dependency)):
+                            # if given merged node consumes local parameter, which comes from merged node, which
+                            # was appended above to list of sorted nodes
+                            if output_signal in dependency[index]:
+                                # remove local parameter from dependency sublist
+                                dependency.remove(dependency[index])
                                 # decrement index for next iteration, as one dependence was removed
                                 # therefore all next dependencies in ref was pushed by one position
-                                # towards beginning of ref, e.g. [...,A,B,C] -> [...,B,C]
-                                # A was removed now B is under previous position of A so at next
-                                # iteration the same index need to be checked to examine B
-                                # this technique is used because same local parameter could be used
+                                # towards beginning of ref, e.g. [...,A,B,C] -> [...,B,C];
+                                # A was removed and now B is under previous position of A so at next
+                                # iteration the same index need to be checked to examine B;
+                                # this approach is used because same local parameter could be used
                                 # two or more times as input to same action
                                 index = index - 1
                             index = index + 1
-                # exit "dep in dependence_list" loop
+
+                # exit "dependency in dependency_list" loop
                 break
 
-    # append merged nodes with empty target (last element of merged_node_list)
+    # append merged nodes with empty target (last element from list of merged nodes)
     sorted_node_list.append(merged_node_list[len(merged_node_list)-1])
 
     # display additional details after component sorting for test run
     if MCG_CC_TEST_RUN:
 
         print("Sorted Nodes:")
-        for n in sorted_node_list:
-            print("          " + str(n))
+        for sorted_node in sorted_node_list:
+            print("          " + str(sorted_node))
         print()
 
     # return sorted list of nodes
@@ -429,7 +435,7 @@ def sort_component(node_list, action_list, local_parameter_list, component_sourc
     dependency_list = count_dependencies(merged_node_list, local_parameter_list)
 
     # sort merged nodes basing on their dependencies
-    sorted_node_list = sort_nodes(dependency_list, merged_node_list)
+    sorted_node_list = sort_nodes(merged_node_list, dependency_list)
 
     print("*** NODES SORTED ***")
     print()
@@ -438,5 +444,5 @@ def sort_component(node_list, action_list, local_parameter_list, component_sourc
     print("************************* END OF COMPONENT SORTING *************************")
     print()
 
-    # return sorted list of nodes
+    # return list of sorted nodes
     return sorted_node_list
