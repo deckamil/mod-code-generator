@@ -5,7 +5,7 @@
 #       modules of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 JUL 2021
+#   DATE:           29 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -80,3 +80,10 @@ UID_END_OFFSET = -3
 # Converter Component (CC), i.e. list of arguments:
 #       - model path
 NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 1
+
+# This list defines all allowed types of actions, which could be used within activity diagram to define signal
+# processing
+action_type_list = ["ADD", "SUB"]
+
+# This list defines all types of actions, which require to distinguish in addition name of first input signal
+action_type_req_first_input_signal_list = ["SUB"]
