@@ -6,7 +6,7 @@
 #       of nodes for conversion into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 JUL 2021
+#   DATE:           29 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,13 +29,14 @@ import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 from mcg_cc_parameters import CUT_FIRST_INPUT_SIGNAL_OFFSET
+from mcg_cc_parameters import action_type_list
 
 
 # Function:
 # sort_actions()
 #
 # Description:
-# This function sort nodes of same action in one place of nodes list.
+# This function sorts nodes of same action in one place of nodes list.
 #
 # Returns:
 # This function returns list of nodes with sorted actions.
@@ -46,25 +47,25 @@ def sort_actions(node_list, action_list):
 
     # repeat for each action recorded on action_list
     # sort nodes of given action in one place of nodes list
-    # first, nodes with inputs to action, are sorted (keyword "target + <action name>"),
-    # then, node with output from action, is placed after them (keyword "<action name> + target")
-    for a in range(0, len(action_list)):
+    # first, nodes with inputs to action are sorted (keyword "target + <action name>"),
+    # then, node with output from action is placed after them (keyword "<action name> + target")
+    for i in range(0, len(action_list)):
         # go through all nodes for each action on action_list
-        for n in node_list:
-            keyword = "target " + str(action_list[a])
+        for node in node_list:
+            keyword = "target " + str(action_list[i])
             # if keyword for given action is found
-            if keyword in n:
+            if keyword in node:
                 # remove action from current position on the list
-                node_list.remove(n)
+                node_list.remove(node)
                 # insert action under new position defined by index
-                node_list.insert(index, n)
+                node_list.insert(index, node)
                 # increment index to put next node right after this node
                 index = index + 1
-        for n in node_list:
-            keyword = str(action_list[a]) + " target"
-            if keyword in n:
-                node_list.remove(n)
-                node_list.insert(index, n)
+        for node in node_list:
+            keyword = str(action_list[i]) + " target"
+            if keyword in node:
+                node_list.remove(node)
+                node_list.insert(index, node)
                 index = index + 1
 
     # place nodes with empty target (keyword "target empty") at the end of node list
@@ -72,11 +73,11 @@ def sort_actions(node_list, action_list):
         # if signal does not have any target
         if "target empty" in node_list[index]:
             # copy node from given index
-            n = node_list[index]
+            node = node_list[index]
             # remove node
-            node_list.remove(n)
+            node_list.remove(node)
             # insert node at the end of list
-            node_list.insert(len(node_list), n)
+            node_list.insert(len(node_list), node)
             # decrement index for next iteration, as new node was pushed by one position
             # from right to left, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A]
             # A was pushed at the end and now B is under previous position of A
@@ -89,8 +90,8 @@ def sort_actions(node_list, action_list):
 
         print()
         print("Sorted Actions:")
-        for n in node_list:
-            print("          " + str(n))
+        for node in node_list:
+            print("          " + str(node))
         print()
 
     return node_list
