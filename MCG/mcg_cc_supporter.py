@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           27 AUG 2021
+#   DATE:           29 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -107,7 +107,7 @@ def get_uid(line, line_number):
 # Returns:
 # This function returns model element name and model element type.
 def find_model_element(file_content):
-    # empty placeholders
+    # local data
     model_element_name = ""
     model_element_type = ""
 
@@ -169,7 +169,7 @@ def find_model_element(file_content):
 # Returns:
 # This function returns first input signal name of given action.
 def find_first_input_signal(target_action, target_action_uid, file_content):
-    # empty placeholder
+    # local data
     first_input_signal = ""
 
     # search for above actions in file content
@@ -221,7 +221,7 @@ def find_first_input_signal(target_action, target_action_uid, file_content):
 # Returns:
 # This function returns list of target elements.
 def find_target_element(target_element_uid, target_element_type, file_content):
-    # empty placeholders
+    # local data
     target_element_name = ""
     target_element_list = []
 
@@ -278,7 +278,7 @@ def find_target_element(target_element_uid, target_element_type, file_content):
 # Returns:
 # This function returns list of interface signals.
 def find_interface_signals(interface_type, interface_source, model_element_name, model_element_type, file_content):
-    # locals
+    # local data
     interface_found = False
     interface_signal = []
     interface_signal_list = []

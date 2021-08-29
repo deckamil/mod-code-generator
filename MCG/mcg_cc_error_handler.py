@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           21 AUG 2021
+#   DATE:           29 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -24,7 +24,7 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-# empty list placeholder
+# error list
 error_list = []
 
 
