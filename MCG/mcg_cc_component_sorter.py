@@ -106,17 +106,16 @@ def sort_actions(node_list, action_list):
 # merge_nodes()
 #
 # Description:
-# This function merges nodes of same action from node list into one node on list of merged nodes and
-# merges local parameters from list into one string. This function also simplifies nodes before merging by
-# removing of redundant action and uid occurrences within node.
+# This function merges nodes of same action from list of nodes into one merged node on list of merged
+# nodes. This function also simplifies nodes before merging by removing of redundant action and uid
+# occurrences within node.
 #
 # Returns:
 # This function returns list of merged nodes and list of merged local parameters.
-def merge_nodes(node_list, action_list, local_parameter_list):
+def merge_nodes(node_list, action_list):
 
     # list of merged nodes
     merged_node_list = []
-    merged_local_parameter = ""
 
     # merge nodes of same action from list of nodes into one node on list of merged nodes
     for i in range(0, len(action_list)):
@@ -175,10 +174,6 @@ def merge_nodes(node_list, action_list, local_parameter_list):
     # append merged node to list of merged nodes
     merged_node_list.append(merged_node)
 
-    # merge local parameter into one string
-    for lpl in local_parameter_list:
-        merged_local_parameter = merged_local_parameter + " " + str(lpl[0])
-
     # display additional details after component sorting for test run
     if MCG_CC_TEST_RUN:
 
@@ -187,7 +182,7 @@ def merge_nodes(node_list, action_list, local_parameter_list):
             print("          " + str(node))
         print()
 
-    return merged_node_list, merged_local_parameter
+    return merged_node_list
 
 
 # Function:
@@ -261,52 +256,55 @@ def sort_first_input_signals(merged_node_list):
 # count_dependencies()
 #
 # Description:
-# This function count dependencies between nodes, i.e. local parameters, which are inputs to nodes, and
-# append them to sublist of dependence list.
+# This function counts dependencies between merged nodes, i.e. number of local parameters outputted by merged nodes,
+# which are required to compute another merged node. The number of dependencies is expressed by length of sublist
+# created for each merged node under list of dependencies.
 #
 # Returns:
-# This function returns list of nodes with counted dependencies.
-def count_dependencies(merged_node_list, merged_local_parameter, signal_list):
+# This function returns list of dependencies.
+def count_dependencies(merged_node_list, local_parameter_list):
 
     # count dependencies between nodes
-    # each node (with exception for target empty node) from merged_node_list has its own sublist on dependence_list
-    # the sublist starts with node from merged_node_list (under index 0) and under further positions of the
-    # sublist local parameters required to compute the node are appended, therefore if more local parameters are
-    # needed to compute the node, then sublist is longer
-    # in special case, if node does not need any local parameter (i.e. only input interface signals are inputs to node)
-    # the length of sublist is equal to 1
-    dependence_list = []
+    # each merged node (with exception for target empty node) has its own sublist under list of dependencies
+    # the sublist starts with merged node under index 0 and local parameters required to compute the merged node
+    # are appended under further indexes of the sublist
+    # as result, length of sublist express number of local parameters needed to compute the merged node
+    # in special case, if merged node does not need any local parameter (i.e. only input interface signals are
+    # inputs to merged node) the length of sublist is equal to 1
+    dependency_list = []
     for i in range(0, len(merged_node_list)):
-        dependence = []
+        # dependency sublist
+        dependency = []
         if "target empty" not in merged_node_list[i]:
-            # copy node from given index
-            m = merged_node_list[i]
-            # append node to dependence
-            dependence.append(m)
-            # find output signal within appended node
-            output_signal = mcg_cc_supporter.find_output_signal(m)
-            # go through all signal for each node on merged_node_list
-            for s in signal_list:
-                # if given signal is local signal of the node, i.e. there is signal occurrence within node,
-                # signal is not in same time output signal from the node and signal belongs to local parameters
-                if (s in m) and (s not in output_signal) and (s in merged_local_parameter):
-                    # append signal to dependence
-                    dependence.append(s)
+            # copy merged node from given index
+            merged_node = merged_node_list[i]
+            # append merged node to dependency sublist
+            dependency.append(merged_node)
+            # find output signal within merged node
+            output_signal = mcg_cc_supporter.find_output_signal(merged_node)
+            # go through all local parameters for each merged node on list of merged nodes
+            for local_parameter in local_parameter_list:
+                # get name of local parameter
+                local_parameter_name = local_parameter[0]
+                # if local parameter is input to merged node
+                if (local_parameter_name in merged_node) and (local_parameter_name not in output_signal):
+                    # append name of local parameter to dependency sublist
+                    dependency.append(local_parameter_name)
 
-        # if dependence is not empty
-        if len(dependence) > 0:
-            # append dependence to dependence_list
-            dependence_list.append(dependence)
+        # if dependency sublist is not empty
+        if len(dependency) > 0:
+            # append dependency sublist to list of dependencies
+            dependency_list.append(dependency)
 
     # display additional details after component sorting for test run
     if MCG_CC_TEST_RUN:
 
         print("Dependencies:")
-        for n in dependence_list:
-            print("          " + str(n))
+        for dependency in dependency_list:
+            print("          " + str(dependency))
         print()
 
-    return dependence_list
+    return dependency_list
 
 
 # Function:
@@ -391,7 +389,7 @@ def sort_nodes(dependence_list, merged_node_list):
 #
 # Returns:
 # This function returns sorted list of nodes.
-def sort_component(node_list, action_list, signal_list, local_parameter_list, component_source, component_name):
+def sort_component(node_list, action_list, local_parameter_list, component_source, component_name):
 
     # component sorting
     print("***************************** COMPONENT SORTING ****************************")
@@ -407,16 +405,16 @@ def sort_component(node_list, action_list, signal_list, local_parameter_list, co
     node_list = sort_actions(node_list, action_list)
 
     # merge nodes of same action on node list into one node on merged node list
-    merged_node_list, merged_local_parameter = merge_nodes(node_list, action_list, local_parameter_list)
+    merged_node_list = merge_nodes(node_list, action_list)
 
     # sort first input signals in merged node list
     merged_node_list = sort_first_input_signals(merged_node_list)
 
     # count dependencies between nodes
-    dependence_list = count_dependencies(merged_node_list, merged_local_parameter, signal_list)
+    dependency_list = count_dependencies(merged_node_list, local_parameter_list)
 
     # sort nodes basing on their dependencies
-    sorted_node_list = sort_nodes(dependence_list, merged_node_list)
+    sorted_node_list = sort_nodes(dependency_list, merged_node_list)
 
     print("*** NODES SORTED ***")
     print()

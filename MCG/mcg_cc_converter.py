@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           21 AUG 2021
+#   DATE:           29 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -276,7 +276,7 @@ def process_components(path):
     for adpl in activity_diagram_path_list:
 
         # read component content
-        node_list, action_list, signal_list, input_interface_list, output_interface_list, local_parameter_list,\
+        node_list, action_list, input_interface_list, output_interface_list, local_parameter_list,\
             component_source, component_name, component_type = mcg_cc_component_reader.read_component(adpl)
 
         # check errors
@@ -286,7 +286,7 @@ def process_components(path):
         if len(node_list) > 0:
 
             # sort component content
-            sorted_node_list = mcg_cc_component_sorter.sort_component(node_list, action_list, signal_list,
+            sorted_node_list = mcg_cc_component_sorter.sort_component(node_list, action_list,
                                                                       local_parameter_list, component_source,
                                                                       component_name)
 

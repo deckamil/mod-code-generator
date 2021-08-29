@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           27 AUG 2021
+#   DATE:           29 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -458,5 +458,5 @@ def read_component(activity_file_path):
         print()
 
     # return collected data
-    return node_list, action_list, signal_list, input_interface_list, output_interface_list, local_parameter_list, \
+    return node_list, action_list, input_interface_list, output_interface_list, local_parameter_list, \
         model_element_source, model_element_name, model_element_type
