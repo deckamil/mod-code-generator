@@ -81,7 +81,10 @@ def check_component_correctness(signal_list, action_list, node_list):
 #
 # Returns:
 # This function returns list of nodes and signals.
-def read_signal_targets(file_content, node_list, signal_list):
+def read_signal_targets(file_content, node_list):
+    # list of signals
+    signal_list = []
+
     # search for signals in file content
     for i in range(0, len(file_content)):
 
@@ -189,7 +192,10 @@ def read_signal_targets(file_content, node_list, signal_list):
 #
 # Returns:
 # This function returns list of nodes and actions.
-def read_action_targets(file_content, node_list, action_list):
+def read_action_targets(file_content, node_list):
+    # list of actions
+    action_list = []
+
     # search for actions in file content
     for i in range(0, len(file_content)):
 
@@ -372,7 +378,6 @@ def read_interfaces(activity_file_path, model_element_name):
 def read_component(activity_file_path):
     # component lists
     node_list = []
-    signal_list = []
     action_list = []
     input_interface_list = []
     output_interface_list = []
@@ -405,10 +410,10 @@ def read_component(activity_file_path):
         print("*** RECORD NODES ***")
 
         # search for signals targets within diagram content
-        node_list, signal_list = read_signal_targets(file_content, node_list, signal_list)
+        node_list, signal_list = read_signal_targets(file_content, node_list)
 
         # search for action targets within diagram content
-        node_list, action_list = read_action_targets(file_content, node_list, action_list)
+        node_list, action_list = read_action_targets(file_content, node_list)
 
         # list of nodes recorded
         print("*** NODES RECORDED ***")
