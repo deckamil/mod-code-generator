@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2021
+#   DATE:           30 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,9 +31,6 @@ import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 from mcg_cc_parameters import ACTION_UID_OFFSET
-
-action_types_with_first_input_signal = "SUB - "
-allowed_action_types = "ADD - SUB - "
 
 
 # Function:
@@ -63,12 +60,16 @@ def check_component_correctness(signal_list, action_list, node_list):
             # record error
             mcg_cc_error_handler.record_error(1, signal, "none")
 
-    # check if some actions are not recognized
+    # check if any action on list of actions is not allowed one
     for action in action_list:
         # get action type
         action_type = action[0:len(action) + ACTION_UID_OFFSET]
+
+        # check if action type is allowed
+        action_type_found = mcg_cc_supporter.check_if_reference_contains_action_type(action_type)
+
         # if action type is not allowed
-        if action_type not in allowed_action_types:
+        if not action_type_found:
             # record error
             mcg_cc_error_handler.record_error(51, action, "none")
 
@@ -135,8 +136,12 @@ def read_signal_targets(file_content, node_list):
                         # first input signal is not needed
                         first_input_signal_needed = False
 
+                        # check if target action requires first input signal
+                        action_type_req_first_input_signal_found = mcg_cc_supporter.\
+                            check_if_reference_contains_action_type_req_first_input_signal(target_action_type)
+
                         # if this type of action requires first input signal
-                        if target_action_type in action_types_with_first_input_signal:
+                        if action_type_req_first_input_signal_found:
 
                             # find first input signal in file content
                             first_input_signal = mcg_cc_supporter.find_first_input_signal(target_action,

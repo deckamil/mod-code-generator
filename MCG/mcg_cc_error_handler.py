@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2021
+#   DATE:           30 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -72,7 +72,7 @@ def record_error(error_code, error_info1, error_info2):
     elif error_code == 51:
         # set error notification
         error = "ERROR " + str(error_code) + ": Action " + str(error_info1) + \
-                " is not recognized as valid one within component content"
+                " is not recognized as allowed one within component content"
         # append error to error list
         error_list.append(error)
 

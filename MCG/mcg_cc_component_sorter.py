@@ -6,7 +6,7 @@
 #       of nodes for conversion into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2021
+#   DATE:           30 AUG 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,8 +29,6 @@ import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 from mcg_cc_parameters import CUT_FIRST_INPUT_SIGNAL_OFFSET
-from mcg_cc_parameters import action_type_list
-from mcg_cc_parameters import action_type_req_first_input_signal_list
 
 
 # Function:
@@ -145,20 +143,12 @@ def merge_nodes(node_list, action_list):
 
     # append "<signal name> target <signal name>" nodes to list of merged nodes
     for node in node_list:
-        # action marker shows whether any action was found or not within node
-        action_found = False
 
-        # for all allowed type of actions
-        for action_type in action_type_list:
-            # if action type is found within node
-            if action_type in node:
-                # change action marker
-                action_found = True
-                # exit loop
-                break
+        # check if node contains any action
+        action_type_found = mcg_cc_supporter.check_if_reference_contains_action_type(node)
 
         # if any action was not found within node and node does not contain "empty" keyword
-        if (not action_found) and ("empty" not in node):
+        if (not action_type_found) and ("empty" not in node):
             # append node to list of merged nodes
             merged_node_list.append(node)
 
@@ -206,21 +196,12 @@ def sort_first_input_signals(merged_node_list):
     # for each merged node check if it contains type of action where sorting of first input signal is required
     for merged_node in merged_node_list:
 
-        # action marker shows whether action requiring to distinguish first input signal was
-        # found or not within merged node
-        action_found = False
-
-        # for all type of actions, which require to distinguish first input signal
-        for action_type_req_first_input_signal in action_type_req_first_input_signal_list:
-            # if action type is found within merged node
-            if action_type_req_first_input_signal in merged_node:
-                # change action marker
-                action_found = True
-                # exit loop
-                break
+        # check if merged node contains action requiring first input signal
+        action_type_req_first_input_signal_found = mcg_cc_supporter.\
+            check_if_reference_contains_action_type_req_first_input_signal(merged_node)
 
         # if merged node contains type of action, which requires to distinguish first input signal
-        if action_found:
+        if action_type_req_first_input_signal_found:
 
             # find start marker of first input signal
             first_input_start = merged_node.find("*FIRST*")
