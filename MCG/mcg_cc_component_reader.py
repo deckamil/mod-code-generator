@@ -31,6 +31,8 @@ import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 from mcg_cc_parameters import ACTION_UID_OFFSET
+from mcg_cc_parameters import TARGET_ELEMENT_FOUND_INDEX
+from mcg_cc_parameters import TARGET_ELEMENT_NAME_INDEX
 
 
 # Function:
@@ -167,16 +169,22 @@ def read_signal_targets(file_content, node_list):
                         line_number = j + 3
                         # get target signal uid
                         target_signal_uid = mcg_cc_supporter.get_uid(line, line_number)
-                        # find target signal
+                        # find target signal name
                         target_signal_list = mcg_cc_supporter.find_target_element(target_signal_uid,
                                                                                   "Standard.Attribute",
                                                                                   file_content)
+
+                        # get target signal found marker
+                        target_signal_found_marker = target_signal_list[TARGET_ELEMENT_FOUND_INDEX]
+                        # get target signal name
+                        target_signal_name = target_signal_list[TARGET_ELEMENT_NAME_INDEX]
+
                         # if target signal was not found
-                        if "NOT_FOUND" in target_signal_list[0]:
+                        if "NOT_FOUND" in target_signal_found_marker:
                             # record error
                             mcg_cc_error_handler.record_error(20, target_signal_uid, signal_name)
                         # append node to list of nodes
-                        node_list.append(str(signal_name) + " target " + str(target_signal_list[1]))
+                        node_list.append(str(signal_name) + " target " + str(target_signal_name))
 
                 # if line contains </COMP> that means end of targets for given signal
                 if "</COMP>" in file_content[j]:
@@ -253,16 +261,22 @@ def read_action_targets(file_content, node_list):
                         line_number = j + 3
                         # get target signal uid
                         target_signal_uid = mcg_cc_supporter.get_uid(line, line_number)
-                        # find target signal
+                        # find target signal name
                         target_signal_list = mcg_cc_supporter.find_target_element(target_signal_uid,
                                                                                   "Standard.Attribute",
                                                                                   file_content)
+
+                        # get target signal found marker
+                        target_signal_found_marker = target_signal_list[TARGET_ELEMENT_FOUND_INDEX]
+                        # get target signal name
+                        target_signal_name = target_signal_list[TARGET_ELEMENT_NAME_INDEX]
+
                         # if target signal was not found
-                        if "NOT_FOUND" in target_signal_list[0]:
+                        if "NOT_FOUND" in target_signal_found_marker:
                             # record error
                             mcg_cc_error_handler.record_error(21, target_signal_uid, action)
                         # append node to list of nodes
-                        node_list.append(str(action) + " target " + str(target_signal_list[1]))
+                        node_list.append(str(action) + " target " + str(target_signal_name))
 
                 # if line contains </COMP> that means end of targets for given signal
                 if "</COMP>" in file_content[j]:

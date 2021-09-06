@@ -5,7 +5,7 @@
 #       modules of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2021
+#   DATE:           6 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,18 +34,19 @@ MCG_CC_TEST_RUN = True
 EXML_FILE_NAME_LENGTH = 41
 
 # This parameter defines offset of signal name after "target" marker in merged node, i.e. number of
-# characters after "target" marker occurrence, where beginning of signal name occurs, an example:
+# characters after occurrence of "target" marker, where beginning of signal name occurs, an example:
 # eng_gain1 target eng_gain2 target ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 target eng_gain_total
 TARGET_OFFSET = 7
 
 # This parameter defines offset of signal name after "*FIRST*" marker in merged node or line of .exml file,
-# i.e. number of characters after "*FIRST*" marker occurrence, where beginning of signal name occurs, an example:
+# i.e. number of characters after occurrence of "*FIRST*" marker, where beginning of signal name occurs, an example:
 # *FIRST* some_signal *FIRST*
 FIRST_INPUT_SIGNAL_OFFSET = 8
 
-# This parameter defines offset of action uid before last "target" marker in merged node, i.e. number of
-# characters before last "target" marker occurrence, where beginning of action uid occurs, an example:
-# eng_gain1 target eng_gain2 target ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 target eng_gain_total
+# This parameter defines offset of action uid before end of action definition, i.e. number of characters
+# before occurrence of action definition end, where beginning of action uid occurs, plus one additional
+# character to accommodate space between action type and action uid, an example:
+# ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
 ACTION_UID_OFFSET = -37
 
 # This parameter defines offset, which is used to cut off first input signal node from merged node, i.e. first input
@@ -57,24 +58,32 @@ ACTION_UID_OFFSET = -37
 CUT_FIRST_INPUT_SIGNAL_OFFSET = 23
 
 # This parameter defines start offset of name element after "name" marker in line of .exml file, i.e.
-# number of characters after "name" marker occurrence, where beginning of name element occurs, an example:
+# number of characters after occurrence of "name" marker, where beginning of name element occurs, an example:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 NAME_START_OFFSET = 6
 
 # This parameter defines end offset of name element before "mc" marker in line of .exml file, i.e.
-# number of characters before "mc" marker occurrence, where end of name element occurs, an example:
+# number of characters before occurrence of "mc" marker, where end of name element occurs, an example:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 NAME_END_OFFSET = -2
 
 # This parameter defines start offset of uid element after "uid" marker in line of .exml file, i.e.
-# number of characters after "uid" marker occurrence, where beginning of uid element occurs, an example:
+# number of characters after occurrence of "uid" marker, where beginning of uid element occurs, an example:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 UID_START_OFFSET = 5
 
 # This parameter defines end offset of uid element before end of .exml file line, i.e.
-# number of characters before end of .exml file line occurrence, where end of uid element occurs, an example:
+# number of characters before occurrence of .exml file line end, where end of uid element occurs, an example:
 # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
 UID_END_OFFSET = -3
+
+# This parameter defines index of target element found marker from list of target elements returned
+# by supporter module function
+TARGET_ELEMENT_FOUND_INDEX = 0
+
+# This parameter defines index of target element name from list of target elements returned
+# by supporter module function
+TARGET_ELEMENT_NAME_INDEX = 1
 
 # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
 # Converter Component (CC), i.e. list of arguments:

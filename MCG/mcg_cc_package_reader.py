@@ -30,6 +30,8 @@ import mcg_cc_error_handler
 import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
+from mcg_cc_parameters import TARGET_ELEMENT_FOUND_INDEX
+from mcg_cc_parameters import TARGET_ELEMENT_NAME_INDEX
 
 
 # Function:
@@ -83,16 +85,22 @@ def read_interface_targets(file_content, node_list, interface_list):
                         line_number = j + 3
                         # get target component uid
                         target_component_uid = mcg_cc_supporter.get_uid(line, line_number)
-                        # find target component
+                        # find target component name
                         target_component_list = mcg_cc_supporter.find_target_element(target_component_uid,
                                                                                      "Standard.Component",
                                                                                      file_content)
+
+                        # get target component found marker
+                        target_component_found_marker = target_component_list[TARGET_ELEMENT_FOUND_INDEX]
+                        # get target component name
+                        target_component_name = target_component_list[TARGET_ELEMENT_NAME_INDEX]
+
                         # if target component was not found
-                        if "NOT_FOUND" in target_component_list[0]:
+                        if "NOT_FOUND" in target_component_found_marker:
                             # record error
                             mcg_cc_error_handler.record_error(172, target_component_uid, interface_type)
                         # append node to list of nodes
-                        node_list.append(str(interface_type) + " target " + str(target_component_list[1]))
+                        node_list.append(str(interface_type) + " target " + str(target_component_name))
 
                 # if line contains </COMP> that means end of targets for given interface
                 if "</COMP>" in file_content[j]:
@@ -156,23 +164,35 @@ def read_component_targets(file_content, node_list, component_list):
                         line_number = j + 3
                         # get target uid
                         target_uid = mcg_cc_supporter.get_uid(line, line_number)
-                        # find target component
+                        # find target component name
                         target_component_list = mcg_cc_supporter.find_target_element(target_uid,
                                                                                      "Standard.Component",
                                                                                      file_content)
-                        # find target interface
+                        # find target interface type
                         target_interface_list = mcg_cc_supporter.find_target_element(target_uid,
                                                                                      "Standard.Interface",
                                                                                      file_content)
+
+                        # get target component found marker
+                        target_component_found_marker = target_component_list[TARGET_ELEMENT_FOUND_INDEX]
+                        # get target component name
+                        target_component_name = target_component_list[TARGET_ELEMENT_NAME_INDEX]
+
+                        # get target interface found marker
+                        target_interface_found_marker = target_interface_list[TARGET_ELEMENT_FOUND_INDEX]
+                        # get target interface type
+                        target_interface_type = target_interface_list[TARGET_ELEMENT_NAME_INDEX]
+
                         # if target element was not found
-                        if ("NOT_FOUND" in target_component_list[0]) and ("NOT_FOUND" in target_interface_list[0]):
+                        if ("NOT_FOUND" in target_component_found_marker) and \
+                                ("NOT_FOUND" in target_interface_found_marker):
                             # record error
                             mcg_cc_error_handler.record_error(171, target_uid, component_name)
                         # select target element for node
-                        if "NOT_FOUND" in target_component_list[0]:
-                            target_element = target_interface_list[1]
+                        if "NOT_FOUND" in target_component_found_marker:
+                            target_element = target_interface_type
                         else:
-                            target_element = target_component_list[1]
+                            target_element = target_component_name
                         # append node to list of nodes
                         node_list.append(str(component_name) + " target " + str(target_element))
 
