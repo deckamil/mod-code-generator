@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2021
+#   DATE:           6 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -183,7 +183,7 @@ def read_signal_targets(file_content, node_list):
                     # exit "for j in range" loop
                     break
 
-    # remove duplicates from signal_list
+    # remove duplicates from signal list
     signal_list = list(set(signal_list))
 
     return node_list, signal_list
@@ -268,6 +268,9 @@ def read_action_targets(file_content, node_list):
                 if "</COMP>" in file_content[j]:
                     # exit "for j in range" loop
                     break
+
+    # remove duplicates from action list
+    action_list = list(set(action_list))
 
     return node_list, action_list
 

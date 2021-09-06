@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           21 AUG 2021
+#   DATE:           6 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -81,16 +81,16 @@ def read_interface_targets(file_content, node_list, interface_list):
                         line = file_content[j + 2]
                         # get line number
                         line_number = j + 3
-                        # get component uid
-                        component_uid = mcg_cc_supporter.get_uid(line, line_number)
+                        # get target component uid
+                        target_component_uid = mcg_cc_supporter.get_uid(line, line_number)
                         # find target component
-                        target_component_list = mcg_cc_supporter.find_target_element(component_uid,
+                        target_component_list = mcg_cc_supporter.find_target_element(target_component_uid,
                                                                                      "Standard.Component",
                                                                                      file_content)
                         # if target component was not found
                         if "NOT_FOUND" in target_component_list[0]:
                             # record error
-                            mcg_cc_error_handler.record_error(172, component_uid, interface_type)
+                            mcg_cc_error_handler.record_error(172, target_component_uid, interface_type)
                         # append node to list of nodes
                         node_list.append(str(interface_type) + " target " + str(target_component_list[1]))
 
@@ -98,6 +98,9 @@ def read_interface_targets(file_content, node_list, interface_list):
                 if "</COMP>" in file_content[j]:
                     # exit "for j in range" loop
                     break
+
+    # remove duplicates from interface list
+    interface_list = list(set(interface_list))
 
     return node_list, interface_list
 
@@ -178,6 +181,9 @@ def read_component_targets(file_content, node_list, component_list):
                     # exit "for j in range" loop
                     break
 
+    # remove duplicates from component list
+    component_list = list(set(component_list))
+
     return node_list, component_list
 
 
@@ -190,40 +196,32 @@ def read_component_targets(file_content, node_list, component_list):
 #
 # Returns:
 # This function returns list of input interfaces and output interfaces.
-def read_interfaces(path, package_name):
-    # locals
+def read_interfaces(activity_file_path, package_name):
+    # interface lists
     input_interface_list = []
     output_interface_list = []
-    signal = []
 
     # interface markers show whether interface was found of not
     input_interface_found = False
     output_interface_found = False
 
     # find position of standard activity within the path
-    standard_activity_position = path.find("\\Standard.Activity")
+    standard_activity_position = activity_file_path.find("\\Standard.Activity")
     # get interface directory path
-    interface_dir_path = path[0:standard_activity_position] + str("\\Standard.Interface")
-
-    # get list of interfaces
-    interface_list = listdir(interface_dir_path)
-
-    # create list of paths to interfaces
-    interface_path_list = []
-    for il in interface_list:
-        interface_path_list.append(interface_dir_path + str("\\") + str(il))
+    interface_dir_path = activity_file_path[0:standard_activity_position] + str("\\Standard.Interface")
+    # get list of interface sources, i.e. names of exml files
+    interface_source_list = listdir(interface_dir_path)
 
     # read interface details
-    for ipl in interface_path_list:
+    for interface_source in interface_source_list:
+        # get interface file path
+        interface_file_path = interface_dir_path + str("\\") + str(interface_source)
 
         # open file and read content, then close file
-        file = open(ipl, "r")
+        file = open(interface_file_path, "r")
         file_content = file.readlines()
-        file_content = [x.strip() for x in file_content]
+        file_content = [line.strip() for line in file_content]
         file.close()
-
-        # find interface source, i.e. name of exml file
-        interface_source = ipl[len(ipl) - EXML_FILE_NAME_LENGTH:len(ipl)]
 
         # if input interface element has not been found yet
         if not input_interface_found:
@@ -274,28 +272,23 @@ def read_interfaces(path, package_name):
 # details from .exml files.
 #
 # Returns:
-# This function returns list of nodes, interfaces, components, input interfaces,
-# output interfaces, package source and package name.
-def read_package(path):
-    # empty placeholders
+# This function returns lists with package details.
+def read_package(activity_file_path):
+    # package lists
     node_list = []
     interface_list = []
     component_list = []
     input_interface_list = []
     output_interface_list = []
 
-    # activity diagram path
-    activity_diagram_path = path
-
     # open file and read content, then close file
-    file = open(activity_diagram_path, "r")
+    file = open(activity_file_path, "r")
     file_content = file.readlines()
-    file_content = [x.strip() for x in file_content]
+    file_content = [line.strip() for line in file_content]
     file.close()
 
     # find model element source, i.e. name of exml file
-    model_element_source = activity_diagram_path[
-                           len(activity_diagram_path) - EXML_FILE_NAME_LENGTH:len(activity_diagram_path)]
+    model_element_source = activity_file_path[len(activity_file_path) - EXML_FILE_NAME_LENGTH:len(activity_file_path)]
 
     # search for model element name and type in file content, i.e. find out if file content contains package data
     model_element_name, model_element_type = mcg_cc_supporter.find_model_element(file_content)
@@ -339,20 +332,20 @@ def read_package(path):
 
             # print component details
             print("Nodes:")
-            for n in node_list:
-                print("          " + str(n))
+            for node in node_list:
+                print("          " + str(node))
             print("Interfaces:")
-            for i in interface_list:
-                print("          " + str(i))
+            for interface in interface_list:
+                print("          " + str(interface))
             print("Components:")
-            for c in component_list:
-                print("          " + str(c))
+            for component in component_list:
+                print("          " + str(component))
             print("Input Interface:")
-            for ii in input_interface_list:
-                print("          " + str(ii))
+            for input_interface in input_interface_list:
+                print("          " + str(input_interface))
             print("Output Interface:")
-            for oi in output_interface_list:
-                print("          " + str(oi))
+            for output_interface in output_interface_list:
+                print("          " + str(output_interface))
             print()
 
         # end of component reading
