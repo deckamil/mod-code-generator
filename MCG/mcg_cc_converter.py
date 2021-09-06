@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2021
+#   DATE:           6 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -36,9 +36,6 @@ from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import TARGET_OFFSET
 from mcg_cc_parameters import ACTION_UID_OFFSET
 from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
-
-# empty model path placeholder
-model_path = ""
 
 
 # Function:
@@ -158,7 +155,7 @@ def convert_sub(configuration_file, sorted_node):
 def convert_component(sorted_node_list, input_interface_list, output_interface_list, local_parameter_list,
                       component_source, component_name):
 
-    # empty placeholder
+    # configuration file
     configuration_file = []
 
     # component conversion
@@ -182,9 +179,15 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
     configuration_file.append(str("INPUT INTERFACE START"))
 
     # append input interface details to configuration file
-    for iil in input_interface_list:
-        input_interface_position = "type " + str(iil[1]) + " name " + str(iil[0])
-        configuration_file.append(input_interface_position)
+    for input_interface in input_interface_list:
+        # get signal name
+        signal_name = input_interface[0]
+        # get signal type
+        signal_type = input_interface[1]
+        # get configuration file line
+        configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
+        # append configuration file line to configuration file
+        configuration_file.append(configuration_file_line)
 
     # append end marker of input interface section to configuration file
     configuration_file.append(str("INPUT INTERFACE END"))
@@ -193,9 +196,15 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
     configuration_file.append(str("OUTPUT INTERFACE START"))
 
     # append output interface details to configuration file
-    for oil in output_interface_list:
-        output_interface_position = "type " + str(oil[1]) + " name " + str(oil[0])
-        configuration_file.append(output_interface_position)
+    for output_interface in output_interface_list:
+        # get signal name
+        signal_name = output_interface[0]
+        # get signal type
+        signal_type = output_interface[1]
+        # get configuration file line
+        configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
+        # append configuration file line to configuration file
+        configuration_file.append(configuration_file_line)
 
     # append end marker of output interface section to configuration file
     configuration_file.append(str("OUTPUT INTERFACE END"))
@@ -204,9 +213,15 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
     configuration_file.append(str("LOCAL PARAMETERS START"))
 
     # append local parameters details to configuration file
-    for lpl in local_parameter_list:
-        local_parameter_position = "type " + str(lpl[1]) + " name " + str(lpl[0])
-        configuration_file.append(local_parameter_position)
+    for local_parameter in local_parameter_list:
+        # get signal name
+        signal_name = local_parameter[0]
+        # get signal type
+        signal_type = local_parameter[1]
+        # get configuration file line
+        configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
+        # append configuration file line to configuration file
+        configuration_file.append(configuration_file_line)
 
     # append end marker of local parameters section to configuration file
     configuration_file.append(str("LOCAL PARAMETERS END"))
@@ -217,17 +232,17 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
     print("*** CONVERT NODES ***")
 
     # repeat for all nodes from sorted list of nodes
-    for snl in sorted_node_list:
+    for sorted_node in sorted_node_list:
 
-        # if given node contains ADD action
-        if "ADD" in snl:
+        # if sorted node contains ADD action
+        if "ADD" in sorted_node:
             # convert ADD action
-            configuration_file = convert_add(configuration_file, snl)
+            configuration_file = convert_add(configuration_file, sorted_node)
 
-        # if given node contains SUB action
-        if "SUB" in snl:
+        # if sorted node contains SUB action
+        if "SUB" in sorted_node:
             # convert ADD action
-            configuration_file = convert_sub(configuration_file, snl)
+            configuration_file = convert_sub(configuration_file, sorted_node)
 
     print("*** NODES CONVERTED ***")
     print()
@@ -242,8 +257,8 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
     if MCG_CC_TEST_RUN:
 
         print("Configuration File:")
-        for n in configuration_file:
-            print("          " + str(n))
+        for line in configuration_file:
+            print("          " + str(line))
         print()
 
     # end of component conversion
@@ -260,45 +275,43 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
 #
 # Returns:
 # This function does not return anything.
-def process_components(path):
-    # path to activity diagrams directory
-    activity_diagram_dir_path = path + str("\\Standard.Activity")
+def process_components(model_dir_path):
+    # get activity directory path
+    activity_dir_path = model_dir_path + str("\\Standard.Activity")
 
-    # get list of activity diagrams
-    activity_diagram_list = listdir(activity_diagram_dir_path)
+    # get list of activity sources, i.e. names of exml files
+    activity_source_list = listdir(activity_dir_path)
 
-    # create list of paths to activity diagrams
-    activity_diagram_path_list = []
-    for adl in activity_diagram_list:
-        activity_diagram_path_list.append(activity_diagram_dir_path + str("\\") + str(adl))
-
-    # read and sort nodes for each activity diagram
-    for adpl in activity_diagram_path_list:
+    # read and sort activity details
+    for activity_source in activity_source_list:
+        # get activity file path
+        activity_file_path = activity_dir_path + str("\\") + str(activity_source)
 
         # read component content
-        node_list, action_list, input_interface_list, output_interface_list, local_parameter_list,\
-            component_source, component_name, component_type = mcg_cc_component_reader.read_component(adpl)
+        node_list, action_list, input_interface_list, output_interface_list, local_parameter_list, \
+            model_element_source, model_element_name, \
+            model_element_type = mcg_cc_component_reader.read_component(activity_file_path)
 
         # check errors
-        mcg_cc_error_handler.check_errors(component_source, component_name, component_type)
+        mcg_cc_error_handler.check_errors(model_element_source, model_element_name, model_element_type)
 
         # if node list is not empty, then sort nodes
         if len(node_list) > 0:
 
             # sort component content
             sorted_node_list = mcg_cc_component_sorter.sort_component(node_list, action_list,
-                                                                      local_parameter_list, component_source,
-                                                                      component_name)
+                                                                      local_parameter_list, model_element_source,
+                                                                      model_element_name)
 
             # check errors
-            mcg_cc_error_handler.check_errors(component_source, component_name, component_type)
+            mcg_cc_error_handler.check_errors(model_element_source, model_element_name, model_element_type)
 
             # if sorted list of nodes is not empty, then convert nodes
             if len(sorted_node_list) > 0:
 
                 # convert component content
                 convert_component(sorted_node_list, input_interface_list, output_interface_list, local_parameter_list,
-                                  component_source, component_name)
+                                  model_element_source, model_element_name)
 
 
 # Function:
@@ -310,10 +323,10 @@ def process_components(path):
 #
 # Returns:
 # This function does not return anything.
-def convert_model(path):
+def convert_model(model_dir_path):
 
     # process components content from .exml files into configuration file
-    process_components(path)
+    process_components(model_dir_path)
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance
@@ -332,11 +345,11 @@ print()
 # check if number of command line arguments is correct
 if len(argv) - 1 == NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
-    # set model path to cmd line argument
-    model_path = str(argv[1])
+    # set model directory path to cmd line argument
+    model_dir_path = str(argv[1])
 
     # convert model
-    convert_model(model_path)
+    convert_model(model_dir_path)
 
 # else display info and exit
 else:
