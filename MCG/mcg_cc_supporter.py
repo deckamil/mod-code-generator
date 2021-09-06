@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2021
+#   DATE:           6 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -245,7 +245,7 @@ def find_target_element(target_element_uid, target_element_type, file_content):
                     line_number = j + 1
                     # get target element name
                     target_element_name = get_name(line, line_number)
-                    # append "found" info to list of target elements
+                    # append "found" marker to list of target elements
                     target_element_list.append("FOUND")
                     # append target element name to list of target elements
                     target_element_list.append(target_element_name)
@@ -259,7 +259,7 @@ def find_target_element(target_element_uid, target_element_type, file_content):
     if target_element_name == "":
         # set target element name
         target_element_name = "TARGET_ELEMENT_NOT_FOUND"
-        # append "not found" info to list of target elements
+        # append "not found" marker to list of target elements
         target_element_list.append("NOT_FOUND")
         # append target element name to list of target elements
         target_element_list.append(target_element_name)
@@ -296,7 +296,7 @@ def find_interface_signals(interface_type, interface_source, model_element_name,
             if not interface_found:
                 # change interface found marker
                 interface_found = True
-                # append "found" info to list of interface signals
+                # append "found" marker to list of interface signals
                 interface_signal_list.append("FOUND")
 
             # print details of interface file
@@ -342,7 +342,7 @@ def find_interface_signals(interface_type, interface_source, model_element_name,
 
     # if interface is not found
     if not interface_found:
-        # append "not found" info to list of interface signals
+        # append "not found" marker to list of interface signals
         interface_signal_list.append("NOT_FOUND")
 
     # return list of interface signals

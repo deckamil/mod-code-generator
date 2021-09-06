@@ -78,12 +78,16 @@ UID_START_OFFSET = 5
 UID_END_OFFSET = -3
 
 # This parameter defines index of target element found marker from list of target elements returned
-# by supporter module function
+# by supporter module function find_target_element()
 TARGET_ELEMENT_FOUND_INDEX = 0
 
 # This parameter defines index of target element name from list of target elements returned
-# by supporter module function
+# by supporter module function find_target_element()
 TARGET_ELEMENT_NAME_INDEX = 1
+
+# This parameter defines index of interface found marker from list of interface signals returned
+# by supporter module function find_interface_signals()
+INTERFACE_FOUND_INDEX = 0
 
 # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
 # Converter Component (CC), i.e. list of arguments:

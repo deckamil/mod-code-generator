@@ -33,6 +33,7 @@ from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
 from mcg_cc_parameters import ACTION_UID_OFFSET
 from mcg_cc_parameters import TARGET_ELEMENT_FOUND_INDEX
 from mcg_cc_parameters import TARGET_ELEMENT_NAME_INDEX
+from mcg_cc_parameters import INTERFACE_FOUND_INDEX
 
 
 # Function:
@@ -335,12 +336,15 @@ def read_interfaces(activity_file_path, model_element_name):
                                                                            model_element_name, "Standard.Component",
                                                                            file_content)
 
+            # get interface found marker
+            interface_found_marker = input_interface_list[INTERFACE_FOUND_INDEX]
+
             # if input interface element was found:
-            if "NOT_FOUND" not in input_interface_list[0]:
+            if "NOT_FOUND" not in interface_found_marker:
                 # change input interface marker
                 input_interface_found = True
-                # remove "found" info from list of input interface
-                input_interface_list.remove(input_interface_list[0])
+                # remove found marker from list of input interface
+                input_interface_list.remove(interface_found_marker)
 
         # if output interface element has not been found yet
         if not output_interface_found:
@@ -349,12 +353,15 @@ def read_interfaces(activity_file_path, model_element_name):
                                                                             model_element_name, "Standard.Component",
                                                                             file_content)
 
+            # get interface found marker
+            interface_found_marker = output_interface_list[INTERFACE_FOUND_INDEX]
+
             # if output interface element was found:
-            if "NOT_FOUND" not in output_interface_list[0]:
+            if "NOT_FOUND" not in interface_found_marker:
                 # change output interface marker
                 output_interface_found = True
-                # remove "found" info from list of output interface
-                output_interface_list.remove(output_interface_list[0])
+                # remove found marker from list of output interface
+                output_interface_list.remove(interface_found_marker)
 
         # if local parameters element has not been found yet
         if not local_parameters_found:
@@ -363,12 +370,15 @@ def read_interfaces(activity_file_path, model_element_name):
                                                                            model_element_name, "Standard.Component",
                                                                            file_content)
 
+            # get interface found marker
+            interface_found_marker = local_parameter_list[INTERFACE_FOUND_INDEX]
+
             # if local parameters element was found:
-            if "NOT_FOUND" not in local_parameter_list[0]:
+            if "NOT_FOUND" not in interface_found_marker:
                 # change local parameters marker
                 local_parameters_found = True
-                # remove "found" info from list of local parameters
-                local_parameter_list.remove(local_parameter_list[0])
+                # remove found marker from list of local parameters
+                local_parameter_list.remove(interface_found_marker)
 
     # if input interface element was not found
     if not input_interface_found:
