@@ -6,7 +6,7 @@
 #       of nodes for conversion into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2021
+#   DATE:           12 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -329,10 +329,11 @@ def sort_nodes(merged_node_list, dependency_list):
     # repeat until all merged nodes are sorted
     while dependency_list_length > 0:
         # go thorough each dependency sublist
-        for dependency in dependency_list:
+        for i in range(0, len(dependency_list)):
             # if given merged node under dependency sublist does not have any further dependencies
-            if len(dependency) == 1:
-
+            if len(dependency_list[i]) == 1:
+                # get dependency sublist
+                dependency = dependency_list[i]
                 # append merged node to list of sorted nodes
                 sorted_node_list.append(dependency[0])
                 # remove dependency sublist from list of dependencies
@@ -343,12 +344,15 @@ def sort_nodes(merged_node_list, dependency_list):
                 dependency_list_length = len(dependency_list)
 
                 # refresh each dependency sublist
-                for dependency in dependency_list:
+                for j in range(0, len(dependency_list)):
                     # if given merged node under dependency sublist does have further dependencies
-                    if len(dependency) > 1:
-                        # go through all further dependencies, i.e. local parameters under dependency sublist
+                    if len(dependency_list[j]) > 1:
+                        # get dependency sublist
+                        dependency = dependency_list[j]
+                        # set initial index
                         index = 1
-                        for i in range(index, len(dependency)):
+                        # chek local parameters under dependency sublist
+                        for k in range(index, len(dependency)):
                             # if given merged node consumes local parameter, which comes from merged node, which
                             # was appended above to list of sorted nodes
                             if output_signal in dependency[index]:
@@ -364,7 +368,7 @@ def sort_nodes(merged_node_list, dependency_list):
                                 index = index - 1
                             index = index + 1
 
-                # exit "dependency in dependency_list" loop
+                # exit "for i in range" loop
                 break
 
     # append merged nodes with empty target (last element from list of merged nodes)
