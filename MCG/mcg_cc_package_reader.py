@@ -5,7 +5,7 @@
 #       activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 SEP 2021
+#   DATE:           12 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -145,8 +145,8 @@ def read_component_targets(file_content, node_list, component_list):
 
                 # if line contains <COMP that means the interface has some targets
                 if "<COMP" in file_content[j]:
-                    # interface has some target
-                    interface_has_targets = True
+                    # component has some target
+                    component_has_targets = True
 
                 # if line contains </DEPENDENCIES> then component does not have any target
                 if ("</DEPENDENCIES>" in file_content[j]) and (not component_has_targets):
@@ -269,7 +269,7 @@ def read_interfaces(activity_file_path, package_name):
                                                                             file_content)
 
             # get interface found marker
-            interface_found_marker = output_interface_found[INTERFACE_FOUND_INDEX]
+            interface_found_marker = output_interface_list[INTERFACE_FOUND_INDEX]
 
             # if output interface element was found:
             if "NOT_FOUND" not in interface_found_marker:
@@ -345,7 +345,7 @@ def read_package(activity_file_path):
         print()
 
         # open and read interface file
-        input_interface_list, output_interface_list = read_interfaces(path, model_element_name)
+        input_interface_list, output_interface_list = read_interfaces(activity_file_path, model_element_name)
 
         # display additional details after component reading for test run
         if MCG_CC_TEST_RUN:
