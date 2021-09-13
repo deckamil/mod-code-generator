@@ -6,7 +6,7 @@
 #       of nodes for conversion into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           12 SEP 2021
+#   DATE:           13 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,9 +54,9 @@ def sort_actions(node_list, action_list):
             keyword = "target " + str(action_list[i])
             # if keyword for given action is found
             if keyword in node:
-                # remove action from current position on the list
+                # remove node from current position on the list
                 node_list.remove(node)
-                # insert action under new position defined by index
+                # insert node under new position defined by index
                 node_list.insert(index, node)
                 # increment index to put next node right after this node
                 index = index + 1
@@ -65,9 +65,9 @@ def sort_actions(node_list, action_list):
             keyword = str(action_list[i]) + " target"
             # if keyword for given action is found
             if keyword in node:
-                # remove action from current position on the list
+                # remove node from current position on the list
                 node_list.remove(node)
-                # insert action under new position defined by index
+                # insert node under new position defined by index
                 node_list.insert(index, node)
                 # increment index to put next node right after this node
                 index = index + 1
