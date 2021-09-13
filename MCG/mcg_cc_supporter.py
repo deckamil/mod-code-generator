@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 SEP 2021
+#   DATE:           13 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -249,6 +249,11 @@ def find_target_element(target_element_uid, target_element_type, file_content):
                     target_element_list.append("FOUND")
                     # append target element name to list of target elements
                     target_element_list.append(target_element_name)
+                    # exit "for j in range" loop
+                    break
+
+                # if line contains </OBJECT> that means end of object definition
+                if "</OBJECT>" in file_content[j]:
                     # exit "for j in range" loop
                     break
 
