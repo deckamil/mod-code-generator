@@ -5,7 +5,7 @@
 #       processing of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2021
+#   DATE:           16 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -121,6 +121,12 @@ def record_error(error_code, error_info1, error_info2):
         # append error to error list
         error_list.append(error)
 
+    elif error_code == 125:
+        # set error notification
+        error = "ERROR " + str(error_code) + ": Could not find Local Data within package content"
+        # append error to error list
+        error_list.append(error)
+
     # COMPONENT errors, range 151-200
     elif error_code == 170:
         # set error notification
@@ -131,15 +137,8 @@ def record_error(error_code, error_info1, error_info2):
 
     elif error_code == 171:
         # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target component or interface with uid=" + \
+        error = "ERROR " + str(error_code) + ": Could not find target structure with uid=" + \
                 str(error_info1) + " for component " + str(error_info2) + " within package content"
-        # append error to error list
-        error_list.append(error)
-
-    elif error_code == 172:
-        # set error notification
-        error = "ERROR " + str(error_code) + ": Could not find target component with uid=" + str(error_info1) + \
-                " for interface " + str(error_info2) + " within package content"
         # append error to error list
         error_list.append(error)
 
@@ -163,6 +162,14 @@ def record_error(error_code, error_info1, error_info2):
         # set error notification
         error = "ERROR " + str(error_code) + ": Could not find <uid> element at line " + \
                 str(error_info1) + " within file content"
+        # append error to error list
+        error_list.append(error)
+
+    # STRUCTURE errors, range 301-350
+    elif error_code == 301:
+        # set error notification
+        error = "ERROR " + str(error_code) + ": Could not find target component or structure with uid=" + \
+                str(error_info1) + " for structure " + str(error_info2) + " within package content"
         # append error to error list
         error_list.append(error)
 
