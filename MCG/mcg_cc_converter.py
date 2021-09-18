@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           12 SEP 2021
+#   DATE:           18 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,6 +32,7 @@ import mcg_cc_error_handler
 import mcg_cc_component_reader
 import mcg_cc_component_sorter
 import mcg_cc_package_reader
+import mcg_cc_package_sorter
 import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import TARGET_OFFSET
@@ -339,12 +340,19 @@ def process_packages(model_dir_path):
         activity_file_path = activity_dir_path + str("\\") + str(activity_source)
 
         # read package content
-        node_list, interface_list, component_list, input_interface_list, output_interface_list, model_element_source, \
-            model_element_name, model_element_type = mcg_cc_package_reader.read_package(activity_file_path)
+        node_list, structure_list, component_list, input_interface_list, output_interface_list, local_data_list, \
+            model_element_source, model_element_name, \
+            model_element_type = mcg_cc_package_reader.read_package(activity_file_path)
 
         # check errors
         if "Standard.Component" not in model_element_type:
             mcg_cc_error_handler.check_errors(model_element_source, model_element_name, model_element_type)
+
+        # if node list is not empty, then sort nodes
+        if len(node_list) > 0:
+            # sort package content
+            mcg_cc_package_sorter.sort_package(node_list, component_list, local_data_list,
+                                               model_element_source, model_element_name)
 
 
 # Function:

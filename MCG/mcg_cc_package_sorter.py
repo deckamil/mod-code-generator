@@ -1,0 +1,227 @@
+#   FILE:           mcg_cc_package_sorter.py
+#
+#   DESCRIPTION:
+#       This module is responsible for sorting of package content, i.e.
+#       nodes of activity diagram from .exml files and preparing sorted list
+#       of nodes for conversion into configuration file.
+#
+#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
+#   DATE:           18 SEP 2021
+#
+#   LICENSE:
+#       This file is part of Mod Code Generator (MCG).
+#
+#       MCG is free software: you can redistribute it and/or modify
+#       it under the terms of the GNU General Public License as published by
+#       the Free Software Foundation, either version 3 of the License, or
+#       (at your option) any later version.
+#
+#       MCG is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#       GNU General Public License for more details.
+#
+#       You should have received a copy of the GNU General Public License
+#       along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+import mcg_cc_supporter
+from mcg_cc_parameters import MCG_CC_TEST_RUN
+
+
+# Function:
+# sort_components()
+#
+# Description:
+# This function sorts nodes of same component in one place within list of nodes.
+#
+# Returns:
+# This function returns list of nodes with sorted components.
+def sort_components(node_list, component_list):
+
+    # this index tells where to put node (defines new position of node)
+    index = 0
+
+    # repeat for each component recorded on list of components
+    # sort nodes of given component in one place within list of nodes
+    # first, nodes with inputs to component are sorted (keyword "target + <component name>"),
+    # then, node with output from component is placed after them (keyword "<component name> + target")
+    for i in range(0, len(component_list)):
+        # go through all nodes for each component on list of components
+        for node in node_list:
+            keyword = "target " + str(component_list[i])
+            # if keyword for given component is found
+            if keyword in node:
+                # remove node from current position on the list
+                node_list.remove(node)
+                # insert node under new position defined by index
+                node_list.insert(index, node)
+                # increment index to put next node right after this node
+                index = index + 1
+        # go through all nodes for each component on list of components
+        for node in node_list:
+            keyword = str(component_list[i]) + " target"
+            # if keyword for given component is found
+            if keyword in node:
+                # remove node from current position on the list
+                node_list.remove(node)
+                # insert node under new position defined by index
+                node_list.insert(index, node)
+                # increment index to put next node right after this node
+                index = index + 1
+
+    # place nodes with empty target (keyword "target empty") at the end of list of nodes
+    for i in range(index, len(node_list)):
+        # if interface does not have any target
+        if "target empty" in node_list[index]:
+            # copy node from given index
+            node = node_list[index]
+            # remove node
+            node_list.remove(node)
+            # insert node at the end of list
+            node_list.insert(len(node_list), node)
+            # decrement index for next iteration, as inserted node pushes by one position
+            # from right to left other nodes, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A];
+            # A was placed at the end and now B is under previous position of A,
+            # so at next iteration the same index need to be checked to examine B
+            index = index - 1
+        index = index + 1
+
+    # display additional details after package sorting for test run
+    if MCG_CC_TEST_RUN:
+
+        print()
+        print("Sorted Components:")
+        for node in node_list:
+            print("          " + str(node))
+        print()
+
+    return node_list
+
+
+# Function:
+# merge_nodes()
+#
+# Description:
+# This function merges nodes of same component from list of nodes into one merged node on list of merged
+# nodes. This function also simplifies nodes before merging by removing of redundant component
+# occurrences within node.
+#
+# Returns:
+# This function returns list of merged nodes.
+def merge_nodes(node_list, component_list):
+
+    # list of merged nodes
+    merged_node_list = []
+
+    # merge nodes of same component from list of nodes into one node on list of merged nodes
+    for i in range(0, len(component_list)):
+        merged_node = ""
+        # go through all nodes for each component on component_list
+        for node in node_list:
+            # if given component found in node
+            if component_list[i] in node:
+                keyword = "target " + str(component_list[i])
+                # if keyword for given component is found
+                if keyword in node:
+                    # find target position
+                    target_position = node.find("target")
+                    # get structure name
+                    structure_name = node[0:target_position-1]
+                    # get simplified node
+                    node = structure_name + str(" target")
+                # append node of same component to temporary merged node
+                if merged_node == "":
+                    merged_node = merged_node + str(node)
+                else:
+                    merged_node = merged_node + " " + str(node)
+
+        # append merged node to list of merged nodes
+        merged_node_list.append(merged_node)
+
+    # append "<structure name> target <structure name>" nodes to list of merged nodes
+    for node in node_list:
+
+        # component markers show whether component was found or not
+        component_found = False
+
+        # check if node contains component
+        for component in component_list:
+            # if component is found within reference
+            if component in node:
+                # change component marker
+                component_found = True
+                # exit loop
+                break
+
+        # if any component was not found within node and node does not contain "empty" keyword
+        if (not component_found) and ("empty" not in node):
+            # append node to list of merged nodes
+            merged_node_list.append(node)
+
+    # merge nodes with empty target from list of nodes into one node on list of merged nodes
+    merged_node = ""
+    for node in node_list:
+        if "target empty" in node:
+            # append node of empty target to temporary merged node
+            if merged_node == "":
+                merged_node = merged_node + str(node)
+            else:
+                merged_node = merged_node + " " + str(node)
+
+    # append merged node to list of merged nodes
+    merged_node_list.append(merged_node)
+
+    # display additional details after package sorting for test run
+    if MCG_CC_TEST_RUN:
+
+        print("Merged Nodes:")
+        for node in merged_node_list:
+            print("          " + str(node))
+        print()
+
+    return merged_node_list
+
+
+# Function:
+# sort_package()
+#
+# Description:
+# This is main function of this module and is responsible for sorting of package
+# details from .exml files.
+#
+# Returns:
+# This function returns list of sorted nodes.
+def sort_package(node_list, component_list, local_data_list, package_source, package_name):
+
+    # package sorting
+    print("****************************** PACKAGE SORTING *****************************")
+    print()
+
+    # print component details
+    print("Package Source:      " + str(package_source))
+    print("Package Name:        " + str(package_name))
+
+    print("*** SORT NODES ***")
+
+    # sort nodes of same component in one place under list of nodes
+    node_list = sort_components(node_list, component_list)
+
+    # merge nodes of same action into one merged node on list of merged nodes
+    merged_node_list = merge_nodes(node_list, component_list)
+
+    # count dependencies between merged nodes
+    # dependency_list = count_dependencies(merged_node_list, local_parameter_list)
+
+    # sort merged nodes basing on their dependencies
+    # sorted_node_list = sort_nodes(merged_node_list, dependency_list)
+
+    print("*** NODES SORTED ***")
+    print()
+
+    # end of pacakge sorting
+    print("************************** END OF PACKAGE SORTING **************************")
+    print()
+
+    # return list of sorted nodes
+    # return sorted_node_list
