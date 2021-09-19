@@ -157,9 +157,6 @@ def convert_sub(configuration_file, sorted_node):
 # This function returns configuration file.
 def convert_signal_target_signal(configuration_file, sorted_node):
 
-    # find output signal within sorted node
-    output_signal = mcg_cc_supporter.find_output_signal(sorted_node)
-
     # find position of output signal within sorted node
     target_position = sorted_node.find("target")
 
