@@ -629,3 +629,87 @@ def sort_interactions(node_list, interaction_list):
         print()
 
     return node_list
+
+
+# Function:
+# merge_nodes()
+#
+# Description:
+# This function merges nodes of same interaction from list of nodes into one merged node on list of merged
+# nodes. This function also simplifies nodes before merging by removing of redundant interaction
+# occurrences within node.
+#
+# Returns:
+# This function returns list of merged nodes.
+def merge_nodes(node_list, interaction_list):
+
+    # list of merged nodes
+    merged_node_list = []
+
+    # merge nodes of same interaction from list of nodes into one node on list of merged nodes
+    for i in range(0, len(interaction_list)):
+        merged_node = ""
+        # go through all nodes for each interaction on list of interactions
+        for node in node_list:
+            # if given interaction found in node
+            if interaction_list[i] in node:
+                keyword = "target " + str(interaction_list[i])
+                # if keyword for given interaction is found
+                if keyword in node:
+                    # find target position
+                    target_position = node.find("target")
+                    # get data name
+                    data_name = node[0:target_position-1]
+                    # get simplified node
+                    node = data_name + str(" target")
+                # append node of same interaction to temporary merged node
+                if merged_node == "":
+                    merged_node = merged_node + str(node)
+                else:
+                    merged_node = merged_node + " " + str(node)
+
+        # append merged node to list of merged nodes
+        merged_node_list.append(merged_node)
+
+    # append "data target data" nodes to list of merged nodes
+    for node in node_list:
+
+        # interaction marker show whether interaction was found or not within node
+        interaction_found_marker = False
+
+        # check if node contains interaction
+        for interaction in interaction_list:
+            # if interaction is found within node
+            if interaction in node:
+                # change interaction marker
+                interaction_found_marker = True
+                # exit loop
+                break
+
+        # if any interaction was not found within node and node does not contain "empty" keyword
+        if (not interaction_found_marker) and ("empty" not in node):
+            # append node to list of merged nodes
+            merged_node_list.append(node)
+
+    # merge nodes with empty target from list of nodes into one node on list of merged nodes
+    merged_node = ""
+    for node in node_list:
+        if "target empty" in node:
+            # append node of empty target to temporary merged node
+            if merged_node == "":
+                merged_node = merged_node + str(node)
+            else:
+                merged_node = merged_node + " " + str(node)
+
+    # append merged node to list of merged nodes
+    merged_node_list.append(merged_node)
+
+    # display additional details after sorting for test run
+    if MCG_CC_TEST_RUN:
+
+        print("Merged Nodes:")
+        for node in merged_node_list:
+            print("          " + str(node))
+        print()
+
+    return merged_node_list

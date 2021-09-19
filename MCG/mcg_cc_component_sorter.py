@@ -32,81 +32,6 @@ from mcg_cc_parameters import CUT_FIRST_INPUT_SIGNAL_OFFSET
 
 
 # Function:
-# merge_nodes()
-#
-# Description:
-# This function merges nodes of same action from list of nodes into one merged node on list of merged
-# nodes. This function also simplifies nodes before merging by removing of redundant action and uid
-# occurrences within node.
-#
-# Returns:
-# This function returns list of merged nodes.
-def merge_nodes(node_list, action_list):
-
-    # list of merged nodes
-    merged_node_list = []
-
-    # merge nodes of same action from list of nodes into one node on list of merged nodes
-    for i in range(0, len(action_list)):
-        merged_node = ""
-        # go through all nodes for each action on action_list
-        for node in node_list:
-            # if given action found in node
-            if action_list[i] in node:
-                keyword = "target " + str(action_list[i])
-                # if keyword for given action is found
-                if keyword in node:
-                    # find target position
-                    target_position = node.find("target")
-                    # get signal name
-                    signal_name = node[0:target_position-1]
-                    # get simplified node
-                    node = signal_name + str(" target")
-                # append node of same action to temporary merged node
-                if merged_node == "":
-                    merged_node = merged_node + str(node)
-                else:
-                    merged_node = merged_node + " " + str(node)
-
-        # append merged node to list of merged nodes
-        merged_node_list.append(merged_node)
-
-    # append "<signal name> target <signal name>" nodes to list of merged nodes
-    for node in node_list:
-
-        # check if node contains any action
-        action_type_found = mcg_cc_supporter.check_if_reference_contains_action_type(node)
-
-        # if any action was not found within node and node does not contain "empty" keyword
-        if (not action_type_found) and ("empty" not in node):
-            # append node to list of merged nodes
-            merged_node_list.append(node)
-
-    # merge nodes with empty target from list of nodes into one node on list of merged nodes
-    merged_node = ""
-    for node in node_list:
-        if "target empty" in node:
-            # append node of empty target to temporary merged node
-            if merged_node == "":
-                merged_node = merged_node + str(node)
-            else:
-                merged_node = merged_node + " " + str(node)
-
-    # append merged node to list of merged nodes
-    merged_node_list.append(merged_node)
-
-    # display additional details after component sorting for test run
-    if MCG_CC_TEST_RUN:
-
-        print("Merged Nodes:")
-        for node in merged_node_list:
-            print("          " + str(node))
-        print()
-
-    return merged_node_list
-
-
-# Function:
 # sort_first_input_signals()
 #
 # Description:
@@ -203,7 +128,7 @@ def sort_component(node_list, action_list, local_parameter_list, component_sourc
     node_list = mcg_cc_supporter.sort_interactions(node_list, action_list)
 
     # merge nodes of same action into one merged node on list of merged nodes
-    merged_node_list = merge_nodes(node_list, action_list)
+    merged_node_list = mcg_cc_supporter.merge_nodes(node_list, action_list)
 
     # sort first input signals within list of merged nodes
     merged_node_list = sort_first_input_signals(merged_node_list)
