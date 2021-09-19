@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           18 SEP 2021
+#   DATE:           19 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -351,8 +351,8 @@ def process_packages(model_dir_path):
         # if node list is not empty, then sort nodes
         if len(node_list) > 0:
             # sort package content
-            mcg_cc_package_sorter.sort_package(node_list, component_list, local_data_list,
-                                               model_element_source, model_element_name)
+            sorted_node_list = mcg_cc_package_sorter.sort_package(node_list, component_list, local_data_list,
+                                                                  model_element_source, model_element_name)
 
 
 # Function:

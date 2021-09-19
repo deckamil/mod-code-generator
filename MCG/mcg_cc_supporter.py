@@ -478,3 +478,84 @@ def count_dependencies(merged_node_list, local_data_list):
         print()
 
     return dependency_list
+
+
+# Function:
+# sort_nodes()
+#
+# Description:
+# This function sort nodes basing on their dependencies from sublist under list of dependencies.
+#
+# Returns:
+# This function returns list of sorted nodes.
+def sort_nodes(merged_node_list, dependency_list):
+
+    # list of sorted nodes
+    sorted_node_list = []
+
+    # sort nodes basing on their dependencies
+    # first append merged nodes without dependencies to list of sorted nodes, i.e. those merged nodes which sublist
+    # length is equal to 1, which means that given merged node does not consume any local data elements (or consume
+    # local data elements outputted by merged node, which was already appended to list of sorted nodes);
+    # then remove local data element outputted by above merged node from each sublist under list of dependencies, which
+    # will lead to situation where some of sublist will have new length equal to 1;
+    # next repeat the cycle until all merged nodes are sorted
+
+    # number of merged nodes to sort, i.e. length of list of dependencies
+    dependency_list_length = len(dependency_list)
+    # repeat until all merged nodes are sorted
+    while dependency_list_length > 0:
+        # go thorough each dependency sublist
+        for i in range(0, len(dependency_list)):
+            # if given merged node under dependency sublist does not have any further dependencies
+            if len(dependency_list[i]) == 1:
+                # get dependency sublist
+                dependency = dependency_list[i]
+                # append merged node to list of sorted nodes
+                sorted_node_list.append(dependency[0])
+                # remove dependency sublist from list of dependencies
+                dependency_list.remove(dependency)
+                # find output element within merged node
+                output_element = find_output_signal(dependency[0])
+                # recalculate number of merged nodes to sort, i.e. length of list of dependencies
+                dependency_list_length = len(dependency_list)
+
+                # refresh each dependency sublist
+                for j in range(0, len(dependency_list)):
+                    # if given merged node under dependency sublist does have further dependencies
+                    if len(dependency_list[j]) > 1:
+                        # get dependency sublist
+                        dependency = dependency_list[j]
+                        # set initial index
+                        index = 1
+                        # chek local data elements under dependency sublist
+                        for k in range(index, len(dependency)):
+                            # if given merged node consumes local data elements, which comes from merged node, which
+                            # was appended above to list of sorted nodes
+                            if output_element in dependency[index]:
+                                # remove local data element from dependency sublist
+                                dependency.remove(dependency[index])
+                                # decrement index for next iteration, as one dependence was removed
+                                # therefore all next dependencies in ref was pushed by one position
+                                # towards beginning of ref, e.g. [...,A,B,C] -> [...,B,C];
+                                # A was removed and now B is under previous position of A so at next
+                                # iteration the same index need to be checked to examine B;
+                                index = index - 1
+                            index = index + 1
+
+                # exit "for i in range" loop
+                break
+
+    # append merged nodes with empty target (last element from list of merged nodes)
+    sorted_node_list.append(merged_node_list[len(merged_node_list)-1])
+
+    # display additional details after component sorting for test run
+    if MCG_CC_TEST_RUN:
+
+        print("Sorted Nodes:")
+        for sorted_node in sorted_node_list:
+            print("          " + str(sorted_node))
+        print()
+
+    # return sorted list of nodes
+    return sorted_node_list

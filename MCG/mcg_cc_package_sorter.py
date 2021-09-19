@@ -232,14 +232,14 @@ def sort_package(node_list, component_list, local_data_list, package_source, pac
     dependency_list = mcg_cc_supporter.count_dependencies(merged_node_list, local_data_list)
 
     # sort merged nodes basing on their dependencies
-    # sorted_node_list = sort_nodes(merged_node_list, dependency_list)
+    sorted_node_list = mcg_cc_supporter.sort_nodes(merged_node_list, dependency_list)
 
     print("*** NODES SORTED ***")
     print()
 
-    # end of pacakge sorting
+    # end of package sorting
     print("************************** END OF PACKAGE SORTING **************************")
     print()
 
     # return list of sorted nodes
-    # return sorted_node_list
+    return sorted_node_list
