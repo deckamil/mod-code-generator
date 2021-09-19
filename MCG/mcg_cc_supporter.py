@@ -6,7 +6,7 @@
 #       .exml file or merged nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           13 SEP 2021
+#   DATE:           19 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,6 +32,7 @@ from mcg_cc_parameters import NAME_END_OFFSET
 from mcg_cc_parameters import UID_START_OFFSET
 from mcg_cc_parameters import UID_END_OFFSET
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
+from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import action_type_list
 from mcg_cc_parameters import action_type_req_first_input_signal_list
 
@@ -422,3 +423,58 @@ def check_if_reference_contains_action_type_req_first_input_signal(reference):
 
     # return action marker
     return action_type_req_first_input_signal_found
+
+
+# Function:
+# count_dependencies()
+#
+# Description:
+# This function counts dependencies between merged nodes, i.e. number of local data elements outputted by merged nodes,
+# which are required to compute another merged node. The number of dependencies is expressed by length of sublist
+# created for each merged node under list of dependencies.
+#
+# Returns:
+# This function returns list of dependencies.
+def count_dependencies(merged_node_list, local_data_list):
+
+    # count dependencies between nodes
+    # each merged node (with exception for target empty node) has its own sublist under list of dependencies
+    # the sublist starts with merged node under index 0 and local data elements required to compute the merged node
+    # are appended under further indexes of the sublist;
+    # as result, length of sublist express number of local data elements needed to compute the merged node;
+    # in special case, if merged node does not need any local data element (i.e. only input interface elements are
+    # required to compute the merged node) the length of sublist is equal to 1
+    dependency_list = []
+    for i in range(0, len(merged_node_list)):
+        # dependency sublist
+        dependency = []
+        if "target empty" not in merged_node_list[i]:
+            # copy merged node from given index
+            merged_node = merged_node_list[i]
+            # append merged node to dependency sublist
+            dependency.append(merged_node)
+            # find output element within merged node
+            output_element = find_output_signal(merged_node)
+            # go through all local data elements for each merged node on list of merged nodes
+            for local_data in local_data_list:
+                # get name of local data element
+                local_data_name = local_data[0]
+                # if local data element is input to merged node
+                if (local_data_name in merged_node) and (local_data_name not in output_element):
+                    # append name of local data element to dependency sublist
+                    dependency.append(local_data_name)
+
+        # if dependency sublist is not empty
+        if len(dependency) > 0:
+            # append dependency sublist to list of dependencies
+            dependency_list.append(dependency)
+
+    # display additional details after component sorting for test run
+    if MCG_CC_TEST_RUN:
+
+        print("Dependencies:")
+        for dependency in dependency_list:
+            print("          " + str(dependency))
+        print()
+
+    return dependency_list

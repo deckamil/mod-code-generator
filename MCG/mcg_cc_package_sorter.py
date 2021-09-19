@@ -6,7 +6,7 @@
 #       of nodes for conversion into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           18 SEP 2021
+#   DATE:           19 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -210,8 +210,26 @@ def sort_package(node_list, component_list, local_data_list, package_source, pac
     # merge nodes of same action into one merged node on list of merged nodes
     merged_node_list = merge_nodes(node_list, component_list)
 
+    # remove Input Interface elements from list of local data elements
+    for local_data in local_data_list:
+        # if Input Interface element in local data
+        if "Input Interface" in local_data[0]:
+            # remove local data element from list of local data elements
+            local_data_list.remove(local_data)
+            # break for loop
+            break
+
+    # remove Output Interface element from list of local data elements
+    for local_data in local_data_list:
+        # if Output Interface element in local data
+        if "Output Interface" in local_data[0]:
+            # remove local data element from list of local data elements
+            local_data_list.remove(local_data)
+            # break for loop
+            break
+
     # count dependencies between merged nodes
-    # dependency_list = count_dependencies(merged_node_list, local_parameter_list)
+    dependency_list = mcg_cc_supporter.count_dependencies(merged_node_list, local_data_list)
 
     # sort merged nodes basing on their dependencies
     # sorted_node_list = sort_nodes(merged_node_list, dependency_list)
