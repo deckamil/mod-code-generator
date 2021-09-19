@@ -559,3 +559,73 @@ def sort_nodes(merged_node_list, dependency_list):
 
     # return sorted list of nodes
     return sorted_node_list
+
+
+# Function:
+# sort_interactions()
+#
+# Description:
+# This function sorts nodes with same interaction in one place within list of nodes.
+#
+# Returns:
+# This function returns list of nodes with sorted interactions.
+def sort_interactions(node_list, interaction_list):
+
+    # this index tells where to put node (defines new position of node)
+    index = 0
+
+    # repeat for each interaction recorded on list of interactions
+    # sort nodes of given interaction in one place within list of nodes
+    # first, nodes with inputs to interaction are sorted (keyword "target + interaction"),
+    # then, node with output from interaction is placed after them (keyword "interaction + target")
+    for i in range(0, len(interaction_list)):
+        # go through all nodes for each interaction on list of interactions
+        for node in node_list:
+            keyword = "target " + str(interaction_list[i])
+            # if keyword for given action is found
+            if keyword in node:
+                # remove node from current position on the list
+                node_list.remove(node)
+                # insert node under new position defined by index
+                node_list.insert(index, node)
+                # increment index to put next node right after this node
+                index = index + 1
+        # go through all nodes for each interaction on list of actions
+        for node in node_list:
+            keyword = str(interaction_list[i]) + " target"
+            # if keyword for given action is found
+            if keyword in node:
+                # remove node from current position on the list
+                node_list.remove(node)
+                # insert node under new position defined by index
+                node_list.insert(index, node)
+                # increment index to put next node right after this node
+                index = index + 1
+
+    # place nodes with empty target (keyword "target empty") at the end of list of nodes
+    for i in range(index, len(node_list)):
+        # if data does not have any target
+        if "target empty" in node_list[index]:
+            # copy node from given index
+            node = node_list[index]
+            # remove node
+            node_list.remove(node)
+            # insert node at the end of list
+            node_list.insert(len(node_list), node)
+            # decrement index for next iteration, as inserted node pushes by one position
+            # from right to left other nodes, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A];
+            # A was placed at the end and now B is under previous position of A,
+            # so at next iteration the same index need to be checked to examine B
+            index = index - 1
+        index = index + 1
+
+    # display additional details after sorting for test run
+    if MCG_CC_TEST_RUN:
+
+        print()
+        print("Sorted Interactions:")
+        for node in node_list:
+            print("          " + str(node))
+        print()
+
+    return node_list

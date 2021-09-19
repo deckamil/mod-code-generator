@@ -30,76 +30,6 @@ from mcg_cc_parameters import MCG_CC_TEST_RUN
 
 
 # Function:
-# sort_components()
-#
-# Description:
-# This function sorts nodes of same component in one place within list of nodes.
-#
-# Returns:
-# This function returns list of nodes with sorted components.
-def sort_components(node_list, component_list):
-
-    # this index tells where to put node (defines new position of node)
-    index = 0
-
-    # repeat for each component recorded on list of components
-    # sort nodes of given component in one place within list of nodes
-    # first, nodes with inputs to component are sorted (keyword "target + <component name>"),
-    # then, node with output from component is placed after them (keyword "<component name> + target")
-    for i in range(0, len(component_list)):
-        # go through all nodes for each component on list of components
-        for node in node_list:
-            keyword = "target " + str(component_list[i])
-            # if keyword for given component is found
-            if keyword in node:
-                # remove node from current position on the list
-                node_list.remove(node)
-                # insert node under new position defined by index
-                node_list.insert(index, node)
-                # increment index to put next node right after this node
-                index = index + 1
-        # go through all nodes for each component on list of components
-        for node in node_list:
-            keyword = str(component_list[i]) + " target"
-            # if keyword for given component is found
-            if keyword in node:
-                # remove node from current position on the list
-                node_list.remove(node)
-                # insert node under new position defined by index
-                node_list.insert(index, node)
-                # increment index to put next node right after this node
-                index = index + 1
-
-    # place nodes with empty target (keyword "target empty") at the end of list of nodes
-    for i in range(index, len(node_list)):
-        # if interface does not have any target
-        if "target empty" in node_list[index]:
-            # copy node from given index
-            node = node_list[index]
-            # remove node
-            node_list.remove(node)
-            # insert node at the end of list
-            node_list.insert(len(node_list), node)
-            # decrement index for next iteration, as inserted node pushes by one position
-            # from right to left other nodes, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A];
-            # A was placed at the end and now B is under previous position of A,
-            # so at next iteration the same index need to be checked to examine B
-            index = index - 1
-        index = index + 1
-
-    # display additional details after package sorting for test run
-    if MCG_CC_TEST_RUN:
-
-        print()
-        print("Sorted Components:")
-        for node in node_list:
-            print("          " + str(node))
-        print()
-
-    return node_list
-
-
-# Function:
 # merge_nodes()
 #
 # Description:
@@ -205,7 +135,7 @@ def sort_package(node_list, component_list, local_data_list, package_source, pac
     print("*** SORT NODES ***")
 
     # sort nodes of same component in one place under list of nodes
-    node_list = sort_components(node_list, component_list)
+    node_list = mcg_cc_supporter.sort_interactions(node_list, component_list)
 
     # merge nodes of same action into one merged node on list of merged nodes
     merged_node_list = merge_nodes(node_list, component_list)
