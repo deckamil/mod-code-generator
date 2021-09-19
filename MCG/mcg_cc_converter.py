@@ -142,7 +142,40 @@ def convert_sub(configuration_file, sorted_node):
     # append conversion line to configuration file
     configuration_file.append(conversion_line)
 
-    # return configuration_file of nodes
+    # return configuration file
+    return configuration_file
+
+
+# Function:
+# convert_signal_target_signal()
+#
+# Description:
+# This function is responsible for conversion of sorted node with signal target signal into converted node in format
+# required by configuration file.
+#
+# Returns:
+# This function returns configuration file.
+def convert_signal_target_signal(configuration_file, sorted_node):
+
+    # find output signal within sorted node
+    output_signal = mcg_cc_supporter.find_output_signal(sorted_node)
+
+    # find position of output signal within sorted node
+    target_position = sorted_node.find("target")
+
+    # find output signal within sorted node
+    output_signal = mcg_cc_supporter.find_output_signal(sorted_node)
+
+    # find input signal within sorted node
+    input_signal = sorted_node[0:target_position-1]
+
+    # append input and output signal to conversion line
+    conversion_line = str("INS ") + str(output_signal) + str(" = ") + str(input_signal)
+
+    # append conversion line to configuration file
+    configuration_file.append(conversion_line)
+
+    # return configuration file
     return configuration_file
 
 
@@ -237,14 +270,22 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
     for sorted_node in sorted_node_list:
 
         # if sorted node contains ADD action
-        if "ADD" in sorted_node:
+        if " ADD " in sorted_node:
             # convert ADD action
             configuration_file = convert_add(configuration_file, sorted_node)
 
         # if sorted node contains SUB action
-        if "SUB" in sorted_node:
+        if " SUB " in sorted_node:
             # convert ADD action
             configuration_file = convert_sub(configuration_file, sorted_node)
+
+        # if sorted node contains signal target signal
+        action_type_found = mcg_cc_supporter.check_if_reference_contains_action_type(sorted_node)
+
+        # if sorted node does not contain any action
+        if (not action_type_found) and ("target empty" not in sorted_node):
+            # convert signal target signal
+            configuration_file = convert_signal_target_signal(configuration_file, sorted_node)
 
     print("*** NODES CONVERTED ***")
     print()
