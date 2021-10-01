@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           19 SEP 2021
+#   DATE:           1 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -26,18 +26,18 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-from os import listdir
 from sys import argv
 import mcg_cc_error_handler
-import mcg_cc_component_reader
-import mcg_cc_component_sorter
-import mcg_cc_package_reader
-import mcg_cc_package_sorter
 import mcg_cc_supporter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import TARGET_OFFSET
 from mcg_cc_parameters import ACTION_UID_OFFSET
 from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
+from mcg_cc_file_finder import FileFinder
+from mcg_cc_component_reader import ComponentReader
+from mcg_cc_package_reader import PackageReader
+from mcg_cc_component_sorter import ComponentSorter
+from mcg_cc_package_sorter import PackageSorter
 
 
 # Function:
@@ -315,45 +315,57 @@ def convert_component(sorted_node_list, input_interface_list, output_interface_l
 #
 # Returns:
 # This function does not return anything.
-def process_components(model_dir_path):
-    # get activity directory path
-    activity_dir_path = model_dir_path + str("\\Standard.Activity")
+def process_components():
 
-    # get list of activity sources, i.e. names of exml files
-    activity_source_list = listdir(activity_dir_path)
+    # files marker shows whether desired component files were found or not
+    files_found = True
 
-    # read and sort activity details
-    for activity_source in activity_source_list:
-        # get activity file path
-        activity_file_path = activity_dir_path + str("\\") + str(activity_source)
+    # repeat until all components are converted into configuration file
+    while files_found:
 
-        # read component content
-        node_list, action_list, input_interface_list, output_interface_list, local_parameter_list, \
-            model_element_source, model_element_name, \
-            model_element_type = mcg_cc_component_reader.read_component(activity_file_path)
+        # find component files
+        file_finder_list = FileFinder.find_files("Standard.Component")
 
-        # check errors
-        if "Standard.Package" not in model_element_type:
-            mcg_cc_error_handler.check_errors(model_element_source, model_element_name, model_element_type)
+        # get files marker
+        files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
-        # if node list is not empty, then sort nodes
-        if len(node_list) > 0:
-
-            # sort component content
-            sorted_node_list = mcg_cc_component_sorter.sort_component(node_list, action_list,
-                                                                      local_parameter_list, model_element_source,
-                                                                      model_element_name)
+        # if component files were found
+        if files_found:
 
             # check errors
-            if "Standard.Package" not in model_element_type:
-                mcg_cc_error_handler.check_errors(model_element_source, model_element_name, model_element_type)
+            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                              "Standard.Component")
 
-            # if sorted list of nodes is not empty, then convert nodes
-            if len(sorted_node_list) > 0:
+            # initialize component reader
+            component_reader = ComponentReader(file_finder_list)
 
-                # convert component content
-                convert_component(sorted_node_list, input_interface_list, output_interface_list, local_parameter_list,
-                                  model_element_source, model_element_name)
+            # read component content
+            component_reader_list = component_reader.read_component()
+
+            # check errors
+            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                              "Standard.Component")
+
+            # initialize component sorter
+            component_sorter = ComponentSorter(component_reader_list)
+
+            # sort component content
+            sorted_node_list = component_sorter.sort_component()
+
+            # check errors
+            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                              "Standard.Component")
+
+            # convert component content
+            convert_component(sorted_node_list,
+                              component_reader_list[ComponentReader.INPUT_INTERFACE_LIST_INDEX],
+                              component_reader_list[ComponentReader.OUTPUT_INTERFACE_LIST_INDEX],
+                              component_reader_list[ComponentReader.LOCAL_DATA_LIST_INDEX],
+                              component_reader_list[ComponentReader.ACTIVITY_SOURCE_INDEX],
+                              component_reader_list[ComponentReader.MODEL_ELEMENT_NAME_INDEX])
 
 
 # Function:
@@ -365,32 +377,49 @@ def process_components(model_dir_path):
 #
 # Returns:
 # This function does not return anything.
-def process_packages(model_dir_path):
-    # get activity directory path
-    activity_dir_path = model_dir_path + str("\\Standard.Activity")
+def process_packages():
 
-    # get list of activity sources, i.e. names of exml files
-    activity_source_list = listdir(activity_dir_path)
+    # files marker shows whether desired package files were found or not
+    files_found = True
 
-    # read and sort activity details
-    for activity_source in activity_source_list:
-        # get activity file path
-        activity_file_path = activity_dir_path + str("\\") + str(activity_source)
+    # repeat until all packages are converted into configuration file
+    while files_found:
 
-        # read package content
-        node_list, structure_list, component_list, input_interface_list, output_interface_list, local_data_list, \
-            model_element_source, model_element_name, \
-            model_element_type = mcg_cc_package_reader.read_package(activity_file_path)
+        # find package files
+        file_finder_list = FileFinder.find_files("Standard.Package")
 
-        # check errors
-        if "Standard.Component" not in model_element_type:
-            mcg_cc_error_handler.check_errors(model_element_source, model_element_name, model_element_type)
+        # get files marker
+        files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
-        # if node list is not empty, then sort nodes
-        if len(node_list) > 0:
+        # if package files were found
+        if files_found:
+
+            # check errors
+            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                              "Standard.Package")
+
+            # initialize package reader
+            package_reader = PackageReader(file_finder_list)
+
+            # read package content
+            package_reader_list = package_reader.read_package()
+
+            # check errors
+            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                              "Standard.Package")
+
+            # initialize package sorter
+            package_sorter = PackageSorter(package_reader_list)
+
             # sort package content
-            sorted_node_list = mcg_cc_package_sorter.sort_package(node_list, component_list, local_data_list,
-                                                                  model_element_source, model_element_name)
+            sorted_node_list = package_sorter.sort_package()
+
+            # check errors
+            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                              "Standard.Package")
 
 
 # Function:
@@ -402,13 +431,13 @@ def process_packages(model_dir_path):
 #
 # Returns:
 # This function does not return anything.
-def convert_model(model_dir_path):
+def convert_model():
 
     # process components content from .exml files into configuration file
-    process_components(model_dir_path)
+    process_components()
 
     # process packages content from .exml files into configuration file
-    process_packages(model_dir_path)
+    process_packages()
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance
@@ -427,11 +456,14 @@ print()
 # check if number of command line arguments is correct
 if len(argv) - 1 == NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
-    # set model directory path to cmd line argument
+    # get model directory path from cmd line argument
     model_dir_path = str(argv[1])
 
+    # set path to model directory
+    FileFinder.set_paths(model_dir_path)
+
     # convert model
-    convert_model(model_dir_path)
+    convert_model()
 
 # else display info and exit
 else:

@@ -1,11 +1,12 @@
 #   FILE:           mcg_cc_package_reader.py
 #
 #   DESCRIPTION:
-#       This module is responsible for reading of package content, i.e.
-#       activity diagram and interface details from .exml files.
+#       This module contains definition of PackageReader class, which is child
+#       class of FileReader class and is responsible for reading of package content,
+#       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           16 SEP 2021
+#   DATE:           1 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -24,389 +25,270 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import random
-from os import listdir
 import mcg_cc_error_handler
-import mcg_cc_supporter
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import EXML_FILE_NAME_LENGTH
+from mcg_cc_file_reader import FileReader
 from mcg_cc_parameters import TARGET_ELEMENT_FOUND_INDEX
 from mcg_cc_parameters import TARGET_ELEMENT_NAME_INDEX
-from mcg_cc_parameters import INTERFACE_FOUND_INDEX
+from mcg_cc_parameters import MCG_CC_TEST_RUN
 
 
-# Function:
-# read_structure_targets()
+# Class:
+# PackageReader()
 #
 # Description:
-# This function looks for structures and their targets.
-#
-# Returns:
-# This function returns list of nodes and structures.
-def read_structure_targets(file_content, node_list, structure_list):
-    # search for structures in file content
-    for i in range(0, len(file_content)):
+# This is child class responsible for reading of package .exml file content.
+class PackageReader(FileReader):
 
-        # if given line contains definition of structure name
-        if ("<ID name=" in file_content[i]) and ("Standard.Attribute" in file_content[i]):
-            # get line
-            line = file_content[i]
-            # get line number
-            line_number = i + 1
-            # get structure name
-            structure_name = mcg_cc_supporter.get_name(line, line_number)
-            # append structure name to list of structures
-            structure_list.append(structure_name)
+    # Function:
+    # check_correctness()
+    #
+    # Description:
+    # This function checks correctness of package content.
+    #
+    # Returns:
+    # This function does not return anything.
+    def check_correctness(self):
+        tbd = True
 
-            # structure does not have any target
-            structure_has_targets = False
+    # Function:
+    # read_data_targets()
+    #
+    # Description:
+    # This function looks data targets, i.e. package structures and their targets from activity diagram.
+    #
+    # Returns:
+    # This function does not return anything.
+    def read_data_targets(self):
 
-            # search for targets
-            for j in range(i, len(file_content)):
+        # search for structures in activity file
+        for i in range(0, len(self.activity_file)):
 
-                # if line contains <COMP that means the structure has some targets
-                if "<COMP" in file_content[j]:
-                    # structure has some target
-                    structure_has_targets = True
+            # if given line contains definition of structure name
+            if ("<ID name=" in self.activity_file[i]) and ("Standard.Attribute" in self.activity_file[i]):
+                # get line
+                line = self.activity_file[i]
+                # get line number
+                line_number = i + 1
+                # get structure name
+                structure_name = PackageReader.get_name(line, line_number)
+                # append structure name to data list
+                self.data_list.append(structure_name)
 
-                # if line contains </DEPENDENCIES> then structure does not have any target
-                if ("</DEPENDENCIES>" in file_content[j]) and (not structure_has_targets):
-                    # append node to list of nodes
-                    node_list.append(str(structure_name) + " target empty")
-                    # exit "for j in range" loop
-                    break
+                # structure marker shows whether signal target has been found or not
+                structure_has_targets = False
 
-                # if line contain <LINK relation="Target"> that means target for given structure
-                if ("<LINK relation=" in file_content[j]) and ("Target" in file_content[j]):
-                    # if line contains uid of target element
-                    if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
-                        # get line
-                        line = file_content[j + 2]
-                        # get line number
-                        line_number = j + 3
-                        # get target uid
-                        target_uid = mcg_cc_supporter.get_uid(line, line_number)
-                        # find target component name
-                        target_component_list = mcg_cc_supporter.find_target_element(target_uid,
-                                                                                     "Standard.Component",
-                                                                                     file_content)
-                        # find target structure name
-                        target_structure_list = mcg_cc_supporter.find_target_element(target_uid,
-                                                                                     "Standard.Attribute",
-                                                                                     file_content)
+                # search for targets
+                for j in range(i, len(self.activity_file)):
 
-                        # get target component found marker
-                        target_component_found_marker = target_component_list[TARGET_ELEMENT_FOUND_INDEX]
-                        # get target component name
-                        target_component_name = target_component_list[TARGET_ELEMENT_NAME_INDEX]
+                    # if line contains <COMP that means the structure has some targets
+                    if "<COMP" in self.activity_file[j]:
+                        # change structure marker
+                        structure_has_targets = True
 
-                        # get target structure found marker
-                        target_structure_found_marker = target_structure_list[TARGET_ELEMENT_FOUND_INDEX]
-                        # get target structure name
-                        target_structure_name = target_structure_list[TARGET_ELEMENT_NAME_INDEX]
+                    # if line contains </DEPENDENCIES> then structure does not have any target
+                    if ("</DEPENDENCIES>" in self.activity_file[j]) and (not structure_has_targets):
+                        # append node to node list
+                        self.node_list.append(str(structure_name) + " target empty")
+                        # exit "for j in range" loop
+                        break
 
-                        # if target element was not found
-                        if ("NOT_FOUND" in target_component_found_marker) and \
-                                ("NOT_FOUND" in target_structure_found_marker):
-                            # record error
-                            mcg_cc_error_handler.record_error(301, target_uid, structure_name)
-                        # select target element
-                        if "NOT_FOUND" in target_component_found_marker:
-                            target_element = target_structure_name
-                        else:
-                            target_element = target_component_name
-                        # append node to list of nodes
-                        node_list.append(str(structure_name) + " target " + str(target_element))
+                    # if line contain <LINK relation="Target"> that means target for given structure
+                    if ("<LINK relation=" in self.activity_file[j]) and ("Target" in self.activity_file[j]):
+                        # if line contains uid of target element
+                        if ("<ID name=" in self.activity_file[j + 2]) and \
+                                ("Standard.InstanceNode" in self.activity_file[j + 2]):
+                            # get line
+                            line = self.activity_file[j + 2]
+                            # get line number
+                            line_number = j + 3
+                            # get target uid
+                            target_uid = PackageReader.get_uid(line, line_number)
+                            # find target component name
+                            target_component_list = self.find_target_element_name(target_uid, "Standard.Component")
+                            # find target structure name
+                            target_structure_list = self.find_target_element_name(target_uid, "Standard.Attribute")
 
-                # if line contains </COMP> that means end of targets for given structure
-                if "</COMP>" in file_content[j]:
-                    # exit "for j in range" loop
-                    break
+                            # get target component found marker
+                            target_component_found_marker = target_component_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target component name
+                            target_component_name = target_component_list[TARGET_ELEMENT_NAME_INDEX]
 
-    # remove duplicates from structure list
-    structure_list = list(set(structure_list))
+                            # get target structure found marker
+                            target_structure_found_marker = target_structure_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target structure name
+                            target_structure_name = target_structure_list[TARGET_ELEMENT_NAME_INDEX]
 
-    return node_list, structure_list
+                            # if target element was not found
+                            if ("NOT_FOUND" in target_component_found_marker) and \
+                                    ("NOT_FOUND" in target_structure_found_marker):
+                                # record error
+                                mcg_cc_error_handler.record_error(301, target_uid, structure_name)
+                            # select target element
+                            if "NOT_FOUND" in target_component_found_marker:
+                                target_element = target_structure_name
+                            else:
+                                target_element = target_component_name
+                            # append node to node list
+                            self.node_list.append(str(structure_name) + " target " + str(target_element))
 
+                    # if line contains </COMP> that means end of targets for given structure
+                    if "</COMP>" in self.activity_file[j]:
+                        # exit "for j in range" loop
+                        break
 
-# Function:
-# read_component_targets()
-#
-# Description:
-# This function looks for components and their targets.
-#
-# Returns:
-# This function returns list of nodes and components.
-def read_component_targets(file_content, node_list, component_list):
-    # search for components in file content
-    for i in range(0, len(file_content)):
+        # remove duplicates from data list
+        self.data_list = list(set(self.data_list))
 
-        # if given line contains definition of component name
-        if ("<ID name=" in file_content[i]) and ("Standard.Component" in file_content[i]):
-            # get line
-            line = file_content[i]
-            # get line number
-            line_number = i + 1
-            # get interface type
-            component_name = mcg_cc_supporter.get_name(line, line_number)
-            # append component name to list of components
-            component_list.append(component_name)
+    # Function:
+    # read_interaction_targets()
+    #
+    # Description:
+    # This function looks interaction targets, i.e. package components and their targets from activity diagram.
+    #
+    # Returns:
+    # This function does not return anything.
+    def read_interaction_targets(self):
 
-            # component does not have any target
-            component_has_targets = False
+        # search for components in activity file
+        for i in range(0, len(self.activity_file)):
 
-            # search for targets
-            for j in range(i, len(file_content)):
+            # if given line contains definition of component name
+            if ("<ID name=" in self.activity_file[i]) and ("Standard.Component" in self.activity_file[i]):
+                # get line
+                line = self.activity_file[i]
+                # get line number
+                line_number = i + 1
+                # get component name
+                component_name = PackageReader.get_name(line, line_number)
+                # append component name to interaction list
+                self.interaction_list.append(component_name)
 
-                # if line contains <COMP that means the interface has some targets
-                if "<COMP" in file_content[j]:
-                    # component has some target
-                    component_has_targets = True
+                # component marker shows whether component target has been found or not
+                component_has_targets = False
 
-                # if line contains </DEPENDENCIES> then component does not have any target
-                if ("</DEPENDENCIES>" in file_content[j]) and (not component_has_targets):
-                    # record error
-                    mcg_cc_error_handler.record_error(170, component_name, "none")
-                    # exit "for j in range" loop
-                    break
+                # search for targets
+                for j in range(i, len(self.activity_file)):
 
-                # if line contain <LINK relation="Target"> that means target for given interface
-                if ("<LINK relation=" in file_content[j]) and ("Target" in file_content[j]):
-                    # if line contains uid of target element
-                    if ("<ID name=" in file_content[j + 2]) and ("Standard.InstanceNode" in file_content[j + 2]):
-                        # get line
-                        line = file_content[j + 2]
-                        # get line number
-                        line_number = j + 3
-                        # get target uid
-                        target_uid = mcg_cc_supporter.get_uid(line, line_number)
-                        # find target structure name
-                        target_structure_list = mcg_cc_supporter.find_target_element(target_uid,
-                                                                                     "Standard.Attribute",
-                                                                                     file_content)
+                    # if line contains <COMP that means the component has some targets
+                    if "<COMP" in self.activity_file[j]:
+                        # component has some target
+                        component_has_targets = True
 
-                        # get target structure found marker
-                        target_structure_found_marker = target_structure_list[TARGET_ELEMENT_FOUND_INDEX]
-                        # get target structure name
-                        target_structure_name = target_structure_list[TARGET_ELEMENT_NAME_INDEX]
+                    # if line contains </DEPENDENCIES> then component does not have any target
+                    if ("</DEPENDENCIES>" in self.activity_file[j]) and (not component_has_targets):
+                        # record error
+                        mcg_cc_error_handler.record_error(170, component_name, "none")
+                        # exit "for j in range" loop
+                        break
 
-                        # if target element was not found
-                        if "NOT_FOUND" in target_structure_found_marker:
-                            # record error
-                            mcg_cc_error_handler.record_error(171, target_uid, component_name)
-                        # append node to list of nodes
-                        node_list.append(str(component_name) + " target " + str(target_structure_name))
+                    # if line contain <LINK relation="Target"> that means target for given component
+                    if ("<LINK relation=" in self.activity_file[j]) and ("Target" in self.activity_file[j]):
+                        # if line contains uid of target element
+                        if ("<ID name=" in self.activity_file[j + 2]) and \
+                                ("Standard.InstanceNode" in self.activity_file[j + 2]):
+                            # get line
+                            line = self.activity_file[j + 2]
+                            # get line number
+                            line_number = j + 3
+                            # get target structure uid
+                            target_uid = PackageReader.get_uid(line, line_number)
+                            # find target structure name
+                            target_structure_list = self.find_target_element_name(target_uid, "Standard.Attribute")
 
-                # if line contains </COMP> that means end of targets for given interface
-                if "</COMP>" in file_content[j]:
-                    # exit "for j in range" loop
-                    break
+                            # get target structure found marker
+                            target_structure_found_marker = target_structure_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target structure name
+                            target_structure_name = target_structure_list[TARGET_ELEMENT_NAME_INDEX]
 
-    # remove duplicates from component list
-    component_list = list(set(component_list))
+                            # if target element was not found
+                            if "NOT_FOUND" in target_structure_found_marker:
+                                # record error
+                                mcg_cc_error_handler.record_error(171, target_uid, component_name)
+                            # append node to node list
+                            self.node_list.append(str(component_name) + " target " + str(target_structure_name))
 
-    return node_list, component_list
+                    # if line contains </COMP> that means end of targets for given component
+                    if "</COMP>" in self.activity_file[j]:
+                        # exit "for j in range" loop
+                        break
 
+        # remove duplicates from interaction list
+        self.interaction_list = list(set(self.interaction_list))
 
-# Function:
-# read_interfaces()
-#
-# Description:
-# This function looks for interfaces of package, i.e. input interface list and
-# output interface list.
-#
-# Returns:
-# This function returns list of input interfaces and output interfaces.
-def read_interfaces(activity_file_path, package_name):
-    # interface lists
-    input_interface_list = []
-    output_interface_list = []
-    local_data_list = []
-
-    # interface markers show whether interface was found of not
-    input_interface_found = False
-    output_interface_found = False
-    local_data_found = False
-
-    # find position of standard activity within the path
-    standard_activity_position = activity_file_path.find("\\Standard.Activity")
-    # get interface directory path
-    interface_dir_path = activity_file_path[0:standard_activity_position] + str("\\Standard.Interface")
-    # get list of interface sources, i.e. names of exml files
-    interface_source_list = listdir(interface_dir_path)
-
-    # read interface details
-    for interface_source in interface_source_list:
-        # get interface file path
-        interface_file_path = interface_dir_path + str("\\") + str(interface_source)
-
-        # open file and read content, then close file
-        file = open(interface_file_path, "r")
-        file_content = file.readlines()
-        file_content = [line.strip() for line in file_content]
-        file.close()
-
-        # if input interface element has not been found yet
-        if not input_interface_found:
-            # find input interface
-            input_interface_list = mcg_cc_supporter.find_interface_signals("Input Interface", interface_source,
-                                                                           package_name, "Standard.Package",
-                                                                           file_content)
-
-            # get interface found marker
-            interface_found_marker = input_interface_list[INTERFACE_FOUND_INDEX]
-
-            # if input interface element was found:
-            if "NOT_FOUND" not in interface_found_marker:
-                # change input interface marker
-                input_interface_found = True
-                # remove found marker from list of input interface
-                input_interface_list.remove(interface_found_marker)
-
-        # if output interface element has not been found yet
-        if not output_interface_found:
-            # find output interface
-            output_interface_list = mcg_cc_supporter.find_interface_signals("Output Interface", interface_source,
-                                                                            package_name, "Standard.Package",
-                                                                            file_content)
-
-            # get interface found marker
-            interface_found_marker = output_interface_list[INTERFACE_FOUND_INDEX]
-
-            # if output interface element was found:
-            if "NOT_FOUND" not in interface_found_marker:
-                # change output interface marker
-                output_interface_found = True
-                # remove found marker from list of output interface
-                output_interface_list.remove(interface_found_marker)
-
-        # if local data element has not been found yet
-        if not local_data_found:
-            # find local data
-            local_data_list = mcg_cc_supporter.find_interface_signals("Local Data", interface_source,
-                                                                      package_name, "Standard.Package",
-                                                                      file_content)
-
-            # get interface found marker
-            interface_found_marker = local_data_list[INTERFACE_FOUND_INDEX]
-
-            # if local data element was found:
-            if "NOT_FOUND" not in interface_found_marker:
-                # change local data marker
-                local_data_found = True
-                # remove found marker from list of local data
-                local_data_list.remove(interface_found_marker)
-
-    # if input interface element was not found
-    if not input_interface_found:
-        # record error
-        mcg_cc_error_handler.record_error(123, "none", "none")
-
-    # if output interface element was not found
-    if not output_interface_found:
-        # record error
-        mcg_cc_error_handler.record_error(124, "none", "none")
-
-    # if local data element was not found
-    if not output_interface_found:
-        # record error
-        mcg_cc_error_handler.record_error(125, "none", "none")
-
-    return input_interface_list, output_interface_list, local_data_list
-
-
-# Function:
-# read_package()
-#
-# Description:
-# This is main function of this module and is responsible for reading of package
-# details from .exml files.
-#
-# Returns:
-# This function returns lists with package details.
-def read_package(activity_file_path):
-    # package lists
-    node_list = []
-    structure_list = []
-    component_list = []
-    input_interface_list = []
-    output_interface_list = []
-    local_data_list = []
-
-    # open file and read content, then close file
-    file = open(activity_file_path, "r")
-    file_content = file.readlines()
-    file_content = [line.strip() for line in file_content]
-    file.close()
-
-    # find model element source, i.e. name of exml file
-    model_element_source = activity_file_path[len(activity_file_path) - EXML_FILE_NAME_LENGTH:len(activity_file_path)]
-
-    # search for model element name and type in file content, i.e. find out if file content contains package data
-    model_element_name, model_element_type = mcg_cc_supporter.find_model_element(file_content)
-
-    # if file content contains package data
-    if "Standard.Package" in model_element_type:
+    # Method:
+    # read_package()
+    #
+    # Description:
+    # This method is responsible for reading of package details.
+    #
+    # Returns:
+    # This method returns package reader list, which describes package content and its activity.
+    def read_package(self):
 
         # package reading
         print("****************************** PACKAGE READING *****************************")
         print()
 
-        # print component details
-        print("Package Source:      " + str(model_element_source))
-        print("Package Name:        " + str(model_element_name))
+        # print package details
+        print("Package Source:      " + str(self.activity_source))
+        print("Package Name:        " + str(self.model_element_name))
 
-        # record list of nodes
+        # record node list
         print("*** RECORD NODES ***")
 
-        # search for structure targets within diagram content
-        node_list, structure_list = read_structure_targets(file_content, node_list, structure_list)
+        # search for structure targets within activity file
+        self.read_data_targets()
 
-        # search for component targets within diagram content
-        node_list, component_list = read_component_targets(file_content, node_list, component_list)
+        # search for component targets within activity file
+        self.read_interaction_targets()
 
-        # list of nodes recorded
+        # node list recorded
         print("*** NODES RECORDED ***")
         print()
 
-        # open and read interface file
-        input_interface_list, output_interface_list, local_data_list = read_interfaces(activity_file_path, model_element_name)
+        # search for interface signals
+        self.read_interface_signals()
 
-        # display additional details after component reading for test run
+        # check package correctness
+        self.check_correctness()
+
+        # display additional details after package reading for test run
         if MCG_CC_TEST_RUN:
-
-            # shuffle lists
-            random.shuffle(node_list)
-            random.shuffle(structure_list)
-            random.shuffle(component_list)
-            random.shuffle(input_interface_list)
-            random.shuffle(output_interface_list)
 
             # print component details
             print("Nodes:")
-            for node in node_list:
+            for node in self.node_list:
                 print("          " + str(node))
-            print("Structures:")
-            for structure in structure_list:
-                print("          " + str(structure))
             print("Components:")
-            for component in component_list:
-                print("          " + str(component))
+            for interaction in self.interaction_list:
+                print("          " + str(interaction))
+            print("Structures:")
+            for data in self.data_list:
+                print("          " + str(data))
             print("Input Interface:")
-            for input_interface in input_interface_list:
+            for input_interface in self.input_interface_list:
                 print("          " + str(input_interface))
             print("Output Interface:")
-            for output_interface in output_interface_list:
+            for output_interface in self.output_interface_list:
                 print("          " + str(output_interface))
             print("Local Data:")
-            for local_data in local_data_list:
+            for local_data in self.local_data_list:
                 print("          " + str(local_data))
             print()
 
-        # end of component reading
+        # end of package reading
         print("************************** END OF PACKAGE READING **************************")
         print()
 
-    # return collected data
-    return node_list, structure_list, component_list, input_interface_list, output_interface_list, local_data_list, \
-        model_element_source, model_element_name, model_element_type
+        # append collected data to package reader list
+        package_reader_list = []
+        package_reader_list.insert(PackageReader.MODEL_ELEMENT_NAME_INDEX, self.model_element_name)
+        package_reader_list.insert(PackageReader.ACTIVITY_SOURCE_INDEX, self.activity_source)
+        package_reader_list.insert(PackageReader.NODE_LIST_INDEX, self.node_list)
+        package_reader_list.insert(PackageReader.INTERACTION_LIST_INDEX, self.interaction_list)
+        package_reader_list.insert(PackageReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
+        package_reader_list.insert(PackageReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
+        package_reader_list.insert(PackageReader.LOCAL_DATA_LIST_INDEX, self.local_data_list)
+
+        # return package reader list
+        return package_reader_list

@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_package_sorter.py
 #
 #   DESCRIPTION:
-#       This module is responsible for sorting of package content, i.e.
-#       nodes of activity diagram from .exml files and preparing sorted list
-#       of nodes for conversion into configuration file.
+#       This module contains definition of PackageSorter class, which is child
+#       class of Sorter class and is responsible for sorting of package content,
+#       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           19 SEP 2021
+#   DATE:           1 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,66 +25,85 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_supporter
+from mcg_cc_sorter import Sorter
 
 
-# Function:
-# sort_package()
+# Class:
+# PackageSorter()
 #
 # Description:
-# This is main function of this module and is responsible for sorting of package
-# details from .exml files.
-#
-# Returns:
-# This function returns list of sorted nodes.
-def sort_package(node_list, component_list, local_data_list, package_source, package_name):
+# This is child class responsible for sorting of package content, i.e. nodes of activity diagram.
+class PackageSorter(Sorter):
 
-    # package sorting
-    print("****************************** PACKAGE SORTING *****************************")
-    print()
+    # Method:
+    # remove_input_output_interface_element()
+    #
+    # Description:
+    # This method removes Input Interface and Output Interface elements from local data list.
+    #
+    # Returns:
+    # This method does not return anything.
+    def remove_input_output_interface_element(self):
 
-    # print component details
-    print("Package Source:      " + str(package_source))
-    print("Package Name:        " + str(package_name))
+        # remove Input Interface elements from local data list
+        for local_data in self.local_data_list:
+            # if Input Interface element in local data
+            if "Input Interface" in local_data[0]:
+                # remove local data element from local data list
+                self.local_data_list.remove(local_data)
+                # break for loop
+                break
 
-    print("*** SORT NODES ***")
+        # remove Output Interface element from local data list
+        for local_data in self.local_data_list:
+            # if Output Interface element in local data
+            if "Output Interface" in local_data[0]:
+                # remove local data element from local data list
+                self.local_data_list.remove(local_data)
+                # break for loop
+                break
 
-    # sort nodes of same component in one place under list of nodes
-    node_list = mcg_cc_supporter.sort_interactions(node_list, component_list)
+    # Method:
+    # sort_package()
+    #
+    # Description:
+    # This method is responsible for sorting of package details.
+    #
+    # Returns:
+    # This method returns sorted node list.
+    def sort_package(self):
 
-    # merge nodes of same component into one merged node on list of merged nodes
-    merged_node_list = mcg_cc_supporter.merge_nodes(node_list, component_list)
+        # package sorting
+        print("****************************** PACKAGE SORTING *****************************")
+        print()
 
-    # remove Input Interface elements from list of local data elements
-    for local_data in local_data_list:
-        # if Input Interface element in local data
-        if "Input Interface" in local_data[0]:
-            # remove local data element from list of local data elements
-            local_data_list.remove(local_data)
-            # break for loop
-            break
+        # print component details
+        print("Package Source:      " + str(self.activity_source))
+        print("Package Name:        " + str(self.model_element_name))
 
-    # remove Output Interface element from list of local data elements
-    for local_data in local_data_list:
-        # if Output Interface element in local data
-        if "Output Interface" in local_data[0]:
-            # remove local data element from list of local data elements
-            local_data_list.remove(local_data)
-            # break for loop
-            break
+        print("*** SORT NODES ***")
 
-    # count dependencies between merged nodes
-    dependency_list = mcg_cc_supporter.count_dependencies(merged_node_list, local_data_list)
+        # sort nodes of same component in one place under node list
+        self.sort_interactions()
 
-    # sort merged nodes basing on their dependencies
-    sorted_node_list = mcg_cc_supporter.sort_nodes(merged_node_list, dependency_list)
+        # merge nodes of same component into one merged node on merged node list
+        self.merge_nodes()
 
-    print("*** NODES SORTED ***")
-    print()
+        # remove Input Interface and Output Interface elements from local data list
+        self.remove_input_output_interface_element()
 
-    # end of package sorting
-    print("************************** END OF PACKAGE SORTING **************************")
-    print()
+        # count dependencies between merged nodes
+        self.count_dependencies()
 
-    # return list of sorted nodes
-    return sorted_node_list
+        # sort merged nodes basing on their dependencies
+        self.sort_nodes()
+
+        print("*** NODES SORTED ***")
+        print()
+
+        # end of package sorting
+        print("************************** END OF PACKAGE SORTING **************************")
+        print()
+
+        # return sorted node list
+        return self.sorted_node_list
