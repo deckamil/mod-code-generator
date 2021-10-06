@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           6 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -147,5 +147,9 @@ class ComponentSorter(Sorter):
         print("************************* END OF COMPONENT SORTING *************************")
         print()
 
-        # return sorted node list
-        return self.sorted_node_list
+        # append collected data to component sorter list
+        component_sorter_list = []
+        component_sorter_list.insert(Sorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
+
+        # return component sorter list
+        return component_sorter_list

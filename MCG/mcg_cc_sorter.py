@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           6 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,6 +35,9 @@ from mcg_cc_parameters import TARGET_OFFSET
 # Description:
 # This is base class responsible for sorting of model element content, i.e. nodes of activity diagram.
 class Sorter(object):
+
+    # indexes of sorter list
+    SORTED_NODE_LIST_INDEX = 0
 
     # Method:
     # __init__()

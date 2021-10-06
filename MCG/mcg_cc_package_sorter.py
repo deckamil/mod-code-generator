@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           6 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -105,5 +105,9 @@ class PackageSorter(Sorter):
         print("************************** END OF PACKAGE SORTING **************************")
         print()
 
-        # return sorted node list
-        return self.sorted_node_list
+        # append collected data to package sorter list
+        package_sorter_list = []
+        package_sorter_list.insert(Sorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
+
+        # return package sorter list
+        return package_sorter_list
