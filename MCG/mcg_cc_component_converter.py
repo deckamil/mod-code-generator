@@ -40,7 +40,7 @@ from mcg_cc_parameters import TARGET_OFFSET
 class ComponentConverter(Converter):
 
     # Function:
-    # convert_add()
+    # convert_action()
     #
     # Description:
     # This function is responsible for conversion of sorted node with action into configuration file.
@@ -69,19 +69,19 @@ class ComponentConverter(Converter):
         # search input signals within sorted node starting from this position
         start_index = 0
 
-        # search for all input signals within sorted node and put them into conversion line
+        # search for all input signal names within sorted node and put them into conversion line
         for i in range(0, target_number - 1):
             target_position = sorted_node.find("target", start_index)
-            # get input signal from node
-            input_signal = sorted_node[start_index:target_position - 1]
-            # append input signal to conversion line
-            conversion_line = conversion_line + str(input_signal)
-            # if node processing is not completed
+            # find input signal name within sorted node
+            input_signal_name = sorted_node[start_index:target_position - 1]
+            # append input signal name to conversion line
+            conversion_line = conversion_line + str(input_signal_name)
+            # if sorted node processing is not completed
             if i < target_number - 2:
-                # append "+" sign to conversion line
+                # append math symbol to conversion line
                 conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
 
-            # update start_index to point where to search for next input signal within sorted node
+            # update start_index to point where to search for next input signal name within sorted node
             start_index = target_position + TARGET_OFFSET
 
         # append conversion line to configuration file
@@ -97,17 +97,15 @@ class ComponentConverter(Converter):
     # This function does not return anything.
     def convert_signal_assignment(self, sorted_node):
 
-        # find position of output signal within sorted node
-        target_position = sorted_node.find("target")
-
-        # find output signal within sorted node
-        output_signal = mcg_cc_supporter.find_output_signal(sorted_node)
-
-        # find input signal within sorted node
-        input_signal = sorted_node[0:target_position - 1]
+        # find target last position within sorted node
+        target_last_position = sorted_node.rfind("target")
+        # find output signal name within sorted node
+        output_signal_name = sorted_node[target_last_position + TARGET_OFFSET:len(sorted_node)]
+        # find input signal name within sorted node
+        input_signal_name = sorted_node[0:target_last_position - 1]
 
         # append input and output signal to conversion line
-        conversion_line = str("INS ") + str(output_signal) + str(" = ") + str(input_signal)
+        conversion_line = str("INS ") + str(output_signal_name) + str(" = ") + str(input_signal_name)
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
