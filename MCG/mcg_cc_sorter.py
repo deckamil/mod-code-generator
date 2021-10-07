@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           7 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -321,14 +321,6 @@ class Sorter(object):
 
         # append merged nodes with empty target (last element from merged node list)
         self.sorted_node_list.append(self.merged_node_list[len(self.merged_node_list) - 1])
-
-        # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
-
-            print("Sorted Nodes:")
-            for sorted_node in self.sorted_node_list:
-                print("          " + str(sorted_node))
-            print()
 
     # Method:
     # find_output_element_name()

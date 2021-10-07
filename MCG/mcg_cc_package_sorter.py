@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           7 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -26,6 +26,8 @@
 
 
 from mcg_cc_sorter import Sorter
+from mcg_cc_parameters import TARGET_OFFSET
+from mcg_cc_parameters import MCG_CC_TEST_RUN
 
 
 # Class:
@@ -64,6 +66,70 @@ class PackageSorter(Sorter):
                 break
 
     # Method:
+    # merge_output_assignment()
+    #
+    # Description:
+    # This method merges sorted nodes with output structure assignment into one sorted node on sorted node list.
+    #
+    # Returns:
+    # This method does not return anything.
+    def merge_output_assignment(self):
+
+        # merged node
+        merged_node = ""
+
+        # search output structures within sorted node starting from this position
+        index = 0
+
+        # merge sorted node with output structure assignment
+        for i in range(index, len(self.sorted_node_list)):
+            # count number of keyword "target"
+            target_number = self.sorted_node_list[index].count("target")
+
+            # if sorted node contains only one target and it is Output Interface structure
+            if (target_number == 1) and ("target Output Interface" in self.sorted_node_list[index]):
+                # copy sorted node from given index
+                sorted_node = self.sorted_node_list[index]
+                # remove sorted node from sorted node list
+                self.sorted_node_list.remove(sorted_node)
+                # find output structure position within sorted node
+                output_structure_position = sorted_node.rfind("target")
+                # cut output structure name and target keyword from sorted node
+                sorted_node_cut = sorted_node[0:output_structure_position + TARGET_OFFSET]
+
+                # append sorted node cut to merged node
+                if merged_node == "":
+                    merged_node = str(sorted_node_cut)
+                else:
+                    merged_node = merged_node + str(sorted_node_cut)
+
+                # decrement index for next iteration, as one sorted node was removed
+                # therefore all next sorted nodes were pushed by one position
+                # towards beginning of list, e.g. [...,A,B,C] -> [...,B,C];
+                # A was removed and now B is under previous position of A so at next
+                # iteration the same index need to be checked to examine B;
+                index = index - 1
+            index = index + 1
+
+        # append Output Interface target to merged node
+        merged_node = merged_node + str("Output Interface")
+
+        # append merged node to sorted node list
+        self.sorted_node_list.append(merged_node)
+
+        # place sorted nodes with empty target (keyword "target empty") at the end of sorted node list
+        for sorted_node in self.sorted_node_list:
+
+            # if sorted node contains empty target
+            if "target empty" in sorted_node:
+                # remove sorted node from sorted node list
+                self.sorted_node_list.remove(sorted_node)
+                # append sorted node at the end of sorted node list
+                self.sorted_node_list.append(sorted_node)
+                # exit "for sorted_node in" loop
+                break
+
+    # Method:
     # sort_package()
     #
     # Description:
@@ -97,6 +163,17 @@ class PackageSorter(Sorter):
 
         # sort merged nodes basing on their dependencies
         self.sort_nodes()
+
+        # merge sorted nodes with output structure assignment
+        self.merge_output_assignment()
+
+        # display additional details after sorting for test run
+        if MCG_CC_TEST_RUN:
+
+            print("Sorted Nodes:")
+            for sorted_node in self.sorted_node_list:
+                print("          " + str(sorted_node))
+            print()
 
         print("*** NODES SORTED ***")
         print()

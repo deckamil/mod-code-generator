@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           7 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,14 +39,14 @@ from mcg_cc_parameters import TARGET_OFFSET
 # This is child class responsible for converting of component content into configuration file.
 class ComponentConverter(Converter):
 
-    # Function:
+    # Method:
     # convert_action()
     #
     # Description:
-    # This function is responsible for conversion of sorted node with action into configuration file.
+    # This method is responsible for conversion of sorted node with action into configuration file.
     #
     # Returns:
-    # This function does not return anything.
+    # This method does not return anything.
     def convert_action(self, sorted_node, action_type, math_symbol):
 
         # find target last position within sorted node
@@ -87,14 +87,14 @@ class ComponentConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Function:
+    # Method:
     # convert_signal_assignment()
     #
     # Description:
-    # This function is responsible for conversion of sorted node with signal assignment into configuration file.
+    # This method is responsible for conversion of sorted node with signal assignment into configuration file.
     #
     # Returns:
-    # This function does not return anything.
+    # This method does not return anything.
     def convert_signal_assignment(self, sorted_node):
 
         # find target last position within sorted node
@@ -110,14 +110,14 @@ class ComponentConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Function:
+    # Method:
     # convert_component()
     #
     # Description:
     # This method is responsible for converting of component content into configuration file.
     #
     # Returns:
-    # This function does not return anything.
+    # This method does not return anything.
     def convert_component(self):
 
         # component conversion

@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           7 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,167 +28,14 @@
 
 from sys import argv
 import mcg_cc_error_handler
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import TARGET_OFFSET
 from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_component_reader import ComponentReader
-from mcg_cc_package_reader import PackageReader
 from mcg_cc_component_sorter import ComponentSorter
-from mcg_cc_package_sorter import PackageSorter
 from mcg_cc_component_converter import ComponentConverter
-
-
-# Function:
-# convert_call()
-#
-# Description:
-# This function is responsible for conversion of sorted node with component call into converted node in format
-# required by configuration file.
-#
-# Returns:
-# This function returns configuration file.
-def convert_call(configuration_file, sorted_node):
-
-    # find output structure position within sorted node
-    output_structure_position = sorted_node.rfind("target")
-    # find output structure name within sorted node
-    output_structure_name = sorted_node[output_structure_position + TARGET_OFFSET:len(sorted_node)]
-    # append output structure name to conversion line
-    conversion_line = str("CAL ") + str(output_structure_name) + str(" = ")
-
-    # find component position within sorted node
-    component_position = sorted_node.rfind("target", 0, output_structure_position)
-    # find component name within sorted node
-    component_name = sorted_node[component_position + TARGET_OFFSET:output_structure_position-1]
-    # append component name to conversion line
-    conversion_line = conversion_line + str(component_name) + str("(")
-
-    # append conversion line to configuration file
-    configuration_file.append(conversion_line)
-
-    # return configuration file
-    return configuration_file
-
-
-# Function:
-# convert_package()
-#
-# Description:
-# This function is responsible for conversion of package content into configuration file.
-#
-# Returns:
-# This function does not return anything.
-def convert_package(sorted_node_list, input_interface_list, output_interface_list, local_data_list,
-                    activity_source, model_element_name, interaction_list):
-
-    # configuration file
-    configuration_file = []
-
-    # package conversion
-    print("**************************** PACKAGE CONVERSION ****************************")
-    print()
-
-    # print package details
-    print("Package Source:      " + str(activity_source))
-    print("Package Name:        " + str(model_element_name))
-
-    # append start marker of new package section to configuration file
-    configuration_file.append(str("PACKAGE START"))
-
-    # append file name to configuration file
-    configuration_file.append(str("PACKAGE SOURCE ") + str(activity_source))
-
-    # append package name to configuration file
-    configuration_file.append(str("PACKAGE NAME ") + str(model_element_name))
-
-    # append start marker of input interface section to configuration file
-    configuration_file.append(str("INPUT INTERFACE START"))
-
-    # append input interface details to configuration file
-    for input_interface in input_interface_list:
-        # get signal name
-        signal_name = input_interface[0]
-        # get signal type
-        signal_type = input_interface[1]
-        # get configuration file line
-        configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
-        # append configuration file line to configuration file
-        configuration_file.append(configuration_file_line)
-
-    # append end marker of input interface section to configuration file
-    configuration_file.append(str("INPUT INTERFACE END"))
-
-    # append start marker of output interface section to configuration file
-    configuration_file.append(str("OUTPUT INTERFACE START"))
-
-    # append output interface details to configuration file
-    for output_interface in output_interface_list:
-        # get signal name
-        signal_name = output_interface[0]
-        # get signal type
-        signal_type = output_interface[1]
-        # get configuration file line
-        configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
-        # append configuration file line to configuration file
-        configuration_file.append(configuration_file_line)
-
-    # append end marker of output interface section to configuration file
-    configuration_file.append(str("OUTPUT INTERFACE END"))
-
-    # append start marker of local parameters section to configuration file
-    configuration_file.append(str("LOCAL DATA START"))
-
-    # append local data details to configuration file
-    for local_data in local_data_list:
-        # get structure name
-        structure_name = local_data[0]
-        # get structure type
-        structure_type = local_data[1]
-        # get configuration file line
-        configuration_file_line = "type " + str(structure_type) + " name " + str(structure_name)
-        # append configuration file line to configuration file
-        configuration_file.append(configuration_file_line)
-
-    # append end marker of local parameters section to configuration file
-    configuration_file.append(str("LOCAL DATA END"))
-
-    # append start marker of function body section to configuration file
-    configuration_file.append(str("BODY START"))
-
-    print("*** CONVERT NODES ***")
-
-    # repeat for all nodes from sorted node list
-    for sorted_node in sorted_node_list:
-
-        # if sorted node contains interaction
-        for interaction in interaction_list:
-            keyword = "target " + str(interaction) + " target"
-            # if keyword for given interaction is found
-            if keyword in sorted_node:
-                # convert call
-                configuration_file = convert_call(configuration_file, sorted_node)
-
-    print("*** NODES CONVERTED ***")
-    print()
-
-    # append end marker of function body section to configuration file
-    configuration_file.append(str("BODY END"))
-
-    # append end marker of new package section to configuration file
-    configuration_file.append(str("PACKAGE END"))
-
-    # display additional details after package conversion for test run
-    if MCG_CC_TEST_RUN:
-
-        print("Configuration File:")
-        for line in configuration_file:
-            print("          " + str(line))
-        print()
-
-    # end of package conversion
-    print("************************* END OF PACKAGE CONVERSION ************************")
-    print()
+from mcg_cc_package_reader import PackageReader
+from mcg_cc_package_sorter import PackageSorter
+from mcg_cc_package_converter import PackageConverter
 
 
 # Function:
@@ -297,21 +144,17 @@ def process_packages():
                                               file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
                                               "Standard.Package")
 
+            # initialize package converter
+            package_converter = PackageConverter(package_reader_list, package_sorter_list)
             # convert package content
-            convert_package(package_sorter_list[PackageSorter.SORTED_NODE_LIST_INDEX],
-                            package_reader_list[PackageReader.INPUT_INTERFACE_LIST_INDEX],
-                            package_reader_list[PackageReader.OUTPUT_INTERFACE_LIST_INDEX],
-                            package_reader_list[PackageReader.LOCAL_DATA_LIST_INDEX],
-                            package_reader_list[PackageReader.ACTIVITY_SOURCE_INDEX],
-                            package_reader_list[PackageReader.MODEL_ELEMENT_NAME_INDEX],
-                            package_reader_list[PackageReader.INTERACTION_LIST_INDEX])
+            package_converter.convert_package()
 
 
 # Function:
 # convert_model()
 #
 # Description:
-# This is main function of this module and is responsible for conversion of .exml file
+# This is main function of this module, which invokes conversion of model content in form of .exml files
 # into configuration file.
 #
 # Returns:

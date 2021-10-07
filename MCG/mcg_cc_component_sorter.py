@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           7 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -139,6 +139,14 @@ class ComponentSorter(Sorter):
 
         # sort merged nodes basing on their dependencies
         self.sort_nodes()
+
+        # display additional details after sorting for test run
+        if MCG_CC_TEST_RUN:
+
+            print("Sorted Nodes:")
+            for sorted_node in self.sorted_node_list:
+                print("          " + str(sorted_node))
+            print()
 
         print("*** NODES SORTED ***")
         print()
