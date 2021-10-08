@@ -5,7 +5,7 @@
 #       modules of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 SEP 2021
+#   DATE:           8 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,10 +28,6 @@
 # should be set to false, otherwise it allows to display additional information in console
 # during run of Mod Code Generator (MCG) Converter Component (CC)
 MCG_CC_TEST_RUN = True
-
-# This parameter express length of model file names, i.e. names of .exml files, which are used
-# to store and save model data; an example of model file name: b17d413f-fa9f-4e26-8e8c-9485d9c9ed3d.exml
-EXML_FILE_NAME_LENGTH = 41
 
 # This parameter defines offset of signal name after "target" marker in merged node, i.e. number of
 # characters after occurrence of "target" marker, where beginning of signal name occurs, an example:
@@ -56,38 +52,6 @@ ACTION_UID_OFFSET = -37
 # eng_temp1 target *FIRST* eng_temp2 *FIRST* target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
 # eng_temp1 target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
 CUT_FIRST_INPUT_SIGNAL_OFFSET = 23
-
-# This parameter defines start offset of name element after "name" marker in line of .exml file, i.e.
-# number of characters after occurrence of "name" marker, where beginning of name element occurs, an example:
-# <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
-NAME_START_OFFSET = 6
-
-# This parameter defines end offset of name element before "mc" marker in line of .exml file, i.e.
-# number of characters before occurrence of "mc" marker, where end of name element occurs, an example:
-# <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
-NAME_END_OFFSET = -2
-
-# This parameter defines start offset of uid element after "uid" marker in line of .exml file, i.e.
-# number of characters after occurrence of "uid" marker, where beginning of uid element occurs, an example:
-# <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
-UID_START_OFFSET = 5
-
-# This parameter defines end offset of uid element before end of .exml file line, i.e.
-# number of characters before occurrence of .exml file line end, where end of uid element occurs, an example:
-# <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
-UID_END_OFFSET = -3
-
-# This parameter defines index of target element found marker from list of target elements returned
-# by supporter module function find_target_element()
-TARGET_ELEMENT_FOUND_INDEX = 0
-
-# This parameter defines index of target element name from list of target elements returned
-# by supporter module function find_target_element()
-TARGET_ELEMENT_NAME_INDEX = 1
-
-# This parameter defines index of interface found marker from list of interface signals returned
-# by supporter module function find_interface_signals()
-INTERFACE_FOUND_INDEX = 0
 
 # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
 # Converter Component (CC), i.e. list of arguments:

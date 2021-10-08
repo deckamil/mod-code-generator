@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           8 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,8 +27,6 @@
 
 import mcg_cc_error_handler
 from mcg_cc_file_reader import FileReader
-from mcg_cc_parameters import TARGET_ELEMENT_FOUND_INDEX
-from mcg_cc_parameters import TARGET_ELEMENT_NAME_INDEX
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 
 
@@ -108,28 +106,27 @@ class PackageReader(FileReader):
                             # find target structure name
                             target_structure_list = self.find_target_element_name(target_uid, "Standard.Attribute")
 
-                            # get target component found marker
-                            target_component_found_marker = target_component_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target component marker
+                            target_component_found = target_component_list[PackageReader.TARGET_ELEMENT_FOUND_INDEX]
                             # get target component name
-                            target_component_name = target_component_list[TARGET_ELEMENT_NAME_INDEX]
+                            target_component_name = target_component_list[PackageReader.TARGET_ELEMENT_NAME_INDEX]
 
-                            # get target structure found marker
-                            target_structure_found_marker = target_structure_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target structure marker
+                            target_structure_found = target_structure_list[PackageReader.TARGET_ELEMENT_FOUND_INDEX]
                             # get target structure name
-                            target_structure_name = target_structure_list[TARGET_ELEMENT_NAME_INDEX]
+                            target_structure_name = target_structure_list[PackageReader.TARGET_ELEMENT_NAME_INDEX]
 
                             # if target element was not found
-                            if ("NOT_FOUND" in target_component_found_marker) and \
-                                    ("NOT_FOUND" in target_structure_found_marker):
+                            if (not target_component_found) and (not target_structure_found):
                                 # record error
                                 mcg_cc_error_handler.record_error(301, target_uid, structure_name)
                             # select target element
-                            if "NOT_FOUND" in target_component_found_marker:
-                                target_element = target_structure_name
+                            if not target_component_found:
+                                target_element_name = target_structure_name
                             else:
-                                target_element = target_component_name
+                                target_element_name = target_component_name
                             # append node to node list
-                            self.node_list.append(str(structure_name) + " target " + str(target_element))
+                            self.node_list.append(str(structure_name) + " target " + str(target_element_name))
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -195,13 +192,13 @@ class PackageReader(FileReader):
                             # find target structure name
                             target_structure_list = self.find_target_element_name(target_uid, "Standard.Attribute")
 
-                            # get target structure found marker
-                            target_structure_found_marker = target_structure_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target structure marker
+                            target_structure_found = target_structure_list[PackageReader.TARGET_ELEMENT_FOUND_INDEX]
                             # get target structure name
-                            target_structure_name = target_structure_list[TARGET_ELEMENT_NAME_INDEX]
+                            target_structure_name = target_structure_list[PackageReader.TARGET_ELEMENT_NAME_INDEX]
 
-                            # if target element was not found
-                            if "NOT_FOUND" in target_structure_found_marker:
+                            # if target structure was not found
+                            if not target_structure_found:
                                 # record error
                                 mcg_cc_error_handler.record_error(171, target_uid, component_name)
                             # append node to node list

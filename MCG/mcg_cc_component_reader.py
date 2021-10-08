@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           8 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,8 +29,6 @@ import mcg_cc_supporter
 import mcg_cc_error_handler
 from mcg_cc_file_reader import FileReader
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
-from mcg_cc_parameters import TARGET_ELEMENT_FOUND_INDEX
-from mcg_cc_parameters import TARGET_ELEMENT_NAME_INDEX
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import ACTION_UID_OFFSET
 
@@ -230,13 +228,13 @@ class ComponentReader(FileReader):
                             # find target signal name
                             target_signal_list = self.find_target_element_name(target_signal_uid, "Standard.Attribute")
 
-                            # get target signal found marker
-                            target_signal_found_marker = target_signal_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target signal marker
+                            target_signal_found = target_signal_list[ComponentReader.TARGET_ELEMENT_FOUND_INDEX]
                             # get target signal name
-                            target_signal_name = target_signal_list[TARGET_ELEMENT_NAME_INDEX]
+                            target_signal_name = target_signal_list[ComponentReader.TARGET_ELEMENT_NAME_INDEX]
 
                             # if target signal was not found
-                            if "NOT_FOUND" in target_signal_found_marker:
+                            if not target_signal_found:
                                 # record error
                                 mcg_cc_error_handler.record_error(20, target_signal_uid, signal_name)
                             # append node to node list
@@ -317,13 +315,13 @@ class ComponentReader(FileReader):
                             # find target signal name
                             target_signal_list = self.find_target_element_name(target_signal_uid, "Standard.Attribute")
 
-                            # get target signal found marker
-                            target_signal_found_marker = target_signal_list[TARGET_ELEMENT_FOUND_INDEX]
+                            # get target signal marker
+                            target_signal_found = target_signal_list[ComponentReader.TARGET_ELEMENT_FOUND_INDEX]
                             # get target signal name
-                            target_signal_name = target_signal_list[TARGET_ELEMENT_NAME_INDEX]
+                            target_signal_name = target_signal_list[ComponentReader.TARGET_ELEMENT_NAME_INDEX]
 
                             # if target signal was not found
-                            if "NOT_FOUND" in target_signal_found_marker:
+                            if not target_signal_found:
                                 # record error
                                 mcg_cc_error_handler.record_error(21, target_signal_uid, action)
                             # append node to node list

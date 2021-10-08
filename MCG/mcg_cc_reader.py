@@ -5,7 +5,7 @@
 #       for reading of .exml file content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           8 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,10 +25,6 @@
 
 
 import mcg_cc_error_handler
-from mcg_cc_parameters import NAME_START_OFFSET
-from mcg_cc_parameters import NAME_END_OFFSET
-from mcg_cc_parameters import UID_START_OFFSET
-from mcg_cc_parameters import UID_END_OFFSET
 
 
 # Class:
@@ -37,6 +33,26 @@ from mcg_cc_parameters import UID_END_OFFSET
 # Description:
 # This is base class responsible for reading of .exml file content.
 class Reader(object):
+
+    # This parameter defines start offset of name element after "name" marker in line of .exml file, i.e.
+    # number of characters after occurrence of "name" marker, where beginning of name element occurs, an example:
+    # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
+    NAME_START_OFFSET = 6
+
+    # This parameter defines end offset of name element before "mc" marker in line of .exml file, i.e.
+    # number of characters before occurrence of "mc" marker, where end of name element occurs, an example:
+    # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
+    NAME_END_OFFSET = -2
+
+    # This parameter defines start offset of uid element after "uid" marker in line of .exml file, i.e.
+    # number of characters after occurrence of "uid" marker, where beginning of uid element occurs, an example:
+    # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
+    UID_START_OFFSET = 5
+
+    # This parameter defines end offset of uid element before end of .exml file line, i.e.
+    # number of characters before occurrence of .exml file line end, where end of uid element occurs, an example:
+    # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
+    UID_END_OFFSET = -3
 
     # Method:
     # get_name()
@@ -63,7 +79,7 @@ class Reader(object):
             name = "NAME_NOT_FOUND"
         else:
             # get name
-            name = line[name_position + NAME_START_OFFSET:mc_position + NAME_END_OFFSET]
+            name = line[name_position + Reader.NAME_START_OFFSET:mc_position + Reader.NAME_END_OFFSET]
 
         # return name
         return name
@@ -91,7 +107,7 @@ class Reader(object):
             uid = "UID_NOT_FOUND"
         else:
             # get uid
-            uid = line[uid_position + UID_START_OFFSET:len(line) + UID_END_OFFSET]
+            uid = line[uid_position + Reader.UID_START_OFFSET:len(line) + Reader.UID_END_OFFSET]
 
         # return uid
         return uid

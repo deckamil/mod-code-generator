@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           8 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,6 +35,14 @@ from mcg_cc_file_finder import FileFinder
 # Description:
 # This is child class responsible for reading of .exml file content.
 class FileReader(Reader):
+
+    # This parameter defines index of target element marker from list of target elements returned
+    # by find_target_element_name() method
+    TARGET_ELEMENT_FOUND_INDEX = 0
+
+    # This parameter defines index of target element name from list of target elements returned
+    # by find_target_element_name() method
+    TARGET_ELEMENT_NAME_INDEX = 1
 
     # indexes of reader list
     MODEL_ELEMENT_NAME_INDEX = 0
@@ -83,9 +91,11 @@ class FileReader(Reader):
     # Returns:
     # This method returns target element list.
     def find_target_element_name(self, target_element_uid, target_element_type):
-        # local data
+
+        # target element marker shows whether target element was found or not
+        target_element_found = False
+        # target element name
         target_element_name = ""
-        target_element_list = []
 
         # search for uid in file content
         for i in range(0, len(self.activity_file)):
@@ -107,10 +117,8 @@ class FileReader(Reader):
                         line_number = j + 1
                         # get target element name
                         target_element_name = FileReader.get_name(line, line_number)
-                        # append "found" marker to target element list
-                        target_element_list.append("FOUND")
-                        # append target element name to target element list
-                        target_element_list.append(target_element_name)
+                        # change target element marker
+                        target_element_found = True
                         # exit "for j in range" loop
                         break
 
@@ -122,14 +130,15 @@ class FileReader(Reader):
                 # exit "for i in range" loop
                 break
 
-        # if target element name is not found
-        if len(target_element_list) == 0:
+        # if target element has not been found
+        if not target_element_found:
             # set target element name
-            target_element_name = "TARGET_ELEMENT_NOT_FOUND"
-            # append "not found" marker to target element list
-            target_element_list.append("NOT_FOUND")
-            # append target element name to target element list
-            target_element_list.append(target_element_name)
+            target_element_name = "TARGET_ELEMENT_NAME_NOT_FOUND"
+
+        # append collected data to target element list
+        target_element_list = []
+        target_element_list.insert(FileReader.TARGET_ELEMENT_FOUND_INDEX, target_element_found)
+        target_element_list.insert(FileReader.TARGET_ELEMENT_NAME_INDEX, target_element_name)
 
         # return target element list
         return target_element_list
