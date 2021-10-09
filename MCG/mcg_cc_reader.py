@@ -5,7 +5,7 @@
 #       for reading of .exml file content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           8 OCT 2021
+#   DATE:           9 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -24,7 +24,7 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_error_handler
+from mcg_cc_error_handler import ErrorHandler
 
 
 # Class:
@@ -74,7 +74,7 @@ class Reader(object):
         # check if <name> and <mc> position is found
         if (name_position == -1) or (mc_position == -1):
             # record error
-            mcg_cc_error_handler.record_error(271, line_number, "none")
+            ErrorHandler.record_error(ErrorHandler.GEN_ERR_NO_NAME_ELEMENT, line_number, "none")
             # set error name
             name = "NAME_NOT_FOUND"
         else:
@@ -102,7 +102,7 @@ class Reader(object):
         # check if <uid> position is found
         if uid_position == -1:
             # record error
-            mcg_cc_error_handler.record_error(272, line_number, "none")
+            ErrorHandler.record_error(ErrorHandler.GEN_ERR_NO_UID_ELEMENT, line_number, "none")
             # set error uid
             uid = "UID_NOT_FOUND"
         else:

@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           7 OCT 2021
+#   DATE:           9 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,9 +27,9 @@
 
 
 from sys import argv
-import mcg_cc_error_handler
 from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
 from mcg_cc_file_finder import FileFinder
+from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_component_reader import ComponentReader
 from mcg_cc_component_sorter import ComponentSorter
 from mcg_cc_component_converter import ComponentConverter
@@ -60,13 +60,13 @@ def process_components():
         # get files marker
         files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
+        # check errors
+        ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                  file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                  "Standard.Component")
+
         # if component files were found
         if files_found:
-
-            # check errors
-            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                              "Standard.Component")
 
             # initialize component reader
             component_reader = ComponentReader(file_finder_list)
@@ -74,9 +74,9 @@ def process_components():
             component_reader_list = component_reader.read_component()
 
             # check errors
-            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                              "Standard.Component")
+            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                      "Standard.Component")
 
             # initialize component sorter
             component_sorter = ComponentSorter(component_reader_list)
@@ -84,9 +84,9 @@ def process_components():
             component_sorter_list = component_sorter.sort_component()
 
             # check errors
-            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                              "Standard.Component")
+            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                      "Standard.Component")
 
             # initialize component converter
             component_converter = ComponentConverter(component_reader_list, component_sorter_list)
@@ -116,13 +116,13 @@ def process_packages():
         # get files marker
         files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
+        # check errors
+        ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                  file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                  "Standard.Package")
+
         # if package files were found
         if files_found:
-
-            # check errors
-            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                              "Standard.Package")
 
             # initialize package reader
             package_reader = PackageReader(file_finder_list)
@@ -130,9 +130,9 @@ def process_packages():
             package_reader_list = package_reader.read_package()
 
             # check errors
-            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                              "Standard.Package")
+            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                      "Standard.Package")
 
             # initialize package sorter
             package_sorter = PackageSorter(package_reader_list)
@@ -140,9 +140,9 @@ def process_packages():
             package_sorter_list = package_sorter.sort_package()
 
             # check errors
-            mcg_cc_error_handler.check_errors(file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                              file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                              "Standard.Package")
+            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
+                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
+                                      "Standard.Package")
 
             # initialize package converter
             package_converter = PackageConverter(package_reader_list, package_sorter_list)

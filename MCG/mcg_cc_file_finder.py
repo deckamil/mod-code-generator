@@ -6,7 +6,7 @@
 #       describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           1 OCT 2021
+#   DATE:           9 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,9 +25,9 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_error_handler
 from os import listdir
 from mcg_cc_reader import Reader
+from mcg_cc_error_handler import ErrorHandler
 
 
 # Class:
@@ -242,28 +242,28 @@ class FileFinder(Reader):
             # if input interface element has not been found
             if not input_interface_found:
                 # record error
-                mcg_cc_error_handler.record_error(120, "none", "none")
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_INP_INT_IN_COM, "none", "none")
             # if output interface element has not been found
             if not output_interface_found:
                 # record error
-                mcg_cc_error_handler.record_error(121, "none", "none")
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_OUT_INT_IN_COM, "none", "none")
             # if local data element has not been found
             if not local_data_found:
                 # record error
-                mcg_cc_error_handler.record_error(122, "none", "none")
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_LOC_DAT_IN_COM, "none", "none")
         else:
             # if input interface element has not been found
             if not input_interface_found:
                 # record error
-                mcg_cc_error_handler.record_error(123, "none", "none")
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_INP_INT_IN_PAC, "none", "none")
             # if output interface element has not been found
             if not output_interface_found:
                 # record error
-                mcg_cc_error_handler.record_error(124, "none", "none")
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_OUT_INT_IN_PAC, "none", "none")
             # if local data element has not been found
             if not local_data_found:
                 # record error
-                mcg_cc_error_handler.record_error(125, "none", "none")
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_LOC_DAT_IN_PAC, "none", "none")
 
         # if all interface files have been found
         if input_interface_found and output_interface_found and local_data_found:

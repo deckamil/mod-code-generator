@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           8 OCT 2021
+#   DATE:           9 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,8 +25,8 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_error_handler
 from mcg_cc_file_reader import FileReader
+from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 
 
@@ -119,7 +119,9 @@ class PackageReader(FileReader):
                             # if target element was not found
                             if (not target_component_found) and (not target_structure_found):
                                 # record error
-                                mcg_cc_error_handler.record_error(301, target_uid, structure_name)
+                                ErrorHandler.record_error(ErrorHandler.STR_ERR_NO_COM_STR_UID_TARGET,
+                                                          target_uid,
+                                                          structure_name)
                             # select target element
                             if not target_component_found:
                                 target_element_name = target_structure_name
@@ -174,7 +176,7 @@ class PackageReader(FileReader):
                     # if line contains </DEPENDENCIES> then component does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not component_has_targets):
                         # record error
-                        mcg_cc_error_handler.record_error(170, component_name, "none")
+                        ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_TARGET, component_name, "none")
                         # exit "for j in range" loop
                         break
 
@@ -200,7 +202,9 @@ class PackageReader(FileReader):
                             # if target structure was not found
                             if not target_structure_found:
                                 # record error
-                                mcg_cc_error_handler.record_error(171, target_uid, component_name)
+                                ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_STR_UID_TARGET,
+                                                          target_uid,
+                                                          component_name)
                             # append node to node list
                             self.node_list.append(str(component_name) + " target " + str(target_structure_name))
 

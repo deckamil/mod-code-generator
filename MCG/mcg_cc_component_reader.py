@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           8 OCT 2021
+#   DATE:           9 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -26,8 +26,8 @@
 
 
 import mcg_cc_supporter
-import mcg_cc_error_handler
 from mcg_cc_file_reader import FileReader
+from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import ACTION_UID_OFFSET
@@ -66,7 +66,7 @@ class ComponentReader(FileReader):
             # if keyword has more than one occurrence
             if keyword_occurrence > 1:
                 # record error
-                mcg_cc_error_handler.record_error(1, data, "none")
+                ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_SOURCES, data, "none")
 
         # check if any action on interaction list is not allowed
         for interaction in self.interaction_list:
@@ -79,7 +79,7 @@ class ComponentReader(FileReader):
             # if action type is not allowed
             if not action_type_found:
                 # record error
-                mcg_cc_error_handler.record_error(51, interaction, "none")
+                ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
 
     # Function:
     # find_first_input_signal_name()
@@ -125,7 +125,7 @@ class ComponentReader(FileReader):
         # if signal is not found
         if first_input_signal_name == "":
             # record error
-            mcg_cc_error_handler.record_error(22, target_action, "none")
+            ErrorHandler.record_error(ErrorHandler.ACT_ERR_NO_FIRST_INPUT, target_action, "none")
             # set error signal
             first_input_signal_name = "FIRST_INPUT_SIGNAL_NOT_FOUND"
 
@@ -236,7 +236,9 @@ class ComponentReader(FileReader):
                             # if target signal was not found
                             if not target_signal_found:
                                 # record error
-                                mcg_cc_error_handler.record_error(20, target_signal_uid, signal_name)
+                                ErrorHandler.record_error(ErrorHandler.SIG_ERR_NO_SIG_UID_TARGET,
+                                                          target_signal_uid,
+                                                          signal_name)
                             # append node to node list
                             self.node_list.append(str(signal_name) + " target " + str(target_signal_name))
 
@@ -291,7 +293,7 @@ class ComponentReader(FileReader):
                     # if line contains </DEPENDENCIES> then action does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not action_has_targets):
                         # record error
-                        mcg_cc_error_handler.record_error(70, action, "none")
+                        ErrorHandler.record_error(ErrorHandler.ACT_ERR_NO_TARGET, action, "none")
                         # exit "for j in range" loop
                         break
 
@@ -301,7 +303,7 @@ class ComponentReader(FileReader):
                         if ("<ID name=" in self.activity_file[j + 2]) and \
                                 ("Standard.OpaqueAction" in self.activity_file[j + 2]):
                             # record error
-                            mcg_cc_error_handler.record_error(80, action, "none")
+                            ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_IS_TARGET, action, "none")
 
                         # if signal is target of given action
                         if ("<ID name=" in self.activity_file[j + 2]) and \
@@ -323,7 +325,9 @@ class ComponentReader(FileReader):
                             # if target signal was not found
                             if not target_signal_found:
                                 # record error
-                                mcg_cc_error_handler.record_error(21, target_signal_uid, action)
+                                ErrorHandler.record_error(ErrorHandler.ACT_ERR_NO_SIG_UID_TARGET,
+                                                          target_signal_uid,
+                                                          action)
                             # append node to node list
                             self.node_list.append(str(action) + " target " + str(target_signal_name))
 
