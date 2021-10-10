@@ -5,7 +5,7 @@
 #       modules of Mod Code Generator (MCG) Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           8 SEP 2021
+#   DATE:           10 SEP 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -44,14 +44,6 @@ FIRST_INPUT_SIGNAL_OFFSET = 8
 # character to accommodate space between action type and action uid, an example:
 # ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
 ACTION_UID_OFFSET = -37
-
-# This parameter defines offset, which is used to cut off first input signal node from merged node, i.e. first input
-# signal, its two markers "*FIRST*" and "target" marker, please note that length of first input signal name must be
-# added to the offset in order to calculate final offset used to cut desired part from merged node, an example of
-# merged node with first input signal node and without it:
-# eng_temp1 target *FIRST* eng_temp2 *FIRST* target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
-# eng_temp1 target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
-CUT_FIRST_INPUT_SIGNAL_OFFSET = 23
 
 # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
 # Converter Component (CC), i.e. list of arguments:

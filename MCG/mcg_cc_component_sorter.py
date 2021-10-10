@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           7 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,7 +29,6 @@ import mcg_cc_supporter
 from mcg_cc_sorter import Sorter
 from mcg_cc_parameters import MCG_CC_TEST_RUN
 from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
-from mcg_cc_parameters import CUT_FIRST_INPUT_SIGNAL_OFFSET
 
 
 # Class:
@@ -38,6 +37,14 @@ from mcg_cc_parameters import CUT_FIRST_INPUT_SIGNAL_OFFSET
 # Description:
 # This is child class responsible for sorting of component content, i.e. nodes of activity diagram.
 class ComponentSorter(Sorter):
+
+    # This parameter defines offset, which is used to cut off first input signal node from merged node, i.e. first input
+    # signal, its two markers "*FIRST*" and "target" marker, please note that length of first input signal name must be
+    # added to the offset in order to calculate final offset used to cut desired part from merged node, an example of
+    # merged node with first input signal node and without it:
+    # eng_temp1 target *FIRST* eng_temp2 *FIRST* target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
+    # eng_temp1 target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
+    FIRST_INPUT_SIGNAL_CUT_OFFSET = 23
 
     # Method:
     # sort_first_input_signals()
@@ -76,15 +83,17 @@ class ComponentSorter(Sorter):
 
                 # cut rest of nodes from merged node, but without node which contains first input signal
                 if first_input_start == 0:
-                    cut_merged_node = merged_node[len(first_input_signal) + CUT_FIRST_INPUT_SIGNAL_OFFSET + 1:
+                    merged_node_cut = merged_node[len(first_input_signal) +
+                                                  ComponentSorter.FIRST_INPUT_SIGNAL_CUT_OFFSET + 1:
                                                   len(merged_node)]
                 else:
-                    cut_merged_node = merged_node[0:first_input_start - 1] + \
+                    merged_node_cut = merged_node[0:first_input_start - 1] + \
                                       merged_node[first_input_start + len(first_input_signal) +
-                                                  CUT_FIRST_INPUT_SIGNAL_OFFSET:len(merged_node)]
+                                                  ComponentSorter.FIRST_INPUT_SIGNAL_CUT_OFFSET:
+                                                  len(merged_node)]
 
                 # merge all nodes in correct order into temporary merged node without *FIRST* marker
-                merged_node_with_removed_first_marker = str(first_input_signal_node) + str(" ") + str(cut_merged_node)
+                merged_node_with_removed_first_marker = str(first_input_signal_node) + str(" ") + str(merged_node_cut)
 
                 # remove old merged node which contain *FIRST* markers from merged node list
                 self.merged_node_list.remove(merged_node)

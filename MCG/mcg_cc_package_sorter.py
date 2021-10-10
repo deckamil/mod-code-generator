@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           7 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -75,8 +75,8 @@ class PackageSorter(Sorter):
     # This method does not return anything.
     def merge_output_assignment(self):
 
-        # merged node
-        merged_node = ""
+        # sorted node, where output structure assignment is merged
+        sorted_node_with_merged_output_assignment = ""
 
         # search output structures within sorted node starting from this position
         index = 0
@@ -97,11 +97,12 @@ class PackageSorter(Sorter):
                 # cut output structure name and target keyword from sorted node
                 sorted_node_cut = sorted_node[0:output_structure_position + TARGET_OFFSET]
 
-                # append sorted node cut to merged node
-                if merged_node == "":
-                    merged_node = str(sorted_node_cut)
+                # append sorted node cut
+                if sorted_node_with_merged_output_assignment == "":
+                    sorted_node_with_merged_output_assignment = str(sorted_node_cut)
                 else:
-                    merged_node = merged_node + str(sorted_node_cut)
+                    sorted_node_with_merged_output_assignment = sorted_node_with_merged_output_assignment + \
+                                                                str(sorted_node_cut)
 
                 # decrement index for next iteration, as one sorted node was removed
                 # therefore all next sorted nodes were pushed by one position
@@ -111,11 +112,11 @@ class PackageSorter(Sorter):
                 index = index - 1
             index = index + 1
 
-        # append Output Interface target to merged node
-        merged_node = merged_node + str("Output Interface")
+        # append Output Interface target
+        sorted_node_with_merged_output_assignment = sorted_node_with_merged_output_assignment + str("Output Interface")
 
-        # append merged node to sorted node list
-        self.sorted_node_list.append(merged_node)
+        # append sorted node to sorted node list
+        self.sorted_node_list.append(sorted_node_with_merged_output_assignment)
 
         # place sorted nodes with empty target (keyword "target empty") at the end of sorted node list
         for sorted_node in self.sorted_node_list:
