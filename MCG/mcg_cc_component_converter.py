@@ -172,6 +172,9 @@ class ComponentConverter(Converter):
         # append end marker of new component section to configuration file
         self.configuration_file.append(str("COMPONENT END"))
 
+        # save configuration file
+        ComponentConverter.save_configuration_file(self.configuration_file)
+
         # display additional details after component conversion for test run
         if Supporter.MCG_CC_TEST_RUN:
 

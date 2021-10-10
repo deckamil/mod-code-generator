@@ -5,7 +5,7 @@
 #       for conversion of model element content into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,6 +35,10 @@ from mcg_cc_sorter import Sorter
 # This is base class responsible for conversion of model element content into configuration file.
 class Converter(object):
 
+    # initialize class data
+    configuration_file_hd = ""
+    configuration_file_path = ""
+
     # Method:
     # __init__()
     #
@@ -54,6 +58,49 @@ class Converter(object):
         self.interaction_list = reader_list[FileReader.INTERACTION_LIST_INDEX]
         self.sorted_node_list = sorter_list[Sorter.SORTED_NODE_LIST_INDEX]
         self.configuration_file = []
+
+    # Method:
+    # set_configuration_file_path()
+    #
+    # Description:
+    # This method sets path to directory, where configuration file will be recorded.
+    #
+    # Returns:
+    # This method does not return anything.
+    @staticmethod
+    def set_configuration_file_path(output_dir_path):
+
+        # set configuration file path
+        Converter.configuration_file_path = output_dir_path + str("\\configuration_file.txt")
+
+        # open new file in write mode, then close file, to clear previous content
+        Converter.configuration_file_hd = open(Converter.configuration_file_path, "w")
+        Converter.configuration_file_hd.close()
+
+    # Method:
+    # save_configuration_file()
+    #
+    # Description:
+    # This method saves content of configuration file under previously selected directory.
+    #
+    # Returns:
+    # This method does not return anything.
+    @staticmethod
+    def save_configuration_file(configuration_file):
+
+        # open file in append mode, ready to save fresh configuration file content
+        Converter.configuration_file_hd = open(Converter.configuration_file_path, "a")
+
+        # for each line in configuration file
+        for line in configuration_file:
+            # write line to configuration file on hard drive
+            Converter.configuration_file_hd.write(line)
+            Converter.configuration_file_hd.write("\n")
+
+        # append separation
+        Converter.configuration_file_hd.write("\n")
+        # close file
+        Converter.configuration_file_hd.close()
 
     # Method:
     # convert_specific_interface()

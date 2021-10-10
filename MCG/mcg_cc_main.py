@@ -29,6 +29,7 @@
 from sys import argv
 from mcg_cc_supporter import Supporter
 from mcg_cc_file_finder import FileFinder
+from mcg_cc_converter import Converter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_component_reader import ComponentReader
 from mcg_cc_component_sorter import ComponentSorter
@@ -186,9 +187,13 @@ if len(argv) - 1 == Supporter.NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
     # get model directory path from cmd line argument
     model_dir_path = str(argv[1])
+    # get output directory path from cmd line argument
+    output_dir_path = str(argv[2])
 
     # set path to model directory
-    FileFinder.set_paths(model_dir_path)
+    FileFinder.set_model_path(model_dir_path)
+    # set path to configuration file directory
+    Converter.set_configuration_file_path(output_dir_path)
 
     # convert model
     convert_model()

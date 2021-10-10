@@ -55,8 +55,9 @@ class Supporter(object):
 
     # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
     # Converter Component (CC), i.e. list of arguments:
-    #       - model path
-    NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 1
+    #       - model dir path
+    #       - output dir path
+    NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 2
 
     # This list defines all allowed types of actions, which could be used within activity diagram
     # to define signal interactions.
