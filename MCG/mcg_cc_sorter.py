@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           7 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,8 +25,7 @@
 
 
 from mcg_cc_file_reader import FileReader
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import TARGET_OFFSET
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -118,7 +117,7 @@ class Sorter(object):
             index = index + 1
 
         # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print()
             print("Sorted Interactions:")
@@ -197,7 +196,7 @@ class Sorter(object):
         self.merged_node_list.append(merged_node)
 
         # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Merged Nodes:")
             for merged_node in self.merged_node_list:
@@ -249,7 +248,7 @@ class Sorter(object):
                 self.dependency_list.append(dependency)
 
         # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Dependencies:")
             for dependency in self.dependency_list:
@@ -336,7 +335,7 @@ class Sorter(object):
         # find position of output element name within merged node
         target_last_position = merged_node.rfind("target")
         # get name of output element from merged node
-        output_element_name = merged_node[target_last_position + TARGET_OFFSET:len(merged_node)]
+        output_element_name = merged_node[target_last_position + Supporter.TARGET_OFFSET:len(merged_node)]
 
         # return output element name
         return output_element_name

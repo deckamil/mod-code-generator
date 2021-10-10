@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           7 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -26,8 +26,7 @@
 
 
 from mcg_cc_converter import Converter
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import TARGET_OFFSET
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -50,14 +49,14 @@ class PackageConverter(Converter):
         # find output structure position within sorted node
         output_structure_position = sorted_node.rfind("target")
         # find output structure name within sorted node
-        output_structure_name = sorted_node[output_structure_position + TARGET_OFFSET:len(sorted_node)]
+        output_structure_name = sorted_node[output_structure_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # append output structure name to conversion line
         conversion_line = str("INV ") + str(output_structure_name) + str(" = ")
 
         # find component position within sorted node
         component_position = sorted_node.rfind("target", 0, output_structure_position)
         # find component name within sorted node
-        component_name = sorted_node[component_position + TARGET_OFFSET:output_structure_position - 1]
+        component_name = sorted_node[component_position + Supporter.TARGET_OFFSET:output_structure_position - 1]
         # append component name to conversion line
         conversion_line = conversion_line + str(component_name) + str(" (")
 
@@ -83,7 +82,7 @@ class PackageConverter(Converter):
                 conversion_line = conversion_line + str(", ")
 
             # update start_index to point where to search for next input structure name within sorted node
-            start_index = target_position + TARGET_OFFSET
+            start_index = target_position + Supporter.TARGET_OFFSET
 
         # close component invocation
         conversion_line = conversion_line + str(")")
@@ -128,7 +127,7 @@ class PackageConverter(Converter):
                 conversion_line = conversion_line + str(", ")
 
             # update start_index to point where to search for next output structure name within sorted node
-            start_index = target_position + TARGET_OFFSET
+            start_index = target_position + Supporter.TARGET_OFFSET
 
         # close output structure assignment
         conversion_line = conversion_line + str(")")
@@ -202,7 +201,7 @@ class PackageConverter(Converter):
         self.configuration_file.append(str("PACKAGE END"))
 
         # display additional details after package conversion for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Configuration File:")
             for line in self.configuration_file:

@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           9 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,7 +27,7 @@
 
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
-from mcg_cc_parameters import MCG_CC_TEST_RUN
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -254,7 +254,7 @@ class PackageReader(FileReader):
         self.check_correctness()
 
         # display additional details after package reading for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             # print component details
             print("Nodes:")

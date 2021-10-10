@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           9 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,12 +25,9 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_supporter
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
-from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import ACTION_UID_OFFSET
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -71,10 +68,10 @@ class ComponentReader(FileReader):
         # check if any action on interaction list is not allowed
         for interaction in self.interaction_list:
             # get action type
-            action_type = interaction[0:len(interaction) + ACTION_UID_OFFSET]
+            action_type = interaction[0:len(interaction) + Supporter.ACTION_UID_OFFSET]
 
             # check if action type is allowed
-            action_type_found = mcg_cc_supporter.check_if_reference_contains_action_type(action_type)
+            action_type_found = Supporter.check_if_reference_contains_action_type(action_type)
 
             # if action type is not allowed
             if not action_type_found:
@@ -119,7 +116,7 @@ class ComponentReader(FileReader):
                             first_input_signal_name = ""
                         else:
                             # get first input signal name
-                            first_input_signal_name = line[first_input_start + FIRST_INPUT_SIGNAL_OFFSET:
+                            first_input_signal_name = line[first_input_start + Supporter.FIRST_INPUT_SIGNAL_OFFSET:
                                                            first_input_end - 1]
 
         # if signal is not found
@@ -194,7 +191,7 @@ class ComponentReader(FileReader):
                             first_input_signal_needed = False
 
                             # check if target action requires first input signal
-                            action_type_req_first_input_signal_found = mcg_cc_supporter. \
+                            action_type_req_first_input_signal_found = Supporter. \
                                 check_if_reference_contains_action_type_req_first_input_signal(target_action_type)
 
                             # if this type of action requires first input signal
@@ -377,7 +374,7 @@ class ComponentReader(FileReader):
         self.check_correctness()
 
         # display additional details after component reading for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             # print component details
             print("Nodes:")

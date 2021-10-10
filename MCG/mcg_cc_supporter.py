@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_supporter.py
 #
 #   DESCRIPTION:
-#       This module provides additional, supporting functions, which are used
-#       by Mod Code Generator (MCG) Converter Component (CC) to read details of
-#       .exml file or merged nodes.
+#       This module contains definition of Supporter class, which provides additional
+#       supporting methods and parameters reused by other Mod Code Generator (MCG)
+#       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,55 +25,92 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-from mcg_cc_parameters import action_type_list
-from mcg_cc_parameters import action_type_req_first_input_signal_list
-
-
-# Function:
-# check_if_reference_contains_action_type()
+# Class:
+# Supporter()
 #
 # Description:
-# This function checks if reference contains any action type.
-#
-# Returns:
-# This function returns action found marker.
-def check_if_reference_contains_action_type(reference):
-    # action marker shows whether reference contains action type
-    action_type_found = False
+# This is base class, which provides additional methods and parameters reused by other MCG CC classes.
+class Supporter(object):
 
-    # for all allowed type of actions
-    for action_type in action_type_list:
-        # if action type is found within reference
-        if action_type in reference:
-            # change action marker
-            action_type_found = True
-            # exit loop
-            break
+    # This parameter for production version of Mod Code Generator (MCG) Converter Component (CC)
+    # should be set to false, otherwise it allows to display additional information in console
+    # during run of Mod Code Generator (MCG) Converter Component (CC)
+    MCG_CC_TEST_RUN = True
 
-    # return action marker
-    return action_type_found
+    # This parameter defines offset of signal name after "target" marker in merged node, i.e. number of
+    # characters after occurrence of "target" marker, where beginning of signal name occurs, an example:
+    # eng_gain1 target eng_gain2 target ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 target eng_gain_total
+    TARGET_OFFSET = 7
 
+    # This parameter defines offset of signal name after "*FIRST*" marker in merged node or line of .exml file,
+    # i.e. number of characters after occurrence of "*FIRST*" marker, where beginning of signal name occurs, an example:
+    # *FIRST* some_signal *FIRST*
+    FIRST_INPUT_SIGNAL_OFFSET = 8
 
-# Function:
-# check_if_reference_contains_action_type_req_first_input_signal()
-#
-# Description:
-# This function checks if reference contains any action type requiring first input signal.
-#
-# Returns:
-# This function returns action found marker.
-def check_if_reference_contains_action_type_req_first_input_signal(reference):
-    # action marker shows whether reference contains action type requiring first input signal
-    action_type_req_first_input_signal_found = False
+    # This parameter defines offset of action uid before end of action definition, i.e. number of characters
+    # before occurrence of action definition end, where beginning of action uid occurs, plus one additional
+    # character to accommodate space between action type and action uid, an example:
+    # ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
+    ACTION_UID_OFFSET = -37
 
-    # for all allowed type of actions requiring first input signal
-    for action_type_req_first_input_signal in action_type_req_first_input_signal_list:
-        # if action type requiring first input signal is found within reference
-        if action_type_req_first_input_signal in reference:
-            # change action marker
-            action_type_req_first_input_signal_found = True
-            # exit loop
-            break
+    # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
+    # Converter Component (CC), i.e. list of arguments:
+    #       - model path
+    NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 1
 
-    # return action marker
-    return action_type_req_first_input_signal_found
+    # This list defines all allowed types of actions, which could be used within activity diagram
+    # to define signal interactions.
+    action_type_list = ["ADD", "SUB"]
+
+    # This list defines all types of actions, which require to distinguish in addition first input signal.
+    action_type_req_first_input_signal_list = ["SUB"]
+
+    # Method:
+    # check_if_reference_contains_action_type()
+    #
+    # Description:
+    # This method checks if reference contains any action type.
+    #
+    # Returns:
+    # This method returns action marker.
+    @staticmethod
+    def check_if_reference_contains_action_type(reference):
+        # action marker shows whether reference contains action type
+        action_type_found = False
+
+        # for all allowed type of actions
+        for action_type in Supporter.action_type_list:
+            # if action type is found within reference
+            if action_type in reference:
+                # change action marker
+                action_type_found = True
+                # exit loop
+                break
+
+        # return action marker
+        return action_type_found
+
+    # Method:
+    # check_if_reference_contains_action_type_req_first_input_signal()
+    #
+    # Description:
+    # This method checks if reference contains any action type requiring first input signal.
+    #
+    # Returns:
+    # This method returns action marker.
+    @staticmethod
+    def check_if_reference_contains_action_type_req_first_input_signal(reference):
+        # action marker shows whether reference contains action type requiring first input signal
+        action_type_req_first_input_signal_found = False
+
+        # for all allowed type of actions requiring first input signal
+        for action_type_req_first_input_signal in Supporter.action_type_req_first_input_signal_list:
+            # if action type requiring first input signal is found within reference
+            if action_type_req_first_input_signal in reference:
+                # change action marker
+                action_type_req_first_input_signal_found = True
+                # exit loop
+                break
+
+        # return action marker
+        return action_type_req_first_input_signal_found

@@ -7,7 +7,7 @@
 #       (MCG) Code Generator Component (CGC) to generate C code for the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           9 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,7 +27,7 @@
 
 
 from sys import argv
-from mcg_cc_parameters import NUMBER_OF_MCG_CC_CMD_LINE_ARGS
+from mcg_cc_supporter import Supporter
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_component_reader import ComponentReader
@@ -182,7 +182,7 @@ print("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS
 print()
 
 # check if number of command line arguments is correct
-if len(argv) - 1 == NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
+if len(argv) - 1 == Supporter.NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
     # get model directory path from cmd line argument
     model_dir_path = str(argv[1])

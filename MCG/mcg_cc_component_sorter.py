@@ -25,10 +25,8 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_supporter
 from mcg_cc_sorter import Sorter
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import FIRST_INPUT_SIGNAL_OFFSET
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -64,7 +62,7 @@ class ComponentSorter(Sorter):
         for merged_node in self.merged_node_list:
 
             # check if merged node contains action requiring first input signal
-            action_type_req_first_input_signal_found = mcg_cc_supporter. \
+            action_type_req_first_input_signal_found = Supporter. \
                 check_if_reference_contains_action_type_req_first_input_signal(merged_node)
 
             # if merged node contains type of action, which requires to distinguish first input signal
@@ -75,7 +73,7 @@ class ComponentSorter(Sorter):
                 # find end marker of first input signal
                 first_input_end = merged_node.rfind("*FIRST*")
                 # get first input signal
-                first_input_signal = merged_node[first_input_start + FIRST_INPUT_SIGNAL_OFFSET:
+                first_input_signal = merged_node[first_input_start + Supporter.FIRST_INPUT_SIGNAL_OFFSET:
                                                  first_input_end - 1]
 
                 # get node with first input signal, but without *FIRST* markers
@@ -107,7 +105,7 @@ class ComponentSorter(Sorter):
             self.merged_node_list = [merged_node_with_removed_first_marker] + self.merged_node_list
 
         # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Sorted First Input Signals:")
             for merged_node in self.merged_node_list:
@@ -150,7 +148,7 @@ class ComponentSorter(Sorter):
         self.sort_nodes()
 
         # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Sorted Nodes:")
             for sorted_node in self.sorted_node_list:

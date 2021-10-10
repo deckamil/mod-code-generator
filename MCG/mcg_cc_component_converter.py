@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           7 OCT 2021
+#   DATE:           10 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -25,11 +25,8 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import mcg_cc_supporter
 from mcg_cc_converter import Converter
-from mcg_cc_parameters import MCG_CC_TEST_RUN
-from mcg_cc_parameters import ACTION_UID_OFFSET
-from mcg_cc_parameters import TARGET_OFFSET
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -52,9 +49,9 @@ class ComponentConverter(Converter):
         # find target last position within sorted node
         target_last_position = sorted_node.rfind("target")
         # find action uid within sorted node
-        action_uid = sorted_node[target_last_position + ACTION_UID_OFFSET:target_last_position - 1]
+        action_uid = sorted_node[target_last_position + Supporter.ACTION_UID_OFFSET:target_last_position - 1]
         # find output signal name within sorted node
-        output_signal_name = sorted_node[target_last_position + TARGET_OFFSET:len(sorted_node)]
+        output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # append action uid to configuration file
         self.configuration_file.append(str("COM Action ") + str(action_type) + str(" ") + str(action_uid))
         # append output signal name to conversion line
@@ -82,7 +79,7 @@ class ComponentConverter(Converter):
                 conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
 
             # update start_index to point where to search for next input signal name within sorted node
-            start_index = target_position + TARGET_OFFSET
+            start_index = target_position + Supporter.TARGET_OFFSET
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
@@ -100,7 +97,7 @@ class ComponentConverter(Converter):
         # find target last position within sorted node
         target_last_position = sorted_node.rfind("target")
         # find output signal name within sorted node
-        output_signal_name = sorted_node[target_last_position + TARGET_OFFSET:len(sorted_node)]
+        output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # find input signal name within sorted node
         input_signal_name = sorted_node[0:target_last_position - 1]
 
@@ -159,7 +156,7 @@ class ComponentConverter(Converter):
                 self.convert_action(sorted_node, "SUB", "-")
 
             # if sorted node contains signal target signal
-            action_type_found = mcg_cc_supporter.check_if_reference_contains_action_type(sorted_node)
+            action_type_found = Supporter.check_if_reference_contains_action_type(sorted_node)
 
             # if sorted node does not contain any action
             if (not action_type_found) and ("target empty" not in sorted_node):
@@ -176,7 +173,7 @@ class ComponentConverter(Converter):
         self.configuration_file.append(str("COMPONENT END"))
 
         # display additional details after component conversion for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Configuration File:")
             for line in self.configuration_file:

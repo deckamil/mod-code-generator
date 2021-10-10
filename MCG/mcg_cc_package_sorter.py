@@ -26,8 +26,7 @@
 
 
 from mcg_cc_sorter import Sorter
-from mcg_cc_parameters import TARGET_OFFSET
-from mcg_cc_parameters import MCG_CC_TEST_RUN
+from mcg_cc_supporter import Supporter
 
 
 # Class:
@@ -95,7 +94,7 @@ class PackageSorter(Sorter):
                 # find output structure position within sorted node
                 output_structure_position = sorted_node.rfind("target")
                 # cut output structure name and target keyword from sorted node
-                sorted_node_cut = sorted_node[0:output_structure_position + TARGET_OFFSET]
+                sorted_node_cut = sorted_node[0:output_structure_position + Supporter.TARGET_OFFSET]
 
                 # append sorted node cut
                 if sorted_node_with_merged_output_assignment == "":
@@ -169,7 +168,7 @@ class PackageSorter(Sorter):
         self.merge_output_assignment()
 
         # display additional details after sorting for test run
-        if MCG_CC_TEST_RUN:
+        if Supporter.MCG_CC_TEST_RUN:
 
             print("Sorted Nodes:")
             for sorted_node in self.sorted_node_list:
