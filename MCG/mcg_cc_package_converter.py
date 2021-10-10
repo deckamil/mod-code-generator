@@ -201,7 +201,7 @@ class PackageConverter(Converter):
         self.configuration_file.append(str("PACKAGE END"))
 
         # save configuration file
-        PackageConverter.save_configuration_file(self.configuration_file)
+        self.save_configuration_file()
 
         # display additional details after package conversion for test run
         if Supporter.MCG_CC_TEST_RUN:

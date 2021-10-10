@@ -85,14 +85,13 @@ class Converter(object):
     #
     # Returns:
     # This method does not return anything.
-    @staticmethod
-    def save_configuration_file(configuration_file):
+    def save_configuration_file(self):
 
         # open file in append mode, ready to save fresh configuration file content
         Converter.configuration_file_hd = open(Converter.configuration_file_path, "a")
 
         # for each line in configuration file
-        for line in configuration_file:
+        for line in self.configuration_file:
             # write line to configuration file on hard drive
             Converter.configuration_file_hd.write(line)
             Converter.configuration_file_hd.write("\n")
