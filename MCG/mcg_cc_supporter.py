@@ -6,7 +6,7 @@
 #       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           14 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -52,12 +52,6 @@ class Supporter(object):
     # character to accommodate space between action type and action uid, an example:
     # ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
     ACTION_UID_OFFSET = -37
-
-    # This parameter defines expected number of command line arguments passed to Mod Code Generator (MCG)
-    # Converter Component (CC), i.e. list of arguments:
-    #       - model dir path
-    #       - output dir path
-    NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 2
 
     # This list defines all allowed types of actions, which could be used within activity diagram
     # to define signal interactions.
