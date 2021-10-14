@@ -109,7 +109,7 @@ class MCGCCMain(object):
         # else display info and exit
         else:
             print("Incorrect number of command line arguments, MCG CC process cancelled.")
-            print("Usage: python mcg_cc_main.py <model_dir_path> <output_dir_path> <extra_info>")
+            print("Usage: python mcg_cc_main.py \"<model_dir_path>\" \"<output_dir_path>\" \"<extra_info>\"")
             print("Arguments:")
             print("    <model_dir_path>       Path to model directory, where all catalogs with .exml files are stored")
             print("    <output_dir_path>      Path to output directory, where results from MCG will be saved")
