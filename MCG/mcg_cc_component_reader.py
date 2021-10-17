@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           17 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,6 +28,7 @@
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_supporter import Supporter
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -346,16 +347,11 @@ class ComponentReader(FileReader):
     # This method returns component reader list, which describes component content and its activity.
     def read_component(self):
 
-        # component reading
-        print("***************************** COMPONENT READING ****************************")
-        print()
-
-        # print component details
-        print("Component Source:    " + str(self.activity_source))
-        print("Component Name:      " + str(self.model_element_name))
+        # component reader
+        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # record node list
-        print("*** RECORD NODES ***")
+        Logger.record_in_log("*** RECORD NODES ***")
 
         # search for signals target within activity file
         self.read_data_targets()
@@ -364,8 +360,7 @@ class ComponentReader(FileReader):
         self.read_interaction_targets()
 
         # node list recorded
-        print("*** NODES RECORDED ***")
-        print()
+        Logger.record_in_log("*** NODES RECORDED ***")
 
         # search for interface signals
         self.read_interface_signals()
@@ -373,33 +368,32 @@ class ComponentReader(FileReader):
         # check component correctness
         self.check_correctness()
 
-        # display additional details after component reading for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after component reading
+        if Supporter.PRINT_EXTRA_INFO:
 
             # print component details
-            print("Nodes:")
+            Logger.record_in_log("")
+            Logger.record_in_log("Nodes:")
             for node in self.node_list:
-                print("          " + str(node))
-            print("Actions:")
+                Logger.record_in_log("          " + str(node))
+            Logger.record_in_log("Actions:")
             for interaction in self.interaction_list:
-                print("          " + str(interaction))
-            print("Signals:")
+                Logger.record_in_log("          " + str(interaction))
+            Logger.record_in_log("Signals:")
             for data in self.data_list:
-                print("          " + str(data))
-            print("Input Interface:")
+                Logger.record_in_log("          " + str(data))
+            Logger.record_in_log("Input Interface:")
             for input_interface in self.input_interface_list:
-                print("          " + str(input_interface))
-            print("Output Interface:")
+                Logger.record_in_log("          " + str(input_interface))
+            Logger.record_in_log("Output Interface:")
             for output_interface in self.output_interface_list:
-                print("          " + str(output_interface))
-            print("Local Data:")
+                Logger.record_in_log("          " + str(output_interface))
+            Logger.record_in_log("Local Data:")
             for local_data in self.local_data_list:
-                print("          " + str(local_data))
-            print()
+                Logger.record_in_log("          " + str(local_data))
 
-        # end of component reading
-        print("************************* END OF COMPONENT READING *************************")
-        print()
+        # end of component reader
+        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to component reader list
         component_reader_list = []

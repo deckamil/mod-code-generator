@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           8 OCT 2021
+#   DATE:           17 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,6 +27,7 @@
 
 from mcg_cc_reader import Reader
 from mcg_cc_file_finder import FileFinder
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -201,44 +202,17 @@ class FileReader(Reader):
     # This method does not return anything.
     def read_interface_signals(self):
 
-        # print details of interface file
-        print("Interface Source:    " + str(self.input_interface_source))
-        print("Interface Type:      " + str("Input Interface"))
-
         # record interface signal list
-        print("*** RECORD INTERFACE ***")
+        Logger.record_in_log("\n*** RECORD INTERFACES ***")
 
-        # find interface signals
+        # find input interface signals
         self.input_interface_list = FileReader.find_interface_signals(self.input_interface_file)
 
-        # interface signal list recorded
-        print("*** INTERFACE RECORDED ***")
-        print()
-
-        # print details of interface file
-        print("Interface Source:    " + str(self.output_interface_source))
-        print("Interface Type:      " + str("Output Interface"))
-
-        # record interface signal list
-        print("*** RECORD INTERFACE ***")
-
-        # find interface signals
+        # find output interface signals
         self.output_interface_list = FileReader.find_interface_signals(self.output_interface_file)
 
-        # interface signal list recorded
-        print("*** INTERFACE RECORDED ***")
-        print()
-
-        # print details of interface file
-        print("Interface Source:    " + str(self.local_data_source))
-        print("Interface Type:      " + str("Local Data"))
-
-        # record interface signal list
-        print("*** RECORD INTERFACE ***")
-
-        # find interface signals
+        # find local data interface signals
         self.local_data_list = FileReader.find_interface_signals(self.local_data_file)
 
         # interface signal list recorded
-        print("*** INTERFACE RECORDED ***")
-        print()
+        Logger.record_in_log("*** INTERFACES RECORDED ***")

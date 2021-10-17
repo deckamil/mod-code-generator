@@ -32,6 +32,7 @@ from mcg_cc_file_finder import FileFinder
 from mcg_cc_converter import Converter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
+from mcg_cc_supporter import Supporter
 from mcg_cc_component_reader import ComponentReader
 from mcg_cc_component_sorter import ComponentSorter
 from mcg_cc_component_converter import ComponentConverter
@@ -58,10 +59,6 @@ class MCGCCMain(object):
     MODEL_DIR_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
     PRINT_EXTRA_INFO_INDEX = 3
-
-    # This parameter allows other MCG CC classes to determine whether to print extra information
-    # during conversion process or not.
-    PRINT_EXTRA_INFO = False
 
     # Method:
     # main()
@@ -95,9 +92,9 @@ class MCGCCMain(object):
 
             # get extra info flag from cmd line argument
             if "EXTRA_INFO" in str(argv[MCGCCMain.PRINT_EXTRA_INFO_INDEX]):
-                MCGCCMain.PRINT_EXTRA_INFO = True
+                Supporter.PRINT_EXTRA_INFO = True
             else:
-                MCGCCMain.PRINT_EXTRA_INFO = False
+                Supporter.PRINT_EXTRA_INFO = False
 
             # set path to model directory
             FileFinder.set_model_path(model_dir_path)
