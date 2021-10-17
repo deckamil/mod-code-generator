@@ -6,7 +6,7 @@
 #       describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           17 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -168,10 +168,10 @@ class FileFinder(Reader):
             interface_file_path = FileFinder.interface_dir_path + str("\\") + str(interface_source)
 
             # open file and read content, then close file
-            interface_file_hd = open(interface_file_path, "r")
-            interface_file = interface_file_hd.readlines()
+            interface_file_disk = open(interface_file_path, "r")
+            interface_file = interface_file_disk.readlines()
             interface_file = [line.strip() for line in interface_file]
-            interface_file_hd.close()
+            interface_file_disk.close()
 
             # check interface file
             input_interface_found = FileFinder.check_interface_file(model_element_type,
@@ -193,10 +193,10 @@ class FileFinder(Reader):
             interface_file_path = FileFinder.interface_dir_path + str("\\") + str(interface_source)
 
             # open file and read content, then close file
-            interface_file_hd = open(interface_file_path, "r")
-            interface_file = interface_file_hd.readlines()
+            interface_file_disk = open(interface_file_path, "r")
+            interface_file = interface_file_disk.readlines()
             interface_file = [line.strip() for line in interface_file]
-            interface_file_hd.close()
+            interface_file_disk.close()
 
             # check interface file
             output_interface_found = FileFinder.check_interface_file(model_element_type,
@@ -218,10 +218,10 @@ class FileFinder(Reader):
             interface_file_path = FileFinder.interface_dir_path + str("\\") + str(interface_source)
 
             # open file and read content, then close file
-            interface_file_hd = open(interface_file_path, "r")
-            interface_file = interface_file_hd.readlines()
+            interface_file_disk = open(interface_file_path, "r")
+            interface_file = interface_file_disk.readlines()
             interface_file = [line.strip() for line in interface_file]
-            interface_file_hd.close()
+            interface_file_disk.close()
 
             # check interface file
             local_data_found = FileFinder.check_interface_file(model_element_type,
@@ -348,10 +348,10 @@ class FileFinder(Reader):
                 activity_index = activity_index + 1
 
                 # open file and read content, then close file
-                activity_file_hd = open(activity_file_path, "r")
-                activity_file = activity_file_hd.readlines()
+                activity_file_disk = open(activity_file_path, "r")
+                activity_file = activity_file_disk.readlines()
                 activity_file = [line.strip() for line in activity_file]
-                activity_file_hd.close()
+                activity_file_disk.close()
 
                 # check activity file
                 activity_found, model_element_name = FileFinder.check_activity_file(model_element_type,

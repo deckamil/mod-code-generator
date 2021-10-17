@@ -8,7 +8,7 @@
 #       Generator Component (CGC) to generate C code from the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           14 OCT 2021
+#   DATE:           17 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,6 +31,7 @@ from sys import argv
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_converter import Converter
 from mcg_cc_error_handler import ErrorHandler
+from mcg_cc_logger import Logger
 from mcg_cc_component_reader import ComponentReader
 from mcg_cc_component_sorter import ComponentSorter
 from mcg_cc_component_converter import ComponentConverter
@@ -102,6 +103,8 @@ class MCGCCMain(object):
             FileFinder.set_model_path(model_dir_path)
             # set path to configuration file directory
             Converter.set_configuration_file_path(output_dir_path)
+            # set path to log file directory
+            Logger.set_log_file_path(output_dir_path)
 
             # convert model
             MCGCCMain.convert_model()

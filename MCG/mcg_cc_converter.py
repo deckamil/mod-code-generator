@@ -5,7 +5,7 @@
 #       for conversion of model element content into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           17 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -36,7 +36,7 @@ from mcg_cc_sorter import Sorter
 class Converter(object):
 
     # initialize class data
-    configuration_file_hd = ""
+    configuration_file_disk = ""
     configuration_file_path = ""
 
     # Method:
@@ -74,8 +74,8 @@ class Converter(object):
         Converter.configuration_file_path = output_dir_path + str("\\configuration_file.txt")
 
         # open new file in write mode, then close file, to clear previous content
-        Converter.configuration_file_hd = open(Converter.configuration_file_path, "w")
-        Converter.configuration_file_hd.close()
+        Converter.configuration_file_disk = open(Converter.configuration_file_path, "w")
+        Converter.configuration_file_disk.close()
 
     # Method:
     # save_configuration_file()
@@ -88,18 +88,18 @@ class Converter(object):
     def save_configuration_file(self):
 
         # open file in append mode, ready to save fresh configuration file content
-        Converter.configuration_file_hd = open(Converter.configuration_file_path, "a")
+        Converter.configuration_file_disk = open(Converter.configuration_file_path, "a")
 
         # for each line in configuration file
         for line in self.configuration_file:
-            # write line to configuration file on hard drive
-            Converter.configuration_file_hd.write(line)
-            Converter.configuration_file_hd.write("\n")
+            # write line to configuration file on hard disk
+            Converter.configuration_file_disk.write(line)
+            Converter.configuration_file_disk.write("\n")
 
         # append separation
-        Converter.configuration_file_hd.write("\n")
+        Converter.configuration_file_disk.write("\n")
         # close file
-        Converter.configuration_file_hd.close()
+        Converter.configuration_file_disk.close()
 
     # Method:
     # convert_specific_interface()
