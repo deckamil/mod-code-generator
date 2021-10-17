@@ -205,7 +205,8 @@ class MCGCCMain(object):
                 component_converter.convert_component()
 
                 # end of component processing
-                Logger.record_in_log("************************* END OF COMPONENT PROCESSING *************************")
+                Logger.record_in_log("************************* END OF COMPONENT PROCESSING *************************"
+                                     "\n\n\n\n\n\n")
 
     # Method:
     # process_packages()
@@ -273,7 +274,8 @@ class MCGCCMain(object):
                 package_converter.convert_package()
 
                 # end of package processing
-                Logger.record_in_log("************************** END OF PACKAGE PROCESSING **************************")
+                Logger.record_in_log("************************** END OF PACKAGE PROCESSING **************************"
+                                     "\n\n\n\n\n\n")
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance
