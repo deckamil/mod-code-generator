@@ -6,7 +6,7 @@
 #       Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           9 OCT 2021
+#   DATE:           17 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -23,6 +23,9 @@
 #
 #       You should have received a copy of the GNU General Public License
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -234,26 +237,23 @@ class ErrorHandler(object):
     def check_errors(model_element_name, activity_source, model_element_type):
 
         # check errors
-        print("******************************** ERROR CHECK *******************************")
-        print()
+        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # if any error was recorded
-        print("*** CHECK ERRORS ***")
+        Logger.record_in_log("*** CHECK ERRORS ***")
         if len(ErrorHandler.error_list) > 0:
             # print model element details
-            print("Model Element Name:      " + str(model_element_name))
-            print("Model Element Source:    " + str(activity_source))
-            print("Model Element Type:      " + str(model_element_type))
-            print("*** ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT")
+            Logger.record_in_log("Model Element Name:      " + str(model_element_name))
+            Logger.record_in_log("Model Element Source:    " + str(activity_source))
+            Logger.record_in_log("Model Element Type:      " + str(model_element_type))
+            Logger.record_in_log("*** ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT")
             # display errors
             for error in ErrorHandler.error_list:
-                print(error)
+                Logger.record_in_log(error)
             # exit MCG CC.
             exit()
 
         # no errors found, keep processing
-        print("*** NO ERRORS FOUND ***")
-        print()
+        Logger.record_in_log("*** NO ERRORS FOUND ***")
 
-        print("**************************** END OF ERROR CHECK ****************************")
-        print()
+        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

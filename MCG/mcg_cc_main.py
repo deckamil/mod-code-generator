@@ -157,6 +157,9 @@ class MCGCCMain(object):
         # repeat until all components are converted into configuration file
         while files_found:
 
+            # file searching
+            Logger.record_in_log("******************************** FILE SEARCHING *******************************")
+
             # find component files
             file_finder_list = FileFinder.find_files("Standard.Component")
             # get files marker
@@ -167,8 +170,14 @@ class MCGCCMain(object):
                                       file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
                                       "Standard.Component")
 
+            # end of file searching
+            Logger.record_in_log("**************************** END OF FILE SEARCHING ****************************")
+
             # if component files were found
             if files_found:
+
+                # component processing
+                Logger.record_in_log("***************************** COMPONENT PROCESSING ****************************")
 
                 # initialize component reader
                 component_reader = ComponentReader(file_finder_list)
@@ -195,6 +204,9 @@ class MCGCCMain(object):
                 # convert component content
                 component_converter.convert_component()
 
+                # end of component processing
+                Logger.record_in_log("************************* END OF COMPONENT PROCESSING *************************")
+
     # Method:
     # process_packages()
     #
@@ -213,6 +225,9 @@ class MCGCCMain(object):
         # repeat until all packages are converted into configuration file
         while files_found:
 
+            # file searching
+            Logger.record_in_log("******************************** FILE SEARCHING *******************************")
+
             # find package files
             file_finder_list = FileFinder.find_files("Standard.Package")
             # get files marker
@@ -223,8 +238,14 @@ class MCGCCMain(object):
                                       file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
                                       "Standard.Package")
 
+            # end of file searching
+            Logger.record_in_log("**************************** END OF FILE SEARCHING ****************************")
+
             # if package files were found
             if files_found:
+
+                # package processing
+                Logger.record_in_log("****************************** PACKAGE PROCESSING *****************************")
 
                 # initialize package reader
                 package_reader = PackageReader(file_finder_list)
@@ -250,6 +271,9 @@ class MCGCCMain(object):
                 package_converter = PackageConverter(package_reader_list, package_sorter_list)
                 # convert package content
                 package_converter.convert_package()
+
+                # end of package processing
+                Logger.record_in_log("************************** END OF PACKAGE PROCESSING **************************")
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance
