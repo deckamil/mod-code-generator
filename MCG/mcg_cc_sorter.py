@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           18 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -26,6 +26,7 @@
 
 from mcg_cc_file_reader import FileReader
 from mcg_cc_supporter import Supporter
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -116,14 +117,12 @@ class Sorter(object):
                 index = index - 1
             index = index + 1
 
-        # display additional details after sorting for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after sorting
+        if Supporter.PRINT_EXTRA_INFO:
 
-            print()
-            print("Sorted Interactions:")
+            Logger.record_in_log("Sorted Interactions:")
             for node in self.node_list:
-                print("          " + str(node))
-            print()
+                Logger.record_in_log("          " + str(node))
 
     # Method:
     # merge_nodes()
@@ -195,13 +194,12 @@ class Sorter(object):
         # append merged node to merged node list
         self.merged_node_list.append(merged_node)
 
-        # display additional details after sorting for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after sorting
+        if Supporter.PRINT_EXTRA_INFO:
 
-            print("Merged Nodes:")
+            Logger.record_in_log("Merged Nodes:")
             for merged_node in self.merged_node_list:
-                print("          " + str(merged_node))
-            print()
+                Logger.record_in_log("          " + str(merged_node))
 
     # Method:
     # count_dependencies()
@@ -247,13 +245,12 @@ class Sorter(object):
                 # append dependency sublist to list of dependencies
                 self.dependency_list.append(dependency)
 
-        # display additional details after sorting for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after sorting
+        if Supporter.PRINT_EXTRA_INFO:
 
-            print("Dependencies:")
+            Logger.record_in_log("Dependencies:")
             for dependency in self.dependency_list:
-                print("          " + str(dependency))
-            print()
+                Logger.record_in_log("          " + str(dependency))
 
     # Method:
     # sort_nodes()

@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           18 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,6 +27,7 @@
 
 from mcg_cc_sorter import Sorter
 from mcg_cc_supporter import Supporter
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -122,15 +123,14 @@ class ComponentSorter(Sorter):
     # This method returns sorted node list.
     def sort_component(self):
 
-        # component sorting
-        print("***************************** COMPONENT SORTING ****************************")
-        print()
+        # component sorter
+        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # print component details
-        print("Component Source:    " + str(self.activity_source))
-        print("Component Name:      " + str(self.model_element_name))
+        Logger.record_in_log("Component Source:    " + str(self.activity_source))
+        Logger.record_in_log("Component Name:      " + str(self.model_element_name))
 
-        print("*** SORT NODES ***")
+        Logger.record_in_log("\n*** SORT NODES ***")
 
         # sort nodes of same action in one place under node list
         self.sort_interactions()
@@ -147,20 +147,17 @@ class ComponentSorter(Sorter):
         # sort merged nodes basing on their dependencies
         self.sort_nodes()
 
-        # display additional details after sorting for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after sorting
+        if Supporter.PRINT_EXTRA_INFO:
 
-            print("Sorted Nodes:")
+            Logger.record_in_log("Sorted Nodes:")
             for sorted_node in self.sorted_node_list:
-                print("          " + str(sorted_node))
-            print()
+                Logger.record_in_log("          " + str(sorted_node))
 
-        print("*** NODES SORTED ***")
-        print()
+        Logger.record_in_log("*** NODES SORTED ***")
 
-        # end of component sorting
-        print("************************* END OF COMPONENT SORTING *************************")
-        print()
+        # end of component sorter
+        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to component sorter list
         component_sorter_list = []

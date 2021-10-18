@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           18 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,6 +27,7 @@
 
 from mcg_cc_sorter import Sorter
 from mcg_cc_supporter import Supporter
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -139,15 +140,14 @@ class PackageSorter(Sorter):
     # This method returns sorted node list.
     def sort_package(self):
 
-        # package sorting
-        print("****************************** PACKAGE SORTING *****************************")
-        print()
+        # package sorter
+        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
-        # print component details
-        print("Package Source:      " + str(self.activity_source))
-        print("Package Name:        " + str(self.model_element_name))
+        # print package details
+        Logger.record_in_log("Package Source:      " + str(self.activity_source))
+        Logger.record_in_log("Package Name:        " + str(self.model_element_name))
 
-        print("*** SORT NODES ***")
+        Logger.record_in_log("\n*** SORT NODES ***")
 
         # sort nodes of same component in one place under node list
         self.sort_interactions()
@@ -167,20 +167,17 @@ class PackageSorter(Sorter):
         # merge sorted nodes with output structure assignment
         self.merge_output_assignment()
 
-        # display additional details after sorting for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after sorting
+        if Supporter.PRINT_EXTRA_INFO:
 
-            print("Sorted Nodes:")
+            Logger.record_in_log("Sorted Nodes:")
             for sorted_node in self.sorted_node_list:
-                print("          " + str(sorted_node))
-            print()
+                Logger.record_in_log("          " + str(sorted_node))
 
-        print("*** NODES SORTED ***")
-        print()
+        Logger.record_in_log("*** NODES SORTED ***")
 
-        # end of package sorting
-        print("************************** END OF PACKAGE SORTING **************************")
-        print()
+        # end of package sorter
+        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to package sorter list
         package_sorter_list = []
