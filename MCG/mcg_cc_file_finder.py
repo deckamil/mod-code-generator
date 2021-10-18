@@ -6,7 +6,7 @@
 #       describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           18 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -458,7 +458,7 @@ class FileFinder(Reader):
             FileFinder.clear_collected_data()
 
             # no files found
-            Logger.record_in_log("*** NO FILES FOUND")
+            Logger.record_in_log("*** FILES NOT FOUND ***")
 
         # end of file finder
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

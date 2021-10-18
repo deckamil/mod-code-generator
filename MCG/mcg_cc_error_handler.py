@@ -6,7 +6,7 @@
 #       Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           18 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -236,12 +236,11 @@ class ErrorHandler(object):
     @staticmethod
     def check_errors(model_element_name, activity_source, model_element_type):
 
-        # check errors
-        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-
         # if any error was recorded
-        Logger.record_in_log("*** CHECK ERRORS ***")
         if len(ErrorHandler.error_list) > 0:
+            # error handler
+            Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+
             # print model element details
             Logger.record_in_log("Model Element Name:      " + str(model_element_name))
             Logger.record_in_log("Model Element Source:    " + str(activity_source))
@@ -250,10 +249,9 @@ class ErrorHandler(object):
             # display errors
             for error in ErrorHandler.error_list:
                 Logger.record_in_log(error)
+
+            # end of error handler
+            Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
             # exit MCG CC.
             exit()
-
-        # no errors found, keep processing
-        Logger.record_in_log("*** NO ERRORS FOUND ***")
-
-        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
