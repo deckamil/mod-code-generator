@@ -8,7 +8,7 @@
 #       Generator Component (CGC) to generate C code from the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           20 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -154,8 +154,7 @@ class MCGCCMain(object):
         # repeat until all components are converted into configuration file
         while files_found:
 
-            # file searching
-            Logger.record_in_log("******************************** FILE SEARCHING *******************************")
+            Logger.record_in_log("\n                         *** COMPONENT PROCESSING ***                          \n")
 
             # find component files
             file_finder_list = FileFinder.find_files("Standard.Component")
@@ -167,14 +166,8 @@ class MCGCCMain(object):
                                       file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
                                       "Standard.Component")
 
-            # end of file searching
-            Logger.record_in_log("**************************** END OF FILE SEARCHING ****************************")
-
             # if component files were found
             if files_found:
-
-                # component processing
-                Logger.record_in_log("***************************** COMPONENT PROCESSING ****************************")
 
                 # initialize component reader
                 component_reader = ComponentReader(file_finder_list)
@@ -201,10 +194,6 @@ class MCGCCMain(object):
                 # convert component content
                 component_converter.convert_component()
 
-                # end of component processing
-                Logger.record_in_log("************************* END OF COMPONENT PROCESSING *************************"
-                                     "\n\n\n\n\n\n")
-
     # Method:
     # process_packages()
     #
@@ -223,8 +212,7 @@ class MCGCCMain(object):
         # repeat until all packages are converted into configuration file
         while files_found:
 
-            # file searching
-            Logger.record_in_log("******************************** FILE SEARCHING *******************************")
+            Logger.record_in_log("\n                          *** PACKAGE PROCESSING ***                           \n")
 
             # find package files
             file_finder_list = FileFinder.find_files("Standard.Package")
@@ -236,14 +224,8 @@ class MCGCCMain(object):
                                       file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
                                       "Standard.Package")
 
-            # end of file searching
-            Logger.record_in_log("**************************** END OF FILE SEARCHING ****************************")
-
             # if package files were found
             if files_found:
-
-                # package processing
-                Logger.record_in_log("****************************** PACKAGE PROCESSING *****************************")
 
                 # initialize package reader
                 package_reader = PackageReader(file_finder_list)
@@ -269,10 +251,6 @@ class MCGCCMain(object):
                 package_converter = PackageConverter(package_reader_list, package_sorter_list)
                 # convert package content
                 package_converter.convert_package()
-
-                # end of package processing
-                Logger.record_in_log("************************** END OF PACKAGE PROCESSING **************************"
-                                     "\n\n\n\n\n\n")
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance

@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           10 OCT 2021
+#   DATE:           20 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,6 +27,7 @@
 
 from mcg_cc_converter import Converter
 from mcg_cc_supporter import Supporter
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -145,13 +146,8 @@ class PackageConverter(Converter):
     # This method does not return anything.
     def convert_package(self):
 
-        # package conversion
-        print("**************************** PACKAGE CONVERSION ****************************")
-        print()
-
-        # print package details
-        print("Package Source:      " + str(self.activity_source))
-        print("Package Name:        " + str(self.model_element_name))
+        # package converter
+        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # append start marker of new package section to configuration file
         self.configuration_file.append(str("PACKAGE START"))
@@ -168,7 +164,7 @@ class PackageConverter(Converter):
         # append start marker of function body section to configuration file
         self.configuration_file.append(str("BODY START"))
 
-        print("*** CONVERT NODES ***")
+        Logger.record_in_log("*** CONVERT NODES ***")
 
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
@@ -191,8 +187,7 @@ class PackageConverter(Converter):
                 # convert output assignment
                 self.convert_output_assignment(sorted_node)
 
-        print("*** NODES CONVERTED ***")
-        print()
+        Logger.record_in_log("*** NODES CONVERTED ***")
 
         # append end marker of function body section to configuration file
         self.configuration_file.append(str("BODY END"))
@@ -203,14 +198,12 @@ class PackageConverter(Converter):
         # save configuration file
         self.save_configuration_file()
 
-        # display additional details after package conversion for test run
-        if Supporter.MCG_CC_TEST_RUN:
+        # display additional details after package conversion
+        if Supporter.PRINT_EXTRA_INFO:
 
-            print("Configuration File:")
+            Logger.record_in_log("\nConfiguration File:")
             for line in self.configuration_file:
-                print("          " + str(line))
-            print()
+                Logger.record_in_log("          " + str(line))
 
-        # end of package conversion
-        print("************************ END OF PACKAGE CONVERSION ***********************")
-        print()
+        # end of package converter
+        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")

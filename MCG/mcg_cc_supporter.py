@@ -6,7 +6,7 @@
 #       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           20 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,11 +31,6 @@
 # Description:
 # This is base class, which provides additional methods and parameters reused by other MCG CC classes.
 class Supporter(object):
-
-    # This parameter for production version of Mod Code Generator (MCG) Converter Component (CC)
-    # should be set to false, otherwise it allows to display additional information in console
-    # during run of Mod Code Generator (MCG) Converter Component (CC)
-    MCG_CC_TEST_RUN = True
 
     # This parameter allows other MCG CC classes to determine whether to print extra information
     # during conversion process or not.

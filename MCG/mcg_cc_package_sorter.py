@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           18 OCT 2021
+#   DATE:           20 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -143,11 +143,7 @@ class PackageSorter(Sorter):
         # package sorter
         Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
-        # print package details
-        Logger.record_in_log("Package Source:      " + str(self.activity_source))
-        Logger.record_in_log("Package Name:        " + str(self.model_element_name))
-
-        Logger.record_in_log("\n*** SORT NODES ***")
+        Logger.record_in_log("*** SORT NODES ***")
 
         # sort nodes of same component in one place under node list
         self.sort_interactions()
