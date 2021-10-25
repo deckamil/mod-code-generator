@@ -6,7 +6,7 @@
 #       describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           18 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -126,6 +126,7 @@ class FileFinder(Reader):
     # This method returns interface marker.
     @staticmethod
     def check_interface_file(model_element_type, interface_type, interface_file):
+
         # interface marker shows whether interface was found or not
         interface_found = False
 
@@ -156,6 +157,9 @@ class FileFinder(Reader):
     # This method returns interface marker.
     @staticmethod
     def find_interface_files(model_element_type):
+
+        # find interface files
+        Logger.record_in_log("*** find interface files")
 
         # interface markers show whether interface was found or not
         interface_found = False
@@ -284,6 +288,7 @@ class FileFinder(Reader):
     # This method returns activity marker and model element name.
     @staticmethod
     def check_activity_file(model_element_type, activity_file):
+
         # activity marker shows whether activity was found or not
         activity_found = False
 
@@ -320,6 +325,9 @@ class FileFinder(Reader):
     # This method returns activity marker.
     @staticmethod
     def find_activity_file(model_element_type):
+
+        # find activity files
+        Logger.record_in_log("*** find activity file")
 
         # get source list index
         if "Standard.Component" in model_element_type:
@@ -409,9 +417,6 @@ class FileFinder(Reader):
         # if model element type is correct
         if ("Standard.Component" in model_element_type) or ("Standard.Package" in model_element_type):
 
-            # find files
-            Logger.record_in_log("*** FIND FILES ***")
-
             # find activity file
             activity_found = FileFinder.find_activity_file(model_element_type)
 
@@ -425,20 +430,20 @@ class FileFinder(Reader):
             print("Unknown model element type in FileFinder.find_next_file_set() function: " + str(model_element_type))
             print()
 
+        # process completed
+        Logger.record_in_log("PROCESS COMPLETED")
+
         # check activity and interface markers
         if activity_found and interface_found:
             # change files marker
             files_found = True
 
-            # files found
-            Logger.record_in_log("*** FILES FOUND ***\n")
-
             # print details
             if "Standard.Component" in model_element_type:
-                Logger.record_in_log("Component Source:    " + str(FileFinder.activity_source))
+                Logger.record_in_log("\nComponent Source:    " + str(FileFinder.activity_source))
                 Logger.record_in_log("Component Name:      " + str(FileFinder.model_element_name))
             else:
-                Logger.record_in_log("Package Source:      " + str(FileFinder.activity_source))
+                Logger.record_in_log("\nPackage Source:      " + str(FileFinder.activity_source))
                 Logger.record_in_log("Package Name:        " + str(FileFinder.model_element_name))
 
             Logger.record_in_log("")
@@ -457,8 +462,8 @@ class FileFinder(Reader):
             # clear once again collected data before return
             FileFinder.clear_collected_data()
 
-            # no files found
-            Logger.record_in_log("*** FILES NOT FOUND ***")
+            # files not found
+            Logger.record_in_log("FILES NOT FOUND")
 
         # end of file finder
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           18 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -69,6 +69,9 @@ class Sorter(object):
     # This method does not return anything.
     def sort_interactions(self):
 
+        # sort interactions
+        Logger.record_in_log("*** sort interactions")
+
         # this index tells where to put node (defines new position of node)
         index = 0
 
@@ -117,13 +120,6 @@ class Sorter(object):
                 index = index - 1
             index = index + 1
 
-        # display additional details after sorting
-        if Supporter.PRINT_EXTRA_INFO:
-
-            Logger.record_in_log("Sorted Interactions:")
-            for node in self.node_list:
-                Logger.record_in_log("          " + str(node))
-
     # Method:
     # merge_nodes()
     #
@@ -135,6 +131,9 @@ class Sorter(object):
     # Returns:
     # This method does not return anything.
     def merge_nodes(self):
+
+        # merge nodes
+        Logger.record_in_log("*** merge nodes")
 
         # merge nodes of same interaction from node list into one node on merged node list
         for i in range(0, len(self.interaction_list)):
@@ -194,13 +193,6 @@ class Sorter(object):
         # append merged node to merged node list
         self.merged_node_list.append(merged_node)
 
-        # display additional details after sorting
-        if Supporter.PRINT_EXTRA_INFO:
-
-            Logger.record_in_log("Merged Nodes:")
-            for merged_node in self.merged_node_list:
-                Logger.record_in_log("          " + str(merged_node))
-
     # Method:
     # count_dependencies()
     #
@@ -212,6 +204,9 @@ class Sorter(object):
     # Returns:
     # This method does not return anything.
     def count_dependencies(self):
+
+        # count dependencies
+        Logger.record_in_log("*** count dependencies")
 
         # each merged node (with exception for target empty node) has its own sublist under dependency list
         # the sublist starts with merged node under index 0 and local data elements required to compute the merged
@@ -245,13 +240,6 @@ class Sorter(object):
                 # append dependency sublist to list of dependencies
                 self.dependency_list.append(dependency)
 
-        # display additional details after sorting
-        if Supporter.PRINT_EXTRA_INFO:
-
-            Logger.record_in_log("Dependencies:")
-            for dependency in self.dependency_list:
-                Logger.record_in_log("          " + str(dependency))
-
     # Method:
     # sort_nodes()
     #
@@ -261,6 +249,9 @@ class Sorter(object):
     # Returns:
     # This method does not return anything.
     def sort_nodes(self):
+
+        # sort nodes
+        Logger.record_in_log("*** sort nodes")
 
         # sort nodes basing on their dependencies
         # first append merged nodes without dependencies to sorted node list, i.e. those merged nodes which

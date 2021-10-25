@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -55,6 +55,9 @@ class ComponentSorter(Sorter):
     # Returns:
     # This method does not return anything.
     def sort_first_input_signals(self):
+
+        # sort first input signals
+        Logger.record_in_log("*** sort first input signals")
 
         # merged node list, where *FIRST* marker was removed
         merged_node_with_removed_first_marker_list = []
@@ -105,13 +108,6 @@ class ComponentSorter(Sorter):
             # append merged node at beginning of merged node list
             self.merged_node_list = [merged_node_with_removed_first_marker] + self.merged_node_list
 
-        # display additional details after sorting
-        if Supporter.PRINT_EXTRA_INFO:
-
-            Logger.record_in_log("Sorted First Input Signals:")
-            for merged_node in self.merged_node_list:
-                Logger.record_in_log("          " + str(merged_node))
-
     # Method:
     # sort_component()
     #
@@ -124,8 +120,6 @@ class ComponentSorter(Sorter):
 
         # component sorter
         Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-
-        Logger.record_in_log("*** SORT NODES ***")
 
         # sort nodes of same action in one place under node list
         self.sort_interactions()
@@ -142,14 +136,23 @@ class ComponentSorter(Sorter):
         # sort merged nodes basing on their dependencies
         self.sort_nodes()
 
+        # process completed
+        Logger.record_in_log("PROCESS COMPLETED")
+
         # display additional details after sorting
         if Supporter.PRINT_EXTRA_INFO:
 
+            # print component details
+            Logger.record_in_log("")
+            Logger.record_in_log("Sorted Interactions:")
+            for node in self.node_list:
+                Logger.record_in_log("          " + str(node))
+            Logger.record_in_log("Merged Nodes:")
+            for merged_node in self.merged_node_list:
+                Logger.record_in_log("          " + str(merged_node))
             Logger.record_in_log("Sorted Nodes:")
             for sorted_node in self.sorted_node_list:
                 Logger.record_in_log("          " + str(sorted_node))
-
-        Logger.record_in_log("*** NODES SORTED ***")
 
         # end of component sorter
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")

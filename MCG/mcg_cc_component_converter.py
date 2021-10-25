@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -121,6 +121,9 @@ class ComponentConverter(Converter):
         # component converter
         Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
+        # convert header
+        Logger.record_in_log("*** convert header")
+
         # append start marker of new component section to configuration file
         self.configuration_file.append(str("COMPONENT START"))
 
@@ -133,10 +136,11 @@ class ComponentConverter(Converter):
         # convert interface details to configuration file
         self.convert_interfaces()
 
+        # convert body
+        Logger.record_in_log("*** convert body")
+
         # append start marker of function body section to configuration file
         self.configuration_file.append(str("BODY START"))
-
-        Logger.record_in_log("*** CONVERT NODES ***")
 
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
@@ -159,8 +163,6 @@ class ComponentConverter(Converter):
                 # convert signal target signal
                 self.convert_signal_assignment(sorted_node)
 
-        Logger.record_in_log("*** NODES CONVERTED ***")
-
         # append end marker of function body section to configuration file
         self.configuration_file.append(str("BODY END"))
 
@@ -170,10 +172,15 @@ class ComponentConverter(Converter):
         # save configuration file
         self.save_configuration_file()
 
+        # process completed
+        Logger.record_in_log("PROCESS COMPLETED")
+
         # display additional details after component conversion
         if Supporter.PRINT_EXTRA_INFO:
 
-            Logger.record_in_log("\nConfiguration File:")
+            # print component details
+            Logger.record_in_log("")
+            Logger.record_in_log("Configuration File:")
             for line in self.configuration_file:
                 Logger.record_in_log("          " + str(line))
 

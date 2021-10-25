@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,6 +47,9 @@ class PackageSorter(Sorter):
     # This method does not return anything.
     def remove_input_output_interface_element(self):
 
+        # remove input output interface element
+        Logger.record_in_log("*** remove input output interface element")
+
         # remove Input Interface elements from local data list
         for local_data in self.local_data_list:
             # if Input Interface element in local data
@@ -74,6 +77,9 @@ class PackageSorter(Sorter):
     # Returns:
     # This method does not return anything.
     def merge_output_assignment(self):
+
+        # merge output assignment
+        Logger.record_in_log("*** merge output assignment")
 
         # sorted node, where output structure assignment is merged
         sorted_node_with_merged_output_assignment = ""
@@ -143,8 +149,6 @@ class PackageSorter(Sorter):
         # package sorter
         Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
-        Logger.record_in_log("*** SORT NODES ***")
-
         # sort nodes of same component in one place under node list
         self.sort_interactions()
 
@@ -163,14 +167,23 @@ class PackageSorter(Sorter):
         # merge sorted nodes with output structure assignment
         self.merge_output_assignment()
 
+        # process completed
+        Logger.record_in_log("PROCESS COMPLETED")
+
         # display additional details after sorting
         if Supporter.PRINT_EXTRA_INFO:
 
+            # print package details
+            Logger.record_in_log("")
+            Logger.record_in_log("Sorted Interactions:")
+            for node in self.node_list:
+                Logger.record_in_log("          " + str(node))
+            Logger.record_in_log("Merged Nodes:")
+            for merged_node in self.merged_node_list:
+                Logger.record_in_log("          " + str(merged_node))
             Logger.record_in_log("Sorted Nodes:")
             for sorted_node in self.sorted_node_list:
                 Logger.record_in_log("          " + str(sorted_node))
-
-        Logger.record_in_log("*** NODES SORTED ***")
 
         # end of package sorter
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

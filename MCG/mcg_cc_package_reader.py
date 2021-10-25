@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,7 +47,9 @@ class PackageReader(FileReader):
     # Returns:
     # This function does not return anything.
     def check_correctness(self):
-        tbd = True
+
+        # check correctness
+        Logger.record_in_log("*** check correctness")
 
     # Function:
     # read_data_targets()
@@ -58,6 +60,9 @@ class PackageReader(FileReader):
     # Returns:
     # This function does not return anything.
     def read_data_targets(self):
+
+        # read data targets
+        Logger.record_in_log("*** read data targets")
 
         # search for structures in activity file
         for i in range(0, len(self.activity_file)):
@@ -149,6 +154,9 @@ class PackageReader(FileReader):
     # This function does not return anything.
     def read_interaction_targets(self):
 
+        # read interaction targets
+        Logger.record_in_log("*** read interaction targets")
+
         # search for components in activity file
         for i in range(0, len(self.activity_file)):
 
@@ -230,17 +238,11 @@ class PackageReader(FileReader):
         # package reader
         Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
-        # record node list
-        Logger.record_in_log("*** RECORD NODES ***")
-
         # search for structure targets within activity file
         self.read_data_targets()
 
         # search for component targets within activity file
         self.read_interaction_targets()
-
-        # node list recorded
-        Logger.record_in_log("*** NODES RECORDED ***")
 
         # search for interface signals
         self.read_interface_signals()
@@ -248,10 +250,13 @@ class PackageReader(FileReader):
         # check package correctness
         self.check_correctness()
 
+        # process completed
+        Logger.record_in_log("PROCESS COMPLETED")
+
         # display additional details after package reading
         if Supporter.PRINT_EXTRA_INFO:
 
-            # print component details
+            # print package details
             Logger.record_in_log("")
             Logger.record_in_log("Nodes:")
             for node in self.node_list:

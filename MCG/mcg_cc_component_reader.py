@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,6 +47,9 @@ class ComponentReader(FileReader):
     # Returns:
     # This function does not return anything.
     def check_correctness(self):
+
+        # check correctness
+        Logger.record_in_log("*** check correctness")
 
         # check is any signal on data list has more than one source
         for data in self.data_list:
@@ -139,6 +142,9 @@ class ComponentReader(FileReader):
     # Returns:
     # This function does not return anything.
     def read_data_targets(self):
+
+        # read data targets
+        Logger.record_in_log("*** read data targets")
 
         # search for signals in activity file
         for i in range(0, len(self.activity_file)):
@@ -258,6 +264,9 @@ class ComponentReader(FileReader):
     # This function does not return anything.
     def read_interaction_targets(self):
 
+        # read interaction targets
+        Logger.record_in_log("*** read interaction targets")
+
         # search for actions in activity file
         for i in range(0, len(self.activity_file)):
 
@@ -350,23 +359,20 @@ class ComponentReader(FileReader):
         # component reader
         Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
-        # record node list
-        Logger.record_in_log("*** RECORD NODES ***")
-
         # search for signals target within activity file
         self.read_data_targets()
 
         # search for action targets within activity file
         self.read_interaction_targets()
 
-        # node list recorded
-        Logger.record_in_log("*** NODES RECORDED ***")
-
         # search for interface signals
         self.read_interface_signals()
 
         # check component correctness
         self.check_correctness()
+
+        # process completed
+        Logger.record_in_log("PROCESS COMPLETED")
 
         # display additional details after component reading
         if Supporter.PRINT_EXTRA_INFO:

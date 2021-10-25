@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           25 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -202,8 +202,8 @@ class FileReader(Reader):
     # This method does not return anything.
     def read_interface_signals(self):
 
-        # record interface signal list
-        Logger.record_in_log("\n*** RECORD INTERFACES ***")
+        # read interface signals
+        Logger.record_in_log("*** read interface signals")
 
         # find input interface signals
         self.input_interface_list = FileReader.find_interface_signals(self.input_interface_file)
@@ -213,6 +213,3 @@ class FileReader(Reader):
 
         # find local data interface signals
         self.local_data_list = FileReader.find_interface_signals(self.local_data_file)
-
-        # interface signal list recorded
-        Logger.record_in_log("*** INTERFACES RECORDED ***")
