@@ -5,7 +5,7 @@
 #       is responsible for log recording during MCG CC run.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -22,6 +22,9 @@
 #
 #       You should have received a copy of the GNU General Public License
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+import datetime
 
 
 # Class:
@@ -51,6 +54,54 @@ class Logger(object):
 
         # open new file in write mode, then close file, to clear previous content
         Logger.log_file_disk = open(Logger.log_file_path, "w")
+        Logger.log_file_disk.close()
+
+    # Method:
+    # record_log_header()
+    #
+    # Description:
+    # This method records header info in log file.
+    #
+    # Returns:
+    # This method does not return anything.
+    @staticmethod
+    def record_log_header():
+
+        # open file in append mode, ready to save fresh info in log content
+        Logger.log_file_disk = open(Logger.log_file_path, "a")
+
+        # get date
+        date = datetime.datetime.now()
+
+        # write header info to log file on hard disk
+        Logger.log_file_disk.write(str("MCG CC LOG START\n"))
+        Logger.log_file_disk.write(str("MCG CC LOG DATE ") + str(date) + str("\n"))
+
+        # close file
+        Logger.log_file_disk.close()
+
+    # Method:
+    # record_log_footer()
+    #
+    # Description:
+    # This method records footer info in log file.
+    #
+    # Returns:
+    # This method does not return anything.
+    @staticmethod
+    def record_log_footer():
+
+        # open file in append mode, ready to save fresh info in log content
+        Logger.log_file_disk = open(Logger.log_file_path, "a")
+
+        # get date
+        date = datetime.datetime.now()
+
+        # write header info to log file on hard disk
+        Logger.log_file_disk.write(str("\nMCG CC LOG DATE ") + str(date))
+        Logger.log_file_disk.write(str("\nMCG CC LOG END"))
+
+        # close file
         Logger.log_file_disk.close()
 
     # Method:

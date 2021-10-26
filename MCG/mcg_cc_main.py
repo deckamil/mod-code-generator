@@ -119,11 +119,17 @@ class Main(object):
     @staticmethod
     def convert_model():
 
+        # record log header
+        Logger.record_log_header()
+
         # process components content from .exml files into configuration file
         Main.process_components()
 
         # process packages content from .exml files into configuration file
         Main.process_packages()
+
+        # record log footer
+        Logger.record_log_footer()
 
     # Method:
     # process_components()
