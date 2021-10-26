@@ -2,13 +2,13 @@
 #
 #   DESCRIPTION:
 #       This is main module of Mod Code Generator (MCG) Converter Component (CC)
-#       and it contains definition of MCGCCMain class, which uses other MCG CC classes
+#       and it contains definition of Main class, which uses other MCG CC classes
 #       to convert component and package content from .exml file into configuration
 #       file. The configuration file will be used by Mod Code Generator (MCG) Code
 #       Generator Component (CGC) to generate C code from the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,7 +32,6 @@ from mcg_cc_file_finder import FileFinder
 from mcg_cc_converter import Converter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
-from mcg_cc_supporter import Supporter
 from mcg_cc_component_reader import ComponentReader
 from mcg_cc_component_sorter import ComponentSorter
 from mcg_cc_component_converter import ComponentConverter
@@ -42,23 +41,21 @@ from mcg_cc_package_converter import PackageConverter
 
 
 # Class:
-# MCGCCMain()
+# Main()
 #
 # Description:
 # This is base class, which uses other MCG CC classes to generate configuration file.
-class MCGCCMain(object):
+class Main(object):
 
     # This parameter defines expected number of command line arguments passed to MCG CC,
     # i.e. list of arguments:
     #       - model dir path
     #       - output dir path
-    #       - print additional info flag
-    NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 3
+    NUMBER_OF_MCG_CC_CMD_LINE_ARGS = 2
 
     # indexes of MCG CC command line arguments
     MODEL_DIR_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
-    PRINT_EXTRA_INFO_INDEX = 3
 
     # Method:
     # main()
@@ -83,18 +80,12 @@ class MCGCCMain(object):
         print()
 
         # check if number of command line arguments is correct
-        if len(argv) - 1 == MCGCCMain.NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
+        if len(argv) - 1 == Main.NUMBER_OF_MCG_CC_CMD_LINE_ARGS:
 
             # get model directory path from cmd line argument
-            model_dir_path = str(argv[MCGCCMain.MODEL_DIR_PATH_INDEX])
+            model_dir_path = str(argv[Main.MODEL_DIR_PATH_INDEX])
             # get output directory path from cmd line argument
-            output_dir_path = str(argv[MCGCCMain.OUTPUT_DIR_PATH_INDEX])
-
-            # get extra info flag from cmd line argument
-            if "EXTRA_INFO" in str(argv[MCGCCMain.PRINT_EXTRA_INFO_INDEX]):
-                Supporter.PRINT_EXTRA_INFO = True
-            else:
-                Supporter.PRINT_EXTRA_INFO = False
+            output_dir_path = str(argv[Main.OUTPUT_DIR_PATH_INDEX])
 
             # set path to model directory
             FileFinder.set_model_path(model_dir_path)
@@ -104,17 +95,15 @@ class MCGCCMain(object):
             Logger.set_log_file_path(output_dir_path)
 
             # convert model
-            MCGCCMain.convert_model()
+            Main.convert_model()
 
         # else display info and exit
         else:
             print("Incorrect number of command line arguments, MCG CC process cancelled.")
-            print("Usage: python mcg_cc_main.py \"<model_dir_path>\" \"<output_dir_path>\" \"<extra_info>\"")
+            print("Usage: python mcg_cc_main.py \"<model_dir_path>\" \"<output_dir_path>\"")
             print("Arguments:")
             print("    <model_dir_path>       Path to model directory, where all catalogs with .exml files are stored")
             print("    <output_dir_path>      Path to output directory, where results from MCG will be saved")
-            print("    <extra_info>           Flag, which defines whether to print extra info during MCG process")
-            print("                           or not, can be set to either EXTRA_INFO or NO_INFO")
             print("")
             print("Keep specific order of arguments, as pointed in usage above.")
             print("See Mod Code Generator Manual for further information.")
@@ -131,10 +120,10 @@ class MCGCCMain(object):
     def convert_model():
 
         # process components content from .exml files into configuration file
-        MCGCCMain.process_components()
+        Main.process_components()
 
         # process packages content from .exml files into configuration file
-        MCGCCMain.process_packages()
+        Main.process_packages()
 
     # Method:
     # process_components()
@@ -254,4 +243,4 @@ class MCGCCMain(object):
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance
-MCGCCMain.main()
+Main.main()
