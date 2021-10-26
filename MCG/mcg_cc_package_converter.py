@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -204,13 +204,10 @@ class PackageConverter(Converter):
         Logger.record_in_log("PROCESS COMPLETED")
 
         # display additional details after package conversion
-        if Supporter.PRINT_EXTRA_INFO:
-
-            # print package details
-            Logger.record_in_log("")
-            Logger.record_in_log("Configuration File:")
-            for line in self.configuration_file:
-                Logger.record_in_log("          " + str(line))
+        Logger.record_in_log("")
+        Logger.record_in_log("Configuration File:")
+        for line in self.configuration_file:
+            Logger.record_in_log("          " + str(line))
 
         # end of package converter
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")

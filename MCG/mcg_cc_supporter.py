@@ -6,7 +6,7 @@
 #       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,10 +31,6 @@
 # Description:
 # This is base class, which provides additional methods and parameters reused by other MCG CC classes.
 class Supporter(object):
-
-    # This parameter allows other MCG CC classes to determine whether to print extra information
-    # during conversion process or not.
-    PRINT_EXTRA_INFO = False
 
     # This parameter defines offset of signal name after "target" marker in merged node, i.e. number of
     # characters after occurrence of "target" marker, where beginning of signal name occurs, an example:

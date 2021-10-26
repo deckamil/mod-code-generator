@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -375,28 +375,25 @@ class ComponentReader(FileReader):
         Logger.record_in_log("PROCESS COMPLETED")
 
         # display additional details after component reading
-        if Supporter.PRINT_EXTRA_INFO:
-
-            # print component details
-            Logger.record_in_log("")
-            Logger.record_in_log("Nodes:")
-            for node in self.node_list:
-                Logger.record_in_log("          " + str(node))
-            Logger.record_in_log("Actions:")
-            for interaction in self.interaction_list:
-                Logger.record_in_log("          " + str(interaction))
-            Logger.record_in_log("Signals:")
-            for data in self.data_list:
-                Logger.record_in_log("          " + str(data))
-            Logger.record_in_log("Input Interface:")
-            for input_interface in self.input_interface_list:
-                Logger.record_in_log("          " + str(input_interface))
-            Logger.record_in_log("Output Interface:")
-            for output_interface in self.output_interface_list:
-                Logger.record_in_log("          " + str(output_interface))
-            Logger.record_in_log("Local Data:")
-            for local_data in self.local_data_list:
-                Logger.record_in_log("          " + str(local_data))
+        Logger.record_in_log("")
+        Logger.record_in_log("Nodes:")
+        for node in self.node_list:
+            Logger.record_in_log("          " + str(node))
+        Logger.record_in_log("Actions:")
+        for interaction in self.interaction_list:
+            Logger.record_in_log("          " + str(interaction))
+        Logger.record_in_log("Signals:")
+        for data in self.data_list:
+            Logger.record_in_log("          " + str(data))
+        Logger.record_in_log("Input Interface:")
+        for input_interface in self.input_interface_list:
+            Logger.record_in_log("          " + str(input_interface))
+        Logger.record_in_log("Output Interface:")
+        for output_interface in self.output_interface_list:
+            Logger.record_in_log("          " + str(output_interface))
+        Logger.record_in_log("Local Data:")
+        for local_data in self.local_data_list:
+            Logger.record_in_log("          " + str(local_data))
 
         # end of component reader
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")

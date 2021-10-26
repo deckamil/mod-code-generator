@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -170,20 +170,17 @@ class PackageSorter(Sorter):
         # process completed
         Logger.record_in_log("PROCESS COMPLETED")
 
-        # display additional details after sorting
-        if Supporter.PRINT_EXTRA_INFO:
-
-            # print package details
-            Logger.record_in_log("")
-            Logger.record_in_log("Sorted Interactions:")
-            for node in self.node_list:
-                Logger.record_in_log("          " + str(node))
-            Logger.record_in_log("Merged Nodes:")
-            for merged_node in self.merged_node_list:
-                Logger.record_in_log("          " + str(merged_node))
-            Logger.record_in_log("Sorted Nodes:")
-            for sorted_node in self.sorted_node_list:
-                Logger.record_in_log("          " + str(sorted_node))
+        # display additional details after package sorting
+        Logger.record_in_log("")
+        Logger.record_in_log("Sorted Interactions:")
+        for node in self.node_list:
+            Logger.record_in_log("          " + str(node))
+        Logger.record_in_log("Merged Nodes:")
+        for merged_node in self.merged_node_list:
+            Logger.record_in_log("          " + str(merged_node))
+        Logger.record_in_log("Sorted Nodes:")
+        for sorted_node in self.sorted_node_list:
+            Logger.record_in_log("          " + str(sorted_node))
 
         # end of package sorter
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

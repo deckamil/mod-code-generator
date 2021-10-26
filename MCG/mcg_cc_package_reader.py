@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,7 +27,6 @@
 
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
-from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 
 
@@ -254,28 +253,25 @@ class PackageReader(FileReader):
         Logger.record_in_log("PROCESS COMPLETED")
 
         # display additional details after package reading
-        if Supporter.PRINT_EXTRA_INFO:
-
-            # print package details
-            Logger.record_in_log("")
-            Logger.record_in_log("Nodes:")
-            for node in self.node_list:
-                Logger.record_in_log("          " + str(node))
-            Logger.record_in_log("Components:")
-            for interaction in self.interaction_list:
-                Logger.record_in_log("          " + str(interaction))
-            Logger.record_in_log("Structures:")
-            for data in self.data_list:
-                Logger.record_in_log("          " + str(data))
-            Logger.record_in_log("Input Interface:")
-            for input_interface in self.input_interface_list:
-                Logger.record_in_log("          " + str(input_interface))
-            Logger.record_in_log("Output Interface:")
-            for output_interface in self.output_interface_list:
-                Logger.record_in_log("          " + str(output_interface))
-            Logger.record_in_log("Local Data:")
-            for local_data in self.local_data_list:
-                Logger.record_in_log("          " + str(local_data))
+        Logger.record_in_log("")
+        Logger.record_in_log("Nodes:")
+        for node in self.node_list:
+            Logger.record_in_log("          " + str(node))
+        Logger.record_in_log("Components:")
+        for interaction in self.interaction_list:
+            Logger.record_in_log("          " + str(interaction))
+        Logger.record_in_log("Structures:")
+        for data in self.data_list:
+            Logger.record_in_log("          " + str(data))
+        Logger.record_in_log("Input Interface:")
+        for input_interface in self.input_interface_list:
+            Logger.record_in_log("          " + str(input_interface))
+        Logger.record_in_log("Output Interface:")
+        for output_interface in self.output_interface_list:
+            Logger.record_in_log("          " + str(output_interface))
+        Logger.record_in_log("Local Data:")
+        for local_data in self.local_data_list:
+            Logger.record_in_log("          " + str(local_data))
 
         # end of package reader
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

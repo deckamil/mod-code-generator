@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           26 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -27,7 +27,7 @@
 
 from mcg_cc_converter import Converter
 from mcg_cc_supporter import Supporter
-from mcg_cc_logger import  Logger
+from mcg_cc_logger import Logger
 
 
 # Class:
@@ -176,13 +176,10 @@ class ComponentConverter(Converter):
         Logger.record_in_log("PROCESS COMPLETED")
 
         # display additional details after component conversion
-        if Supporter.PRINT_EXTRA_INFO:
-
-            # print component details
-            Logger.record_in_log("")
-            Logger.record_in_log("Configuration File:")
-            for line in self.configuration_file:
-                Logger.record_in_log("          " + str(line))
+        Logger.record_in_log("")
+        Logger.record_in_log("Configuration File:")
+        for line in self.configuration_file:
+            Logger.record_in_log("          " + str(line))
 
         # end of component converter
         Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<")
