@@ -120,7 +120,7 @@ class Converter(object):
         # get date
         date = datetime.datetime.now()
 
-        # write header info to configuration file on hard disk
+        # write footer info to configuration file on hard disk
         Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n"))
         Converter.configuration_file_disk.write(str("MCG CGC CONFIG END\n"))
 

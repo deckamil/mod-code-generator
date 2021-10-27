@@ -97,7 +97,7 @@ class Logger(object):
         # get date
         date = datetime.datetime.now()
 
-        # write header info to log file on hard disk
+        # write footer info to log file on hard disk
         Logger.log_file_disk.write(str("\nMCG CC LOG DATE ") + str(date))
         Logger.log_file_disk.write(str("\nMCG CC LOG END"))
 
