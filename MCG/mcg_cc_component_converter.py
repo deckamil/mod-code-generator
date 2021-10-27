@@ -170,7 +170,7 @@ class ComponentConverter(Converter):
         self.configuration_file.append(str("COMPONENT END"))
 
         # save configuration file
-        self.save_configuration_file()
+        self.save_in_configuration_file()
 
         # process completed
         Logger.save_in_log_file("PROCESS COMPLETED")

@@ -81,7 +81,7 @@ class Logger(object):
         Logger.log_file_disk.close()
 
     # Method:
-    # saves_log_file_footer()
+    # save_log_file_footer()
     #
     # Description:
     # This method saves footer info in log file.
@@ -89,7 +89,7 @@ class Logger(object):
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def saves_log_file_footer():
+    def save_log_file_footer():
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")

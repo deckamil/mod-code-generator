@@ -24,6 +24,7 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+import datetime
 from mcg_cc_file_reader import FileReader
 from mcg_cc_sorter import Sorter
 from mcg_cc_logger import Logger
@@ -79,14 +80,62 @@ class Converter(object):
         Converter.configuration_file_disk.close()
 
     # Method:
-    # save_configuration_file()
+    # save_configuration_file_header()
     #
     # Description:
-    # This method saves content of configuration file under previously selected directory.
+    # This method saves header info in configuration file.
     #
     # Returns:
     # This method does not return anything.
-    def save_configuration_file(self):
+    @staticmethod
+    def save_configuration_file_header():
+
+        # open file in append mode, ready to save fresh configuration file content
+        Converter.configuration_file_disk = open(Converter.configuration_file_path, "a")
+
+        # get date
+        date = datetime.datetime.now()
+
+        # write header info to configuration file on hard disk
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG START\n"))
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n\n"))
+
+        # close file
+        Converter.configuration_file_disk.close()
+
+    # Method:
+    # save_configuration_file_footer()
+    #
+    # Description:
+    # This method saves footer info in configuration file.
+    #
+    # Returns:
+    # This method does not return anything.
+    @staticmethod
+    def save_configuration_file_footer():
+
+        # open file in append mode, ready to save fresh configuration file content
+        Converter.configuration_file_disk = open(Converter.configuration_file_path, "a")
+
+        # get date
+        date = datetime.datetime.now()
+
+        # write header info to configuration file on hard disk
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n"))
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG END\n"))
+
+        # close file
+        Converter.configuration_file_disk.close()
+
+    # Method:
+    # save_in_configuration_file()
+    #
+    # Description:
+    # This method saves configuration in configuration file.
+    #
+    # Returns:
+    # This method does not return anything.
+    def save_in_configuration_file(self):
 
         # open file in append mode, ready to save fresh configuration file content
         Converter.configuration_file_disk = open(Converter.configuration_file_path, "a")

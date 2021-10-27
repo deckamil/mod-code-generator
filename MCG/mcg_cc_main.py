@@ -121,15 +121,18 @@ class Main(object):
 
         # saves log file header
         Logger.save_log_file_header()
+        # saves configuration file header
+        Converter.save_configuration_file_header()
 
         # process components content from .exml files into configuration file
         Main.process_components()
-
         # process packages content from .exml files into configuration file
         Main.process_packages()
 
+        # saves configuration file footer
+        Converter.save_configuration_file_footer()
         # saves log file footer
-        Logger.saves_log_file_footer()
+        Logger.save_log_file_footer()
 
     # Method:
     # process_components()
