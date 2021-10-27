@@ -42,7 +42,7 @@ class Logger(object):
     # set_log_file_path()
     #
     # Description:
-    # This method sets path to log file, where log info from MCG CC run will be saves.
+    # This method sets path to log file, which will contain events record from MCG CC.
     #
     # Returns:
     # This method does not return anything.

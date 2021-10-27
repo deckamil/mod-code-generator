@@ -65,7 +65,7 @@ class Converter(object):
     # set_configuration_file_path()
     #
     # Description:
-    # This method sets path to configuration file, where configuration input to MCG CGC will be saved.
+    # This method sets path to configuration file, which will contain input configuration to MCG CGC.
     #
     # Returns:
     # This method does not return anything.
