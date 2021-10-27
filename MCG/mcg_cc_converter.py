@@ -65,7 +65,7 @@ class Converter(object):
     # set_configuration_file_path()
     #
     # Description:
-    # This method sets path to directory, where configuration file will be recorded.
+    # This method sets path to configuration file, where configuration input to MCG CGC will be saved.
     #
     # Returns:
     # This method does not return anything.
@@ -73,7 +73,7 @@ class Converter(object):
     def set_configuration_file_path(output_dir_path):
 
         # set configuration file path
-        Converter.configuration_file_path = output_dir_path + str("\\configuration_file.txt")
+        Converter.configuration_file_path = output_dir_path + str("\\mcg_cgc_config.txt")
 
         # open new file in write mode, then close file, to clear previous content
         Converter.configuration_file_disk = open(Converter.configuration_file_path, "w")

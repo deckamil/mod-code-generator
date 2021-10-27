@@ -71,15 +71,15 @@ class FileFinder(Reader):
     LOCAL_DATA_FILE_INDEX = 9
 
     # Method:
-    # set_model_path()
+    # set_model_dir_path()
     #
     # Description:
-    # This method sets paths to .exml files, which describe model content.
+    # This method sets path to model directory with .exml files, which describe model content.
     #
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def set_model_path(model_dir_path):
+    def set_model_dir_path(model_dir_path):
 
         # get activity directory path
         FileFinder.activity_dir_path = model_dir_path + str("\\Standard.Activity")

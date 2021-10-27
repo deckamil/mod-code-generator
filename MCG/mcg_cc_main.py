@@ -88,10 +88,10 @@ class Main(object):
             output_dir_path = str(argv[Main.OUTPUT_DIR_PATH_INDEX])
 
             # set path to model directory
-            FileFinder.set_model_path(model_dir_path)
-            # set path to configuration file directory
+            FileFinder.set_model_dir_path(model_dir_path)
+            # set path to configuration file
             Converter.set_configuration_file_path(output_dir_path)
-            # set path to log file directory
+            # set path to log file
             Logger.set_log_file_path(output_dir_path)
 
             # convert model
