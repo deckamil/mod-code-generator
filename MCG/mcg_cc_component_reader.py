@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -49,7 +49,7 @@ class ComponentReader(FileReader):
     def check_correctness(self):
 
         # check correctness
-        Logger.record_in_log("*** check correctness")
+        Logger.save_in_log_file("*** check correctness")
 
         # check is any signal on data list has more than one source
         for data in self.data_list:
@@ -144,7 +144,7 @@ class ComponentReader(FileReader):
     def read_data_targets(self):
 
         # read data targets
-        Logger.record_in_log("*** read data targets")
+        Logger.save_in_log_file("*** read data targets")
 
         # search for signals in activity file
         for i in range(0, len(self.activity_file)):
@@ -265,7 +265,7 @@ class ComponentReader(FileReader):
     def read_interaction_targets(self):
 
         # read interaction targets
-        Logger.record_in_log("*** read interaction targets")
+        Logger.save_in_log_file("*** read interaction targets")
 
         # search for actions in activity file
         for i in range(0, len(self.activity_file)):
@@ -357,7 +357,7 @@ class ComponentReader(FileReader):
     def read_component(self):
 
         # component reader
-        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # search for signals target within activity file
         self.read_data_targets()
@@ -372,31 +372,31 @@ class ComponentReader(FileReader):
         self.check_correctness()
 
         # process completed
-        Logger.record_in_log("PROCESS COMPLETED")
+        Logger.save_in_log_file("PROCESS COMPLETED")
 
         # display additional details after component reading
-        Logger.record_in_log("")
-        Logger.record_in_log("Nodes:")
+        Logger.save_in_log_file("")
+        Logger.save_in_log_file("Nodes:")
         for node in self.node_list:
-            Logger.record_in_log("          " + str(node))
-        Logger.record_in_log("Actions:")
+            Logger.save_in_log_file("          " + str(node))
+        Logger.save_in_log_file("Actions:")
         for interaction in self.interaction_list:
-            Logger.record_in_log("          " + str(interaction))
-        Logger.record_in_log("Signals:")
+            Logger.save_in_log_file("          " + str(interaction))
+        Logger.save_in_log_file("Signals:")
         for data in self.data_list:
-            Logger.record_in_log("          " + str(data))
-        Logger.record_in_log("Input Interface:")
+            Logger.save_in_log_file("          " + str(data))
+        Logger.save_in_log_file("Input Interface:")
         for input_interface in self.input_interface_list:
-            Logger.record_in_log("          " + str(input_interface))
-        Logger.record_in_log("Output Interface:")
+            Logger.save_in_log_file("          " + str(input_interface))
+        Logger.save_in_log_file("Output Interface:")
         for output_interface in self.output_interface_list:
-            Logger.record_in_log("          " + str(output_interface))
-        Logger.record_in_log("Local Data:")
+            Logger.save_in_log_file("          " + str(output_interface))
+        Logger.save_in_log_file("Local Data:")
         for local_data in self.local_data_list:
-            Logger.record_in_log("          " + str(local_data))
+            Logger.save_in_log_file("          " + str(local_data))
 
         # end of component reader
-        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to component reader list
         component_reader_list = []

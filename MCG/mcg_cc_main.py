@@ -8,7 +8,7 @@
 #       Generator Component (CGC) to generate C code from the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -119,8 +119,8 @@ class Main(object):
     @staticmethod
     def convert_model():
 
-        # record log header
-        Logger.record_log_header()
+        # saves log file header
+        Logger.save_log_file_header()
 
         # process components content from .exml files into configuration file
         Main.process_components()
@@ -128,8 +128,8 @@ class Main(object):
         # process packages content from .exml files into configuration file
         Main.process_packages()
 
-        # record log footer
-        Logger.record_log_footer()
+        # saves log file footer
+        Logger.saves_log_file_footer()
 
     # Method:
     # process_components()
@@ -149,7 +149,8 @@ class Main(object):
         # repeat until all components are converted into configuration file
         while files_found:
 
-            Logger.record_in_log("\n                         *** COMPONENT PROCESSING ***                          \n")
+            Logger.save_in_log_file("\n                         *** COMPONENT PROCESSING ***"
+                                    "                          \n")
 
             # find component files
             file_finder_list = FileFinder.find_files("Standard.Component")
@@ -207,7 +208,8 @@ class Main(object):
         # repeat until all packages are converted into configuration file
         while files_found:
 
-            Logger.record_in_log("\n                          *** PACKAGE PROCESSING ***                           \n")
+            Logger.save_in_log_file("\n                          *** PACKAGE PROCESSING ***"
+                                    "                           \n")
 
             # find package files
             file_finder_list = FileFinder.find_files("Standard.Package")

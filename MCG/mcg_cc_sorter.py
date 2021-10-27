@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -70,7 +70,7 @@ class Sorter(object):
     def sort_interactions(self):
 
         # sort interactions
-        Logger.record_in_log("*** sort interactions")
+        Logger.save_in_log_file("*** sort interactions")
 
         # this index tells where to put node (defines new position of node)
         index = 0
@@ -133,7 +133,7 @@ class Sorter(object):
     def merge_nodes(self):
 
         # merge nodes
-        Logger.record_in_log("*** merge nodes")
+        Logger.save_in_log_file("*** merge nodes")
 
         # merge nodes of same interaction from node list into one node on merged node list
         for i in range(0, len(self.interaction_list)):
@@ -206,7 +206,7 @@ class Sorter(object):
     def count_dependencies(self):
 
         # count dependencies
-        Logger.record_in_log("*** count dependencies")
+        Logger.save_in_log_file("*** count dependencies")
 
         # each merged node (with exception for target empty node) has its own sublist under dependency list
         # the sublist starts with merged node under index 0 and local data elements required to compute the merged
@@ -251,7 +251,7 @@ class Sorter(object):
     def sort_nodes(self):
 
         # sort nodes
-        Logger.record_in_log("*** sort nodes")
+        Logger.save_in_log_file("*** sort nodes")
 
         # sort nodes basing on their dependencies
         # first append merged nodes without dependencies to sorted node list, i.e. those merged nodes which

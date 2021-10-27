@@ -5,7 +5,7 @@
 #       for conversion of model element content into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -134,7 +134,7 @@ class Converter(object):
     def convert_interfaces(self):
 
         # convert interfaces
-        Logger.record_in_log("*** convert interfaces")
+        Logger.save_in_log_file("*** convert interfaces")
 
         # append start marker of input interface section to configuration file
         self.configuration_file.append(str("INPUT INTERFACE START"))

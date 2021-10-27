@@ -6,7 +6,7 @@
 #       describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           25 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -159,7 +159,7 @@ class FileFinder(Reader):
     def find_interface_files(model_element_type):
 
         # find interface files
-        Logger.record_in_log("*** find interface files")
+        Logger.save_in_log_file("*** find interface files")
 
         # interface markers show whether interface was found or not
         interface_found = False
@@ -327,7 +327,7 @@ class FileFinder(Reader):
     def find_activity_file(model_element_type):
 
         # find activity files
-        Logger.record_in_log("*** find activity file")
+        Logger.save_in_log_file("*** find activity file")
 
         # get source list index
         if "Standard.Component" in model_element_type:
@@ -412,7 +412,7 @@ class FileFinder(Reader):
         FileFinder.clear_collected_data()
 
         # file finder
-        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # if model element type is correct
         if ("Standard.Component" in model_element_type) or ("Standard.Package" in model_element_type):
@@ -431,7 +431,7 @@ class FileFinder(Reader):
             print()
 
         # process completed
-        Logger.record_in_log("PROCESS COMPLETED")
+        Logger.save_in_log_file("PROCESS COMPLETED")
 
         # check activity and interface markers
         if activity_found and interface_found:
@@ -440,33 +440,33 @@ class FileFinder(Reader):
 
             # print details
             if "Standard.Component" in model_element_type:
-                Logger.record_in_log("\nComponent Source:    " + str(FileFinder.activity_source))
-                Logger.record_in_log("Component Name:      " + str(FileFinder.model_element_name))
+                Logger.save_in_log_file("\nComponent Source:    " + str(FileFinder.activity_source))
+                Logger.save_in_log_file("Component Name:      " + str(FileFinder.model_element_name))
             else:
-                Logger.record_in_log("\nPackage Source:      " + str(FileFinder.activity_source))
-                Logger.record_in_log("Package Name:        " + str(FileFinder.model_element_name))
+                Logger.save_in_log_file("\nPackage Source:      " + str(FileFinder.activity_source))
+                Logger.save_in_log_file("Package Name:        " + str(FileFinder.model_element_name))
 
-            Logger.record_in_log("")
-            Logger.record_in_log("Interface Source:    " + str(FileFinder.input_interface_source))
-            Logger.record_in_log("Interface Type:      " + str("Input Interface"))
+            Logger.save_in_log_file("")
+            Logger.save_in_log_file("Interface Source:    " + str(FileFinder.input_interface_source))
+            Logger.save_in_log_file("Interface Type:      " + str("Input Interface"))
 
-            Logger.record_in_log("")
-            Logger.record_in_log("Interface Source:    " + str(FileFinder.output_interface_source))
-            Logger.record_in_log("Interface Type:      " + str("Output Interface"))
+            Logger.save_in_log_file("")
+            Logger.save_in_log_file("Interface Source:    " + str(FileFinder.output_interface_source))
+            Logger.save_in_log_file("Interface Type:      " + str("Output Interface"))
 
-            Logger.record_in_log("")
-            Logger.record_in_log("Interface Source:    " + str(FileFinder.local_data_source))
-            Logger.record_in_log("Interface Type:      " + str("Local Data"))
+            Logger.save_in_log_file("")
+            Logger.save_in_log_file("Interface Source:    " + str(FileFinder.local_data_source))
+            Logger.save_in_log_file("Interface Type:      " + str("Local Data"))
 
         else:
             # clear once again collected data before return
             FileFinder.clear_collected_data()
 
             # files not found
-            Logger.record_in_log("FILES NOT FOUND")
+            Logger.save_in_log_file("FILES NOT FOUND")
 
         # end of file finder
-        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to file finder list
         file_finder_list = []

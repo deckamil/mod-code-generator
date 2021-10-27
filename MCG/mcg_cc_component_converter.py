@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -119,10 +119,10 @@ class ComponentConverter(Converter):
     def convert_component(self):
 
         # component converter
-        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # convert header
-        Logger.record_in_log("*** convert header")
+        Logger.save_in_log_file("*** convert header")
 
         # append start marker of new component section to configuration file
         self.configuration_file.append(str("COMPONENT START"))
@@ -137,7 +137,7 @@ class ComponentConverter(Converter):
         self.convert_interfaces()
 
         # convert body
-        Logger.record_in_log("*** convert body")
+        Logger.save_in_log_file("*** convert body")
 
         # append start marker of function body section to configuration file
         self.configuration_file.append(str("BODY START"))
@@ -173,13 +173,13 @@ class ComponentConverter(Converter):
         self.save_configuration_file()
 
         # process completed
-        Logger.record_in_log("PROCESS COMPLETED")
+        Logger.save_in_log_file("PROCESS COMPLETED")
 
         # display additional details after component conversion
-        Logger.record_in_log("")
-        Logger.record_in_log("Configuration File:")
+        Logger.save_in_log_file("")
+        Logger.save_in_log_file("Configuration File:")
         for line in self.configuration_file:
-            Logger.record_in_log("          " + str(line))
+            Logger.save_in_log_file("          " + str(line))
 
         # end of component converter
-        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<")

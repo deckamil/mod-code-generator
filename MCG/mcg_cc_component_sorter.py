@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,7 +57,7 @@ class ComponentSorter(Sorter):
     def sort_first_input_signals(self):
 
         # sort first input signals
-        Logger.record_in_log("*** sort first input signals")
+        Logger.save_in_log_file("*** sort first input signals")
 
         # merged node list, where *FIRST* marker was removed
         merged_node_with_removed_first_marker_list = []
@@ -119,7 +119,7 @@ class ComponentSorter(Sorter):
     def sort_component(self):
 
         # component sorter
-        Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # sort nodes of same action in one place under node list
         self.sort_interactions()
@@ -137,22 +137,22 @@ class ComponentSorter(Sorter):
         self.sort_nodes()
 
         # process completed
-        Logger.record_in_log("PROCESS COMPLETED")
+        Logger.save_in_log_file("PROCESS COMPLETED")
 
         # display additional details after component sorting
-        Logger.record_in_log("")
-        Logger.record_in_log("Sorted Interactions:")
+        Logger.save_in_log_file("")
+        Logger.save_in_log_file("Sorted Interactions:")
         for node in self.node_list:
-            Logger.record_in_log("          " + str(node))
-        Logger.record_in_log("Merged Nodes:")
+            Logger.save_in_log_file("          " + str(node))
+        Logger.save_in_log_file("Merged Nodes:")
         for merged_node in self.merged_node_list:
-            Logger.record_in_log("          " + str(merged_node))
-        Logger.record_in_log("Sorted Nodes:")
+            Logger.save_in_log_file("          " + str(merged_node))
+        Logger.save_in_log_file("Sorted Nodes:")
         for sorted_node in self.sorted_node_list:
-            Logger.record_in_log("          " + str(sorted_node))
+            Logger.save_in_log_file("          " + str(sorted_node))
 
         # end of component sorter
-        Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to component sorter list
         component_sorter_list = []

@@ -6,7 +6,7 @@
 #       Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           18 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -239,19 +239,19 @@ class ErrorHandler(object):
         # if any error was recorded
         if len(ErrorHandler.error_list) > 0:
             # error handler
-            Logger.record_in_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+            Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
             # print model element details
-            Logger.record_in_log("Model Element Name:      " + str(model_element_name))
-            Logger.record_in_log("Model Element Source:    " + str(activity_source))
-            Logger.record_in_log("Model Element Type:      " + str(model_element_type))
-            Logger.record_in_log("*** ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT")
+            Logger.save_in_log_file("Model Element Name:      " + str(model_element_name))
+            Logger.save_in_log_file("Model Element Source:    " + str(activity_source))
+            Logger.save_in_log_file("Model Element Type:      " + str(model_element_type))
+            Logger.save_in_log_file("*** ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT")
             # display errors
             for error in ErrorHandler.error_list:
-                Logger.record_in_log(error)
+                Logger.save_in_log_file(error)
 
             # end of error handler
-            Logger.record_in_log("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
             # exit MCG CC.
             exit()

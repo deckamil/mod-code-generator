@@ -5,7 +5,7 @@
 #       is responsible for log recording during MCG CC run.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2021
+#   DATE:           27 OCT 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,15 +57,15 @@ class Logger(object):
         Logger.log_file_disk.close()
 
     # Method:
-    # record_log_header()
+    # save_log_file_header()
     #
     # Description:
-    # This method records header info in log file.
+    # This method saves header info in log file.
     #
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def record_log_header():
+    def save_log_file_header():
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")
@@ -81,15 +81,15 @@ class Logger(object):
         Logger.log_file_disk.close()
 
     # Method:
-    # record_log_footer()
+    # saves_log_file_footer()
     #
     # Description:
-    # This method records footer info in log file.
+    # This method saves footer info in log file.
     #
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def record_log_footer():
+    def saves_log_file_footer():
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")
@@ -105,15 +105,15 @@ class Logger(object):
         Logger.log_file_disk.close()
 
     # Method:
-    # record_in_log()
+    # save_in_log_file()
     #
     # Description:
-    # This method prints and records info in log file.
+    # This method prints and saves info in log file.
     #
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def record_in_log(info):
+    def save_in_log_file(info):
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")
