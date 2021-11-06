@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           27 OCT 2021
+#   DATE:           6 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -20,6 +20,10 @@
 #       but WITHOUT ANY WARRANTY; without even the implied warranty of
 #       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #       GNU General Public License for more details.
+#
+#       Under Section 7 of GPL version 3, you are granted additional
+#       permissions described in the MCG Output Exception, version 1, which
+#       copy you should have received along with this program.
 #
 #       You should have received a copy of the GNU General Public License
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
