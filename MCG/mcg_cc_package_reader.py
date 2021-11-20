@@ -54,6 +54,30 @@ class PackageReader(FileReader):
         # check correctness
         Logger.save_in_log_file("*** check correctness")
 
+        # *** NEW CHECK SECTION ***
+        # check if any structure used on diagram does not come from interface element
+        for structure_name in self.data_list:
+            # structure marker shows whether structure was found or not within interface element
+            structure_found = False
+
+            # go through all local data interface elements
+            for interface_element in self.local_data_list:
+
+                # get element_name
+                element_name = interface_element[0]
+
+                # if diagram structure is identified as interface element
+                if (structure_name in element_name) and (element_name in structure_name):
+                    # change structure marker
+                    structure_found = True
+                    # break "for interface_element in" loop
+                    break
+
+            # if diagram structure is not found in interface element
+            if not structure_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_STR_NOT_IN_INT, structure_name, "none")
+
     # Function:
     # read_data_targets()
     #

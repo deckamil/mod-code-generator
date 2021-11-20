@@ -55,9 +55,10 @@ class ComponentReader(FileReader):
         # check correctness
         Logger.save_in_log_file("*** check correctness")
 
-        # check is any signal on data list has more than one source
-        for data in self.data_list:
-            keyword = "target " + str(data)
+        # *** NEW CHECK SECTION ***
+        # check if any signal on data list has more than one source
+        for signal_name in self.data_list:
+            keyword = "target " + str(signal_name)
             keyword_occurrence = 0
 
             # go through all nodes for each signal
@@ -71,8 +72,9 @@ class ComponentReader(FileReader):
             # if keyword has more than one occurrence
             if keyword_occurrence > 1:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_SOURCES, data, "none")
+                ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_SOURCES, signal_name, "none")
 
+        # *** NEW CHECK SECTION ***
         # check if any action on interaction list is not allowed
         for interaction in self.interaction_list:
             # get action type
@@ -85,6 +87,62 @@ class ComponentReader(FileReader):
             if not action_type_found:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
+
+        # *** NEW CHECK SECTION ***
+        # check if any signal used on diagram does not come from interface element
+        for signal_name in self.data_list:
+            # signal marker shows whether signal was found or not within interface element
+            signal_found = False
+
+            # if signal has not been found, search in input interface
+            if not signal_found:
+                # go through all input interface elements
+                for interface_element in self.input_interface_list:
+
+                    # get element_name
+                    element_name = interface_element[0]
+
+                    # if diagram signal is identified as interface element
+                    if (signal_name in element_name) and (element_name in signal_name):
+                        # change signal marker
+                        signal_found = True
+                        # break "for interface_element in" loop
+                        break
+
+            # if signal has not been found, search in output interface
+            if not signal_found:
+                # go through all output interface elements
+                for interface_element in self.output_interface_list:
+
+                    # get element_name
+                    element_name = interface_element[0]
+
+                    # if diagram signal is identified as interface element
+                    if (signal_name in element_name) and (element_name in signal_name):
+                        # change signal marker
+                        signal_found = True
+                        # break "for interface_element in" loop
+                        break
+
+            # if signal has not been found, search in local data interface
+            if not signal_found:
+                # go through all local data interface elements
+                for interface_element in self.local_data_list:
+
+                    # get element_name
+                    element_name = interface_element[0]
+
+                    # if diagram signal is identified as interface element
+                    if (signal_name in element_name) and (element_name in signal_name):
+                        # change signal marker
+                        signal_found = True
+                        # break "for interface_element in" loop
+                        break
+
+            # if diagram signal is not found in interface element
+            if not signal_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_SIG_NOT_IN_INT, signal_name, "none")
 
     # Function:
     # find_first_input_signal_name()

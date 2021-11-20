@@ -67,6 +67,8 @@ class ErrorHandler(object):
     INT_ERR_NO_INP_INT_IN_PAC = 204
     INT_ERR_NO_OUT_INT_IN_PAC = 205
     INT_ERR_NO_LOC_DAT_IN_PAC = 206
+    INT_ERR_SIG_NOT_IN_INT = 210
+    INT_ERR_STR_NOT_IN_INT = 211
 
     # GENERAL errors
     GEN_ERR_NO_NAME_ELEMENT = 270
@@ -193,6 +195,20 @@ class ErrorHandler(object):
         elif error_code == ErrorHandler.INT_ERR_NO_LOC_DAT_IN_PAC:
             # set error notification
             error = "ERROR " + str(error_code) + ": Could not find Local Data element within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_SIG_NOT_IN_INT:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Could not find " + str(error_info1) + \
+                    " signal within component interface"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_STR_NOT_IN_INT:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Could not find " + str(error_info1) + \
+                    " structure within package interface"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
