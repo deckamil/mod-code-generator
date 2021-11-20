@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           20 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -149,10 +149,10 @@ class FileReader(Reader):
         return target_element_list
 
     # Method:
-    # find_interface_signals()
+    # find_interface_elements()
     #
     # Description:
-    # This method looks for name and type of interface signals within content of .exml file,
+    # This method looks for name and type of interface signals/structures within content of .exml file,
     # an example of .exml file line:
     # <ID name="loc_add_result" mc="Standard.Attribute" uid="47398f97-728c-4e18-aa19-d36a5c099ba7"/>
     # <ID name="INT16" mc="Standard.DataType" uid="e7213c05-8c48-4585-8bc5-cc8690ffd6be"/>
@@ -160,60 +160,60 @@ class FileReader(Reader):
     # Returns:
     # This method returns interface signal list.
     @staticmethod
-    def find_interface_signals(interface_file):
+    def find_interface_elements(interface_file):
         # local data
-        interface_signal = []
-        interface_signal_list = []
+        interface_element = []
+        interface_element_list = []
 
-        # search for interface signals in interface file
+        # search for interface elements in interface file
         for i in range(0, len(interface_file)):
 
-            # if given line contains definition of signal name
+            # if given line contains definition of element name
             if ("<ID name=" in interface_file[i]) and ("Standard.Attribute" in interface_file[i]):
                 # get line
                 line = interface_file[i]
                 # get line number
                 line_number = i + 1
-                # get signal name
-                signal_name = FileReader.get_name(line, line_number)
-                # append signal name to interface signal
-                interface_signal.append(signal_name)
-            # if given line contain definition of signal type
+                # get element name
+                element_name = FileReader.get_name(line, line_number)
+                # append element name to interface element
+                interface_element.append(element_name)
+            # if given line contain definition of element type
             if ("<ID name=" in interface_file[i]) and ("Standard.DataType" in interface_file[i]):
                 # get line
                 line = interface_file[i]
                 # get line number
                 line_number = i + 1
-                # get signal type
-                signal_type = FileReader.get_name(line, line_number)
-                # append signal type to interface signal
-                interface_signal.append(signal_type)
-                # append interface signal to interface signal list
-                interface_signal_list.append(interface_signal)
-                # clear interface signal
-                interface_signal = []
+                # get element type
+                element_type = FileReader.get_name(line, line_number)
+                # append element type to interface element
+                interface_element.append(element_type)
+                # append interface element to interface element list
+                interface_element_list.append(interface_element)
+                # clear interface element
+                interface_element = []
 
-        # return interface signal list
-        return interface_signal_list
+        # return interface element list
+        return interface_element_list
 
     # Method:
-    # read_interface_signals()
+    # read_interface_elements()
     #
     # Description:
-    # This method looks for signals of input interface, output interface and local data elements.
+    # This method looks for signals/structures of input interface, output interface and local data elements.
     #
     # Returns:
     # This method does not return anything.
-    def read_interface_signals(self):
+    def read_interface_elements(self):
 
-        # read interface signals
-        Logger.save_in_log_file("*** read interface signals")
+        # read interface elements
+        Logger.save_in_log_file("*** read interface elements")
 
-        # find input interface signals
-        self.input_interface_list = FileReader.find_interface_signals(self.input_interface_file)
+        # find input interface elements
+        self.input_interface_list = FileReader.find_interface_elements(self.input_interface_file)
 
-        # find output interface signals
-        self.output_interface_list = FileReader.find_interface_signals(self.output_interface_file)
+        # find output interface elements
+        self.output_interface_list = FileReader.find_interface_elements(self.output_interface_file)
 
-        # find local data interface signals
-        self.local_data_list = FileReader.find_interface_signals(self.local_data_file)
+        # find local data interface elements
+        self.local_data_list = FileReader.find_interface_elements(self.local_data_file)

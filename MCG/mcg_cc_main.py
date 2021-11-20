@@ -8,7 +8,7 @@
 #       Generator Component (CGC) to generate C code from the model.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           20 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -129,9 +129,9 @@ class Main(object):
         Converter.save_configuration_file_header()
 
         # process components content from .exml files into configuration file
-        Main.process_components()
+        Main.run_component_conversion()
         # process packages content from .exml files into configuration file
-        Main.process_packages()
+        Main.run_package_conversion()
 
         # saves configuration file footer
         Converter.save_configuration_file_footer()
@@ -139,7 +139,7 @@ class Main(object):
         Logger.save_log_file_footer()
 
     # Method:
-    # process_components()
+    # run_component_conversion()
     #
     # Description:
     # This method is responsible for processing of component content from .exml file
@@ -148,7 +148,7 @@ class Main(object):
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def process_components():
+    def run_component_conversion():
 
         # files marker shows whether desired component files were found or not
         files_found = True
@@ -198,7 +198,7 @@ class Main(object):
                 component_converter.convert_component()
 
     # Method:
-    # process_packages()
+    # run_package_conversion()
     #
     # Description:
     # This method is responsible for processing of package content from .exml file
@@ -207,7 +207,7 @@ class Main(object):
     # Returns:
     # This method does not return anything.
     @staticmethod
-    def process_packages():
+    def run_package_conversion():
 
         # files marker shows whether desired package files were found or not
         files_found = True

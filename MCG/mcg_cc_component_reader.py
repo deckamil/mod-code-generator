@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           20 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -369,8 +369,8 @@ class ComponentReader(FileReader):
         # search for action targets within activity file
         self.read_interaction_targets()
 
-        # search for interface signals
-        self.read_interface_signals()
+        # search for interface elements
+        self.read_interface_elements()
 
         # check component correctness
         self.check_correctness()
