@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -52,7 +52,7 @@ class ComponentConverter(Converter):
     def convert_action(self, sorted_node, action_type, math_symbol):
 
         # find target last position within sorted node
-        target_last_position = sorted_node.rfind("target")
+        target_last_position = sorted_node.rfind("$TARGET$")
         # find action uid within sorted node
         action_uid = sorted_node[target_last_position + Supporter.ACTION_UID_OFFSET:target_last_position - 1]
         # find output signal name within sorted node
@@ -66,14 +66,14 @@ class ComponentConverter(Converter):
         # number of "target" occurrences is required to calculate how many input signals are
         # consumed by node with action, i.e. basing on the format and content of sorted node
         # with action, the number of input signals is equal to (target_number - 1)
-        target_number = sorted_node.count("target")
+        target_number = sorted_node.count("$TARGET$")
 
         # search input signals within sorted node starting from this position
         start_index = 0
 
         # search for all input signal names within sorted node and put them into conversion line
         for i in range(0, target_number - 1):
-            target_position = sorted_node.find("target", start_index)
+            target_position = sorted_node.find("$TARGET$", start_index)
             # find input signal name within sorted node
             input_signal_name = sorted_node[start_index:target_position - 1]
             # append input signal name to conversion line
@@ -100,7 +100,7 @@ class ComponentConverter(Converter):
     def convert_signal_assignment(self, sorted_node):
 
         # find target last position within sorted node
-        target_last_position = sorted_node.rfind("target")
+        target_last_position = sorted_node.rfind("$TARGET$")
         # find output signal name within sorted node
         output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # find input signal name within sorted node
@@ -163,7 +163,7 @@ class ComponentConverter(Converter):
             action_type_found = Supporter.check_if_reference_contains_action_type(sorted_node)
 
             # if sorted node does not contain any action
-            if (not action_type_found) and ("target empty" not in sorted_node):
+            if (not action_type_found) and ("$TARGET$ empty" not in sorted_node):
                 # convert signal target signal
                 self.convert_signal_assignment(sorted_node)
 

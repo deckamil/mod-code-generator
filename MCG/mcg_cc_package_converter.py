@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -52,31 +52,31 @@ class PackageConverter(Converter):
     def convert_component_invocation(self, sorted_node):
 
         # find output structure position within sorted node
-        output_structure_position = sorted_node.rfind("target")
+        output_structure_position = sorted_node.rfind("$TARGET$")
         # find output structure name within sorted node
         output_structure_name = sorted_node[output_structure_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # append output structure name to conversion line
         conversion_line = str("INV ") + str(output_structure_name) + str(" = ")
 
         # find component position within sorted node
-        component_position = sorted_node.rfind("target", 0, output_structure_position)
+        component_position = sorted_node.rfind("$TARGET$", 0, output_structure_position)
         # find component name within sorted node
         component_name = sorted_node[component_position + Supporter.TARGET_OFFSET:output_structure_position - 1]
         # append component name to conversion line
         conversion_line = conversion_line + str(component_name) + str(" (")
 
-        # count number of keyword "target"
-        # number of "target" occurrences is required to calculate how many input structures are
+        # count number of keyword "$TARGET$"
+        # number of "$TARGET$" occurrences is required to calculate how many input structures are
         # consumed by node with component, i.e. basing on the format and content of sorted node
         # with component, the number of input structures is equal to (target_number - 1)
-        target_number = sorted_node.count("target")
+        target_number = sorted_node.count("$TARGET$")
 
         # search input structures within sorted node starting from this position
         start_index = 0
 
         # search for all input structure names within sorted node and put them into conversion line
         for i in range(0, target_number - 1):
-            target_position = sorted_node.find("target", start_index)
+            target_position = sorted_node.find("$TARGET$", start_index)
             # find input structure name within sorted node
             input_structure_name = sorted_node[start_index:target_position - 1]
             # append input structure name to conversion line
@@ -109,19 +109,19 @@ class PackageConverter(Converter):
         # append Output Interface structure to conversion line
         conversion_line = str("ASI Output Interface = (")
 
-        # count number of keyword "target"
-        # number of "target" occurrences is required to calculate how many output structures are
+        # count number of keyword "$TARGET$"
+        # number of "$TARGET$" occurrences is required to calculate how many output structures are
         # consumed by node with assignment to Output Interface, i.e. basing on the format and content
         # of sorted node with assignment to Output Interface, the number of output structures is equal
         # to target_number
-        target_number = sorted_node.count("target")
+        target_number = sorted_node.count("$TARGET$")
 
         # search output structures within sorted node starting from this position
         start_index = 0
 
         # search for all output structure names within sorted node and put them into conversion line
         for i in range(0, target_number):
-            target_position = sorted_node.find("target", start_index)
+            target_position = sorted_node.find("$TARGET$", start_index)
             # find output structure name within sorted node
             output_structure_name = sorted_node[start_index:target_position - 1]
             # append output structure name to conversion line
@@ -182,7 +182,7 @@ class PackageConverter(Converter):
 
             # if sorted node contains component invocation
             for interaction in self.interaction_list:
-                keyword = "target " + str(interaction) + " target"
+                keyword = "$TARGET$ " + str(interaction) + " $TARGET$"
                 # if keyword for given interaction is found
                 if keyword in sorted_node:
                     # convert component invocation
@@ -191,7 +191,7 @@ class PackageConverter(Converter):
                     component_invocation_found = True
 
             # if component invocation has not been found and sorted node does not have empty target
-            if (not component_invocation_found) and ("target empty" not in sorted_node):
+            if (not component_invocation_found) and ("$TARGET$ empty" not in sorted_node):
                 # convert output assignment
                 self.convert_output_assignment(sorted_node)
 

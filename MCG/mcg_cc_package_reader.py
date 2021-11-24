@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -119,7 +119,7 @@ class PackageReader(FileReader):
                     # if line contains </DEPENDENCIES> then structure does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not structure_has_targets):
                         # append node to node list
-                        self.node_list.append(str(structure_name) + " target empty")
+                        self.node_list.append(str(structure_name) + " $TARGET$ empty")
                         # exit "for j in range" loop
                         break
 
@@ -161,7 +161,7 @@ class PackageReader(FileReader):
                             else:
                                 target_element_name = target_component_name
                             # append node to node list
-                            self.node_list.append(str(structure_name) + " target " + str(target_element_name))
+                            self.node_list.append(str(structure_name) + " $TARGET$ " + str(target_element_name))
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -242,7 +242,7 @@ class PackageReader(FileReader):
                                                           target_uid,
                                                           component_name)
                             # append node to node list
-                            self.node_list.append(str(component_name) + " target " + str(target_structure_name))
+                            self.node_list.append(str(component_name) + " $TARGET$ " + str(target_structure_name))
 
                     # if line contains </COMP> that means end of targets for given component
                     if "</COMP>" in self.activity_file[j]:

@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,12 +42,12 @@ from mcg_cc_logger import Logger
 class ComponentSorter(Sorter):
 
     # This parameter defines offset, which is used to cut off first input signal node from merged node, i.e. first input
-    # signal, its two markers "*FIRST*" and "target" marker, please note that length of first input signal name must be
-    # added to the offset in order to calculate final offset used to cut desired part from merged node, an example of
+    # signal, its two markers "*FIRST*" and "$TARGET$" marker, please note that length of first input signal name must
+    # be added to the offset in order to calculate final offset used to cut desired part from merged node, an example of
     # merged node with first input signal node and without it:
-    # eng_temp1 target *FIRST* eng_temp2 *FIRST* target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
-    # eng_temp1 target SUB 4de5134b-40f6-44ae-a649-1cacb525963b target eng_temp_diff
-    FIRST_INPUT_SIGNAL_CUT_OFFSET = 23
+    # eng_tem1 $TARGET$ *FIRST* eng_tem2 *FIRST* $TARGET$ SUB 4de5134b-40f6-44ae-a649-1cacb525963b $TARGET$ eng_tem_diff
+    # eng_tem1 $TARGET$ SUB 4de5134b-40f6-44ae-a649-1cacb525963b $TARGET$ eng_tem_diff
+    FIRST_INPUT_SIGNAL_CUT_OFFSET = 25
 
     # Method:
     # sort_first_input_signals()
@@ -85,7 +85,7 @@ class ComponentSorter(Sorter):
                                                  first_input_end - 1]
 
                 # get node with first input signal, but without *FIRST* markers
-                first_input_signal_node = str(first_input_signal) + str(" target")
+                first_input_signal_node = str(first_input_signal) + str(" $TARGET$")
 
                 # cut rest of nodes from merged node, but without node which contains first input signal
                 if first_input_start == 0:

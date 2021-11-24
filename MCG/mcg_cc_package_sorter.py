@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -94,16 +94,16 @@ class PackageSorter(Sorter):
         # merge sorted node with output structure assignment
         for i in range(index, len(self.sorted_node_list)):
             # count number of keyword "target"
-            target_number = self.sorted_node_list[index].count("target")
+            target_number = self.sorted_node_list[index].count("$TARGET$")
 
             # if sorted node contains only one target and it is Output Interface structure
-            if (target_number == 1) and ("target Output Interface" in self.sorted_node_list[index]):
+            if (target_number == 1) and ("$TARGET$ Output Interface" in self.sorted_node_list[index]):
                 # copy sorted node from given index
                 sorted_node = self.sorted_node_list[index]
                 # remove sorted node from sorted node list
                 self.sorted_node_list.remove(sorted_node)
                 # find output structure position within sorted node
-                output_structure_position = sorted_node.rfind("target")
+                output_structure_position = sorted_node.rfind("$TARGET$")
                 # cut output structure name and target keyword from sorted node
                 sorted_node_cut = sorted_node[0:output_structure_position + Supporter.TARGET_OFFSET]
 
@@ -132,7 +132,7 @@ class PackageSorter(Sorter):
         for sorted_node in self.sorted_node_list:
 
             # if sorted node contains empty target
-            if "target empty" in sorted_node:
+            if "$TARGET$ empty" in sorted_node:
                 # remove sorted node from sorted node list
                 self.sorted_node_list.remove(sorted_node)
                 # append sorted node at the end of sorted node list

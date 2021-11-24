@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -81,12 +81,12 @@ class Sorter(object):
 
         # repeat for each interaction recorded on interaction list
         # sort nodes of given interaction in one place within node list
-        # first, nodes with inputs to interaction are sorted (keyword "target + interaction"),
-        # then, node with output from interaction is placed after them (keyword "interaction + target")
+        # first, nodes with inputs to interaction are sorted (keyword "$TARGET$ + interaction"),
+        # then, node with output from interaction is placed after them (keyword "interaction + $TARGET$")
         for i in range(0, len(self.interaction_list)):
             # go through all nodes for each interaction on interaction list
             for node in self.node_list:
-                keyword = "target " + str(self.interaction_list[i])
+                keyword = "$TARGET$ " + str(self.interaction_list[i])
                 # if keyword for given action is found
                 if keyword in node:
                     # remove node from current position on the list
@@ -97,7 +97,7 @@ class Sorter(object):
                     index = index + 1
             # go through all nodes for each interaction on interaction list
             for node in self.node_list:
-                keyword = str(self.interaction_list[i]) + " target"
+                keyword = str(self.interaction_list[i]) + " $TARGET$"
                 # if keyword for given action is found
                 if keyword in node:
                     # remove node from current position on the list
@@ -110,7 +110,7 @@ class Sorter(object):
         # place nodes with empty target (keyword "target empty") at the end of node list
         for i in range(index, len(self.node_list)):
             # if data does not have any target
-            if "target empty" in self.node_list[index]:
+            if "$TARGET$ empty" in self.node_list[index]:
                 # copy node from given index
                 node = self.node_list[index]
                 # remove node
@@ -146,15 +146,15 @@ class Sorter(object):
             for node in self.node_list:
                 # if given interaction found in node
                 if self.interaction_list[i] in node:
-                    keyword = "target " + str(self.interaction_list[i])
+                    keyword = "$TARGET$ " + str(self.interaction_list[i])
                     # if keyword for given interaction is found
                     if keyword in node:
                         # find target position
-                        target_position = node.find("target")
+                        target_position = node.find("$TARGET$")
                         # get data name
                         data_name = node[0:target_position - 1]
                         # get simplified node
-                        node = data_name + str(" target")
+                        node = data_name + str(" $TARGET$")
                     # append node of same interaction to temporary merged node
                     if merged_node == "":
                         merged_node = merged_node + str(node)
@@ -187,7 +187,7 @@ class Sorter(object):
         # merge nodes with empty target from node list into one node on merged node list
         merged_node = ""
         for node in self.node_list:
-            if "target empty" in node:
+            if "$TARGET$ empty" in node:
                 # append node of empty target to temporary merged node
                 if merged_node == "":
                     merged_node = merged_node + str(node)
@@ -223,7 +223,7 @@ class Sorter(object):
         for i in range(0, len(self.merged_node_list)):
             # dependency sublist
             dependency = []
-            if "target empty" not in self.merged_node_list[i]:
+            if "$TARGET$ empty" not in self.merged_node_list[i]:
                 # copy merged node from given index
                 merged_node = self.merged_node_list[i]
                 # append merged node to dependency sublist
@@ -325,7 +325,7 @@ class Sorter(object):
     @staticmethod
     def find_output_element_name(merged_node):
         # find position of output element name within merged node
-        target_last_position = merged_node.rfind("target")
+        target_last_position = merged_node.rfind("$TARGET$")
         # get name of output element from merged node
         output_element_name = merged_node[target_last_position + Supporter.TARGET_OFFSET:len(merged_node)]
 

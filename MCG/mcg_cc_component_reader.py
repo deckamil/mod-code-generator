@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -58,7 +58,7 @@ class ComponentReader(FileReader):
         # *** NEW CHECK SECTION ***
         # check if any signal on data list has more than one source
         for signal_name in self.data_list:
-            keyword = "target " + str(signal_name)
+            keyword = "$TARGET$ " + str(signal_name)
             keyword_occurrence = 0
 
             # go through all nodes for each signal
@@ -236,7 +236,7 @@ class ComponentReader(FileReader):
                     # if line contains </DEPENDENCIES> then signal does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not signal_has_targets):
                         # append node to node list
-                        self.node_list.append(str(signal_name) + " target empty")
+                        self.node_list.append(str(signal_name) + " $TARGET$ empty")
                         # exit "for j in range" loop
                         break
 
@@ -277,10 +277,10 @@ class ComponentReader(FileReader):
 
                             # append node to node list
                             if first_input_signal_needed:
-                                self.node_list.append("*FIRST* " + str(signal_name) + " *FIRST* target " +
+                                self.node_list.append("*FIRST* " + str(signal_name) + " *FIRST* $TARGET$ " +
                                                       str(target_action))
                             else:
-                                self.node_list.append(str(signal_name) + " target " + str(target_action))
+                                self.node_list.append(str(signal_name) + " $TARGET$ " + str(target_action))
 
                         # if signal is target of given signal
                         if ("<ID name=" in self.activity_file[j + 2]) and \
@@ -306,7 +306,7 @@ class ComponentReader(FileReader):
                                                           target_signal_uid,
                                                           signal_name)
                             # append node to node list
-                            self.node_list.append(str(signal_name) + " target " + str(target_signal_name))
+                            self.node_list.append(str(signal_name) + " $TARGET$ " + str(target_signal_name))
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -398,7 +398,7 @@ class ComponentReader(FileReader):
                                                           target_signal_uid,
                                                           action)
                             # append node to node list
-                            self.node_list.append(str(action) + " target " + str(target_signal_name))
+                            self.node_list.append(str(action) + " $TARGET$ " + str(target_signal_name))
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:

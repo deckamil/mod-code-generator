@@ -6,7 +6,7 @@
 #       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -36,10 +36,11 @@
 # This is base class, which provides additional methods and parameters reused by other MCG CC classes.
 class Supporter(object):
 
-    # This parameter defines offset of signal name after "target" marker in merged node, i.e. number of
-    # characters after occurrence of "target" marker, where beginning of signal name occurs, an example:
-    # eng_gain1 target eng_gain2 target ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 target eng_gain_total
-    TARGET_OFFSET = 7
+    # This parameter defines offset of signal or structure name after "$TARGET$" marker in merged node,
+    # i.e. number of characters after occurrence of "$TARGET$" marker, where beginning of signal or
+    # structure name occurs, an example:
+    # eng_gain1 $TARGET$ eng_gain2 $TARGET$ ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 $TARGET$ eng_gain_total
+    TARGET_OFFSET = 9
 
     # This parameter defines offset of signal name after "*FIRST*" marker in merged node or line of .exml file,
     # i.e. number of characters after occurrence of "*FIRST*" marker, where beginning of signal name occurs, an example:
