@@ -42,10 +42,10 @@ from mcg_cc_logger import Logger
 class ComponentSorter(Sorter):
 
     # This parameter defines offset, which is used to cut off first input signal node from merged node, i.e. first input
-    # signal, its two markers "*FIRST*" and "$TARGET$" marker, please note that length of first input signal name must
+    # signal, its two markers "$FIRST$" and "$TARGET$" marker, please note that length of first input signal name must
     # be added to the offset in order to calculate final offset used to cut desired part from merged node, an example of
     # merged node with first input signal node and without it:
-    # eng_tem1 $TARGET$ *FIRST* eng_tem2 *FIRST* $TARGET$ SUB 4de5134b-40f6-44ae-a649-1cacb525963b $TARGET$ eng_tem_diff
+    # eng_tem1 $TARGET$ $FIRST$ eng_tem2 $FIRST$ $TARGET$ SUB 4de5134b-40f6-44ae-a649-1cacb525963b $TARGET$ eng_tem_diff
     # eng_tem1 $TARGET$ SUB 4de5134b-40f6-44ae-a649-1cacb525963b $TARGET$ eng_tem_diff
     FIRST_INPUT_SIGNAL_CUT_OFFSET = 25
 
@@ -53,8 +53,8 @@ class ComponentSorter(Sorter):
     # sort_first_input_signals()
     #
     # Description:
-    # This method moves node with first input signal, recognized by *FIRST* marker, at beginning of merged
-    # node and removes *FIRST* marker from it.
+    # This method moves node with first input signal, recognized by $FIRST$ marker, at beginning of merged
+    # node and removes $FIRST$ marker from it.
     #
     # Returns:
     # This method does not return anything.
@@ -63,7 +63,7 @@ class ComponentSorter(Sorter):
         # sort first input signals
         Logger.save_in_log_file("*** sort first input signals")
 
-        # merged node list, where *FIRST* marker was removed
+        # merged node list, where $FIRST$ marker was removed
         merged_node_with_removed_first_marker_list = []
 
         # for each merged node check if it contains type of action where sorting of first input signal is required
@@ -77,14 +77,14 @@ class ComponentSorter(Sorter):
             if action_type_req_first_input_signal_found:
 
                 # find start marker of first input signal
-                first_input_start = merged_node.find("*FIRST*")
+                first_input_start = merged_node.find("$FIRST$")
                 # find end marker of first input signal
-                first_input_end = merged_node.rfind("*FIRST*")
+                first_input_end = merged_node.rfind("$FIRST$")
                 # get first input signal
                 first_input_signal = merged_node[first_input_start + Supporter.FIRST_INPUT_SIGNAL_OFFSET:
                                                  first_input_end - 1]
 
-                # get node with first input signal, but without *FIRST* markers
+                # get node with first input signal, but without $FIRST$ markers
                 first_input_signal_node = str(first_input_signal) + str(" $TARGET$")
 
                 # cut rest of nodes from merged node, but without node which contains first input signal
@@ -98,16 +98,16 @@ class ComponentSorter(Sorter):
                                                   ComponentSorter.FIRST_INPUT_SIGNAL_CUT_OFFSET:
                                                   len(merged_node)]
 
-                # merge all nodes in correct order into temporary merged node without *FIRST* marker
+                # merge all nodes in correct order into temporary merged node without $FIRST$ marker
                 merged_node_with_removed_first_marker = str(first_input_signal_node) + str(" ") + str(merged_node_cut)
 
-                # remove old merged node which contain *FIRST* markers from merged node list
+                # remove old merged node which contain $FIRST$ markers from merged node list
                 self.merged_node_list.remove(merged_node)
 
-                # append merged node without *FIRST* marker to temporary merged node list
+                # append merged node without $FIRST$ marker to temporary merged node list
                 merged_node_with_removed_first_marker_list.append(merged_node_with_removed_first_marker)
 
-        # for each merged node, where *FIRST* markers were removed
+        # for each merged node, where $FIRST$ markers were removed
         for merged_node_with_removed_first_marker in merged_node_with_removed_first_marker_list:
             # append merged node at beginning of merged node list
             self.merged_node_list = [merged_node_with_removed_first_marker] + self.merged_node_list

@@ -148,7 +148,7 @@ class ComponentReader(FileReader):
     # find_first_input_signal_name()
     #
     # Description:
-    # This function looks for first input signal, recognized by *FIRST* marker, of given target action.
+    # This function looks for first input signal, recognized by $FIRST$ marker, of given target action.
     #
     # Returns:
     # This function returns first input signal name.
@@ -168,14 +168,14 @@ class ComponentReader(FileReader):
                 for j in range(i, len(self.activity_file)):
 
                     # if given line contains details about first input signal
-                    if ("<ATT name=" in self.activity_file[j]) and ("*FIRST*" in self.activity_file[j]):
+                    if ("<ATT name=" in self.activity_file[j]) and ("$FIRST$" in self.activity_file[j]):
                         # get line
                         line = self.activity_file[j]
                         # find start marker of first input signal
-                        first_input_start = line.find("*FIRST*")
+                        first_input_start = line.find("$FIRST$")
                         # find end marker of first input signal
-                        first_input_end = line.rfind("*FIRST*")
-                        # check if *FIRST* marker is found
+                        first_input_end = line.rfind("$FIRST$")
+                        # check if $FIRST$ marker is found
                         if (first_input_start == -1) or (first_input_end == -1) or \
                                 (first_input_start == first_input_end):
                             # set empty first input signal name
@@ -271,13 +271,14 @@ class ComponentReader(FileReader):
                                                                                             target_action_uid)
 
                                 # if first input signal name is same as current signal
-                                if signal_name in first_input_signal_name:
+                                if (signal_name in first_input_signal_name) and \
+                                        (first_input_signal_name in signal_name):
                                     # first input signal is needed
                                     first_input_signal_needed = True
 
                             # append node to node list
                             if first_input_signal_needed:
-                                self.node_list.append("*FIRST* " + str(signal_name) + " *FIRST* $TARGET$ " +
+                                self.node_list.append("$FIRST$ " + str(signal_name) + " $FIRST$ $TARGET$ " +
                                                       str(target_action))
                             else:
                                 self.node_list.append(str(signal_name) + " $TARGET$ " + str(target_action))

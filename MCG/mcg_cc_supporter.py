@@ -42,9 +42,9 @@ class Supporter(object):
     # eng_gain1 $TARGET$ eng_gain2 $TARGET$ ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 $TARGET$ eng_gain_total
     TARGET_OFFSET = 9
 
-    # This parameter defines offset of signal name after "*FIRST*" marker in merged node or line of .exml file,
-    # i.e. number of characters after occurrence of "*FIRST*" marker, where beginning of signal name occurs, an example:
-    # *FIRST* some_signal *FIRST*
+    # This parameter defines offset of signal name after "$FIRST$" marker in merged node or line of .exml file,
+    # i.e. number of characters after occurrence of "$FIRST$" marker, where beginning of signal name occurs, an example:
+    # $FIRST$ some_signal $FIRST$
     FIRST_INPUT_SIGNAL_OFFSET = 8
 
     # This parameter defines offset of action uid before end of action definition, i.e. number of characters
