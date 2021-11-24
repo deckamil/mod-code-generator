@@ -128,11 +128,11 @@ class PackageSorter(Sorter):
         # append sorted node to sorted node list
         self.sorted_node_list.append(sorted_node_with_merged_output_assignment)
 
-        # place sorted nodes with empty target (keyword "target empty") at the end of sorted node list
+        # place sorted nodes with empty target (keyword "$TARGET$ $EMPTY$") at the end of sorted node list
         for sorted_node in self.sorted_node_list:
 
             # if sorted node contains empty target
-            if "$TARGET$ empty" in sorted_node:
+            if "$TARGET$ $EMPTY$" in sorted_node:
                 # remove sorted node from sorted node list
                 self.sorted_node_list.remove(sorted_node)
                 # append sorted node at the end of sorted node list

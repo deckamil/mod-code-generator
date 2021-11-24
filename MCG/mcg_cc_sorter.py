@@ -107,10 +107,10 @@ class Sorter(object):
                     # increment index to put next node right after this node
                     index = index + 1
 
-        # place nodes with empty target (keyword "target empty") at the end of node list
+        # place nodes with empty target (keyword "$TARGET$ $EMPTY$") at the end of node list
         for i in range(index, len(self.node_list)):
             # if data does not have any target
-            if "$TARGET$ empty" in self.node_list[index]:
+            if "$TARGET$ $EMPTY$" in self.node_list[index]:
                 # copy node from given index
                 node = self.node_list[index]
                 # remove node
@@ -164,7 +164,7 @@ class Sorter(object):
             # append merged node to merged node list
             self.merged_node_list.append(merged_node)
 
-        # append "data target data" nodes to merged node list
+        # append "data $TARGET$ data" nodes to merged node list
         for node in self.node_list:
 
             # interaction marker show whether interaction was found or not within node
@@ -179,15 +179,15 @@ class Sorter(object):
                     # exit loop
                     break
 
-            # if any interaction was not found within node and node does not contain "empty" keyword
-            if (not interaction_found) and ("empty" not in node):
+            # if any interaction was not found within node and node does not contain "$EMPTY$" keyword
+            if (not interaction_found) and ("$EMPTY$" not in node):
                 # append node to merged node list
                 self.merged_node_list.append(node)
 
         # merge nodes with empty target from node list into one node on merged node list
         merged_node = ""
         for node in self.node_list:
-            if "$TARGET$ empty" in node:
+            if "$TARGET$ $EMPTY$" in node:
                 # append node of empty target to temporary merged node
                 if merged_node == "":
                     merged_node = merged_node + str(node)
@@ -223,7 +223,7 @@ class Sorter(object):
         for i in range(0, len(self.merged_node_list)):
             # dependency sublist
             dependency = []
-            if "$TARGET$ empty" not in self.merged_node_list[i]:
+            if "$TARGET$ $EMPTY$" not in self.merged_node_list[i]:
                 # copy merged node from given index
                 merged_node = self.merged_node_list[i]
                 # append merged node to dependency sublist

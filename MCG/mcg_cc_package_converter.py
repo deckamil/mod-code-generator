@@ -191,7 +191,7 @@ class PackageConverter(Converter):
                     component_invocation_found = True
 
             # if component invocation has not been found and sorted node does not have empty target
-            if (not component_invocation_found) and ("$TARGET$ empty" not in sorted_node):
+            if (not component_invocation_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
                 # convert output assignment
                 self.convert_output_assignment(sorted_node)
 

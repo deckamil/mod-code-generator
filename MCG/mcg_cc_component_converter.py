@@ -163,7 +163,7 @@ class ComponentConverter(Converter):
             action_type_found = Supporter.check_if_reference_contains_action_type(sorted_node)
 
             # if sorted node does not contain any action
-            if (not action_type_found) and ("$TARGET$ empty" not in sorted_node):
+            if (not action_type_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
                 # convert signal target signal
                 self.convert_signal_assignment(sorted_node)
 

@@ -119,7 +119,7 @@ class PackageReader(FileReader):
                     # if line contains </DEPENDENCIES> then structure does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not structure_has_targets):
                         # append node to node list
-                        self.node_list.append(str(structure_name) + " $TARGET$ empty")
+                        self.node_list.append(str(structure_name) + " $TARGET$ $EMPTY$")
                         # exit "for j in range" loop
                         break
 
