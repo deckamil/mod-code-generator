@@ -32,6 +32,7 @@
 from mcg_cc_sorter import Sorter
 from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
+from mcg_cc_file_reader import FileReader
 
 
 # Class:
@@ -56,8 +57,8 @@ class PackageSorter(Sorter):
 
         # remove Input Interface elements from local data list
         for local_data in self.local_data_list:
-            # if Input Interface element in local data
-            if "Input Interface" in local_data[0]:
+            # if Input Interface element is found in local data element
+            if "Input Interface" in local_data[FileReader.INTERFACE_ELEMENT_NAME_INDEX]:
                 # remove local data element from local data list
                 self.local_data_list.remove(local_data)
                 # break for loop
@@ -65,8 +66,8 @@ class PackageSorter(Sorter):
 
         # remove Output Interface element from local data list
         for local_data in self.local_data_list:
-            # if Output Interface element in local data
-            if "Output Interface" in local_data[0]:
+            # if Output Interface element is found in local data element
+            if "Output Interface" in local_data[FileReader.INTERFACE_ELEMENT_NAME_INDEX]:
                 # remove local data element from local data list
                 self.local_data_list.remove(local_data)
                 # break for loop

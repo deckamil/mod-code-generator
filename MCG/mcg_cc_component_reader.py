@@ -99,11 +99,11 @@ class ComponentReader(FileReader):
                 # go through all input interface elements
                 for interface_element in self.input_interface_list:
 
-                    # get element_name
-                    element_name = interface_element[0]
+                    # get interface element name
+                    interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                     # if diagram signal is identified as interface element
-                    if (signal_name in element_name) and (element_name in signal_name):
+                    if (signal_name in interface_element_name) and (interface_element_name in signal_name):
                         # change signal marker
                         signal_found = True
                         # break "for interface_element in" loop
@@ -114,11 +114,11 @@ class ComponentReader(FileReader):
                 # go through all output interface elements
                 for interface_element in self.output_interface_list:
 
-                    # get element_name
-                    element_name = interface_element[0]
+                    # get interface element name
+                    interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                     # if diagram signal is identified as interface element
-                    if (signal_name in element_name) and (element_name in signal_name):
+                    if (signal_name in interface_element_name) and (interface_element_name in signal_name):
                         # change signal marker
                         signal_found = True
                         # break "for interface_element in" loop
@@ -129,11 +129,11 @@ class ComponentReader(FileReader):
                 # go through all local data interface elements
                 for interface_element in self.local_data_list:
 
-                    # get element_name
-                    element_name = interface_element[0]
+                    # get interface element name
+                    interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                     # if diagram signal is identified as interface element
-                    if (signal_name in element_name) and (element_name in signal_name):
+                    if (signal_name in interface_element_name) and (interface_element_name in signal_name):
                         # change signal marker
                         signal_found = True
                         # break "for interface_element in" loop

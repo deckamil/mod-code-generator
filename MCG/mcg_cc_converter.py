@@ -5,7 +5,7 @@
 #       for conversion of model element content into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           6 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -168,9 +168,9 @@ class Converter(object):
         # append interface details to configuration file
         for interface_signal in interface_signal_list:
             # get signal name
-            signal_name = interface_signal[0]
+            signal_name = interface_signal[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
             # get signal type
-            signal_type = interface_signal[1]
+            signal_type = interface_signal[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
             # get configuration file line
             configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
             # append configuration file line to configuration file

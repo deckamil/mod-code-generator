@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 NOV 2021
+#   DATE:           24 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -48,6 +48,14 @@ class FileReader(Reader):
     # This parameter defines index of target element name from list of target elements returned
     # by find_target_element_name() method
     TARGET_ELEMENT_NAME_INDEX = 1
+
+    # This parameter defines index of interface element name from list of interface element returned
+    # by find_interface_elements() method
+    INTERFACE_ELEMENT_NAME_INDEX = 0
+
+    # This parameter defines index of interface element type from list of interface element returned
+    # by find_interface_elements() method
+    INTERFACE_ELEMENT_TYPE_INDEX = 1
 
     # indexes of reader list
     MODEL_ELEMENT_NAME_INDEX = 0
@@ -168,26 +176,26 @@ class FileReader(Reader):
         # search for interface elements in interface file
         for i in range(0, len(interface_file)):
 
-            # if given line contains definition of element name
+            # if given line contains definition of interface element name
             if ("<ID name=" in interface_file[i]) and ("Standard.Attribute" in interface_file[i]):
                 # get line
                 line = interface_file[i]
                 # get line number
                 line_number = i + 1
-                # get element name
-                element_name = FileReader.get_name(line, line_number)
-                # append element name to interface element
-                interface_element.append(element_name)
-            # if given line contain definition of element type
+                # get interface element name
+                interface_element_name = FileReader.get_name(line, line_number)
+                # append interface element name to interface element
+                interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+            # if given line contain definition of interface element type
             if ("<ID name=" in interface_file[i]) and ("Standard.DataType" in interface_file[i]):
                 # get line
                 line = interface_file[i]
                 # get line number
                 line_number = i + 1
-                # get element type
-                element_type = FileReader.get_name(line, line_number)
-                # append element type to interface element
-                interface_element.append(element_type)
+                # get interface element type
+                interface_element_type = FileReader.get_name(line, line_number)
+                # append interface element type to interface element
+                interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
                 # append interface element to interface element list
                 interface_element_list.append(interface_element)
                 # clear interface element

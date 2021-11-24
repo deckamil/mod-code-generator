@@ -233,7 +233,7 @@ class Sorter(object):
                 # go through all local data elements for each merged node on list of merged nodes
                 for local_data in self.local_data_list:
                     # get name of local data element
-                    local_data_name = local_data[0]
+                    local_data_name = local_data[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
                     # if local data element is input to merged node
                     if (local_data_name in merged_node) and (local_data_name not in output_element_name):
                         # append name of local data element to dependency sublist

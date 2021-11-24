@@ -63,11 +63,11 @@ class PackageReader(FileReader):
             # go through all local data interface elements
             for interface_element in self.local_data_list:
 
-                # get element_name
-                element_name = interface_element[0]
+                # get interface element name
+                interface_element_name = interface_element[PackageReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                 # if diagram structure is identified as interface element
-                if (structure_name in element_name) and (element_name in structure_name):
+                if (structure_name in interface_element_name) and (interface_element_name in structure_name):
                     # change structure marker
                     structure_found = True
                     # break "for interface_element in" loop
