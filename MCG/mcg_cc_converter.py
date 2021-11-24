@@ -163,16 +163,16 @@ class Converter(object):
     #
     # Returns:
     # This method does not return anything.
-    def convert_specific_interface(self, interface_signal_list):
+    def convert_specific_interface(self, interface_element_list):
 
         # append interface details to configuration file
-        for interface_signal in interface_signal_list:
-            # get signal name
-            signal_name = interface_signal[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
-            # get signal type
-            signal_type = interface_signal[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+        for interface_element in interface_element_list:
+            # get interface element name
+            interface_element_name = interface_element[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
             # get configuration file line
-            configuration_file_line = "type " + str(signal_type) + " name " + str(signal_name)
+            configuration_file_line = "type " + str(interface_element_type) + " name " + str(interface_element_name)
             # append configuration file line to configuration file
             self.configuration_file.append(configuration_file_line)
 
