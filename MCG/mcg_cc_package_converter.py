@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           26 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -51,19 +51,23 @@ class PackageConverter(Converter):
     # This method does not return anything.
     def convert_component_invocation(self, sorted_node):
 
-        # find output structure position within sorted node
-        output_structure_position = sorted_node.rfind("$TARGET$")
-        # find output structure name within sorted node
-        output_structure_name = sorted_node[output_structure_position + Supporter.TARGET_OFFSET:len(sorted_node)]
-        # append output structure name to conversion line
-        conversion_line = str("INV ") + str(output_structure_name) + str(" = ")
-
+        # find target last position within sorted node
+        target_last_position = sorted_node.rfind("$TARGET$")
         # find component position within sorted node
-        component_position = sorted_node.rfind("$TARGET$", 0, output_structure_position)
-        # find component name within sorted node
-        component_name = sorted_node[component_position + Supporter.TARGET_OFFSET:output_structure_position - 1]
-        # append component name to conversion line
-        conversion_line = conversion_line + str(component_name) + str(" (")
+        component_position = sorted_node.rfind("$TARGET$", 0, target_last_position)
+        # find component within sorted node
+        component = sorted_node[component_position + Supporter.TARGET_OFFSET:target_last_position - 1]
+        # find component name
+        component_name = component[0:len(component) + Supporter.UID_OFFSET]
+        # find component uid
+        component_uid = component[len(component_name) + 1:len(component)]
+        # find output structure name within sorted node
+        output_structure_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
+        # append interaction comment to configuration file
+        self.configuration_file.append(str("COM Component Interaction ") + str(component_name) + str(" ") +
+                                       str(component_uid))
+        # append output structure name and component name to conversion line
+        conversion_line = str("INV ") + str(output_structure_name) + str(" = ") + str(component_name) + str(" (")
 
         # count number of keyword "$TARGET$"
         # number of "$TARGET$" occurrences is required to calculate how many input structures are

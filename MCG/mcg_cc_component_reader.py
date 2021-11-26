@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           26 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -78,7 +78,7 @@ class ComponentReader(FileReader):
         # check if any action on interaction list is not allowed
         for interaction in self.interaction_list:
             # get action type
-            action_type = interaction[0:len(interaction) + Supporter.ACTION_UID_OFFSET]
+            action_type = interaction[0:len(interaction) + Supporter.UID_OFFSET]
 
             # check if action type is allowed
             action_type_found = Supporter.check_if_reference_contains_action_type(action_type)

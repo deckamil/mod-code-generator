@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           26 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,11 +54,11 @@ class ComponentConverter(Converter):
         # find target last position within sorted node
         target_last_position = sorted_node.rfind("$TARGET$")
         # find action uid within sorted node
-        action_uid = sorted_node[target_last_position + Supporter.ACTION_UID_OFFSET:target_last_position - 1]
+        action_uid = sorted_node[target_last_position + Supporter.UID_OFFSET:target_last_position - 1]
         # find output signal name within sorted node
         output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
-        # append action uid to configuration file
-        self.configuration_file.append(str("COM Action ") + str(action_type) + str(" ") + str(action_uid))
+        # append interaction comment to configuration file
+        self.configuration_file.append(str("COM Action Interaction ") + str(action_type) + str(" ") + str(action_uid))
         # append output signal name to conversion line
         conversion_line = str("INS ") + str(output_signal_name) + str(" = ")
 

@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           26 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -157,11 +157,11 @@ class PackageReader(FileReader):
                                                           structure_name)
                             # select target element
                             if not target_component_found:
-                                target_element_name = target_structure_name
+                                target_element = target_structure_name
                             else:
-                                target_element_name = target_component_name
+                                target_element = str(target_component_name) + " " + str(target_uid)
                             # append node to node list
-                            self.node_list.append(str(structure_name) + " $TARGET$ " + str(target_element_name))
+                            self.node_list.append(str(structure_name) + " $TARGET$ " + str(target_element))
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -187,65 +187,93 @@ class PackageReader(FileReader):
         # search for components in activity file
         for i in range(0, len(self.activity_file)):
 
-            # if given line contains definition of component name
-            if ("<ID name=" in self.activity_file[i]) and ("Standard.Component" in self.activity_file[i]):
+            # if given line contains definition of node
+            if ("<ID name=" in self.activity_file[i]) and ("Standard.InstanceNode" in self.activity_file[i]) and \
+                    ("<ATTRIBUTES>" in self.activity_file[i + 1]):
+
                 # get line
                 line = self.activity_file[i]
                 # get line number
                 line_number = i + 1
-                # get component name
-                component_name = PackageReader.get_name(line, line_number)
-                # append component name to interaction list
-                self.interaction_list.append(component_name)
+                # get component uid
+                component_uid = PackageReader.get_uid(line, line_number)
 
-                # component marker shows whether component target has been found or not
-                component_has_targets = False
-
-                # search for targets
+                # search for component definition
                 for j in range(i, len(self.activity_file)):
 
-                    # if line contains <COMP that means the component has some targets
-                    if "<COMP" in self.activity_file[j]:
-                        # component has some target
-                        component_has_targets = True
+                    # if given line contains definition of component
+                    if ("<LINK relation" in self.activity_file[j]) and ("Type" in self.activity_file[j]) and \
+                            ("<ID name=" in self.activity_file[j + 1]) and \
+                            ("Standard.Component" in self.activity_file[j + 1]):
 
-                    # if line contains </DEPENDENCIES> then component does not have any target
-                    if ("</DEPENDENCIES>" in self.activity_file[j]) and (not component_has_targets):
-                        # record error
-                        ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_TARGET, component_name, "none")
-                        # exit "for j in range" loop
-                        break
+                        # get line
+                        line = self.activity_file[j + 1]
+                        # get line number
+                        line_number = j + 2
+                        # get component name
+                        component_name = PackageReader.get_name(line, line_number)
+                        # get component
+                        component = str(component_name) + " " + str(component_uid)
+                        # append component name to interaction list
+                        self.interaction_list.append(component)
 
-                    # if line contain <LINK relation="Target"> that means target for given component
-                    if ("<LINK relation=" in self.activity_file[j]) and ("Target" in self.activity_file[j]):
-                        # if line contains uid of target element
-                        if ("<ID name=" in self.activity_file[j + 2]) and \
-                                ("Standard.InstanceNode" in self.activity_file[j + 2]):
-                            # get line
-                            line = self.activity_file[j + 2]
-                            # get line number
-                            line_number = j + 3
-                            # get target structure uid
-                            target_uid = PackageReader.get_uid(line, line_number)
-                            # find target structure name
-                            target_structure_list = self.find_target_element_name(target_uid, "Standard.Attribute")
+                        # component marker shows whether component target has been found or not
+                        component_has_targets = False
 
-                            # get target structure marker
-                            target_structure_found = target_structure_list[PackageReader.TARGET_ELEMENT_FOUND_INDEX]
-                            # get target structure name
-                            target_structure_name = target_structure_list[PackageReader.TARGET_ELEMENT_NAME_INDEX]
+                        # search for targets
+                        for k in range(j, len(self.activity_file)):
 
-                            # if target structure was not found
-                            if not target_structure_found:
+                            # if line contains <COMP that means the component has some targets
+                            if "<COMP" in self.activity_file[k]:
+                                # component has some target
+                                component_has_targets = True
+
+                            # if line contains </DEPENDENCIES> then component does not have any target
+                            if ("</DEPENDENCIES>" in self.activity_file[k]) and (not component_has_targets):
                                 # record error
-                                ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_STR_UID_TARGET,
-                                                          target_uid,
-                                                          component_name)
-                            # append node to node list
-                            self.node_list.append(str(component_name) + " $TARGET$ " + str(target_structure_name))
+                                ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_TARGET, component, "none")
+                                # exit "for k in range" loop
+                                break
 
-                    # if line contains </COMP> that means end of targets for given component
-                    if "</COMP>" in self.activity_file[j]:
+                            # if line contain <LINK relation="Target"> that means target for given component
+                            if ("<LINK relation=" in self.activity_file[k]) and ("Target" in self.activity_file[k]):
+                                # if line contains uid of target element
+                                if ("<ID name=" in self.activity_file[k + 2]) and \
+                                        ("Standard.InstanceNode" in self.activity_file[k + 2]):
+                                    # get line
+                                    line = self.activity_file[k + 2]
+                                    # get line number
+                                    line_number = k + 3
+                                    # get target structure uid
+                                    target_uid = PackageReader.get_uid(line, line_number)
+                                    # find target structure name
+                                    target_structure_list = \
+                                        self.find_target_element_name(target_uid, "Standard.Attribute")
+
+                                    # get target structure marker
+                                    target_structure_found = \
+                                        target_structure_list[PackageReader.TARGET_ELEMENT_FOUND_INDEX]
+                                    # get target structure name
+                                    target_structure_name = \
+                                        target_structure_list[PackageReader.TARGET_ELEMENT_NAME_INDEX]
+
+                                    # if target structure was not found
+                                    if not target_structure_found:
+                                        # record error
+                                        ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_STR_UID_TARGET,
+                                                                  target_uid,
+                                                                  component)
+                                    # append node to node list
+                                    self.node_list.append(str(component) + " $TARGET$ " +
+                                                          str(target_structure_name))
+
+                            # if line contains </COMP> that means end of targets for given component
+                            if "</COMP>" in self.activity_file[k]:
+                                # exit "for k in range" loop
+                                break
+
+                    # if line contains <OBJECT> then stop searching as component definition should be detected earlier
+                    if "<OBJECT>" in self.activity_file[j]:
                         # exit "for j in range" loop
                         break
 

@@ -6,7 +6,7 @@
 #       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           26 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,11 +47,12 @@ class Supporter(object):
     # $FIRST$ some_signal $FIRST$
     FIRST_INPUT_SIGNAL_OFFSET = 8
 
-    # This parameter defines offset of action uid before end of action definition, i.e. number of characters
-    # before occurrence of action definition end, where beginning of action uid occurs, plus one additional
-    # character to accommodate space between action type and action uid, an example:
+    # This parameter defines offset of action or component uid before end of action or component definition,
+    # i.e. number of characters before occurrence of action or component definition end, where beginning of action
+    # or component uid occurs, plus one additional character to accommodate space between action type or component
+    # name and uid, an example:
     # ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
-    ACTION_UID_OFFSET = -37
+    UID_OFFSET = -37
 
     # This list defines all allowed types of actions, which could be used within activity diagram
     # to define signal interactions.
