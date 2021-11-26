@@ -6,7 +6,7 @@
 #       Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 NOV 2021
+#   DATE:           26 NOV 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -69,6 +69,10 @@ class ErrorHandler(object):
     INT_ERR_NO_LOC_DAT_IN_PAC = 206
     INT_ERR_SIG_NOT_IN_INT = 210
     INT_ERR_STR_NOT_IN_INT = 211
+    INT_ERR_INP_INT_SIG_IS_TAR_IN_COM = 220
+    INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM = 221
+    INT_ERR_INP_INT_STR_IS_TAR_IN_PAC = 222
+    INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC = 223
 
     # GENERAL errors
     GEN_ERR_NO_NAME_ELEMENT = 270
@@ -209,6 +213,34 @@ class ErrorHandler(object):
             # set error notification
             error = "ERROR " + str(error_code) + ": Could not find " + str(error_info1) + \
                     " structure within package interface"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Input Interface signal " + str(error_info1) + \
+                    " is connected as output (target) of " + str(error_info2) + " within component content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Output Interface signal " + str(error_info1) + \
+                    " is connected as input (source) of " + str(error_info2) + " within component content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Input Interface structure is connected as output (target) of " \
+                    + str(error_info1) + " within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as input (source) of " \
+                    + str(error_info1) + " within package content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 

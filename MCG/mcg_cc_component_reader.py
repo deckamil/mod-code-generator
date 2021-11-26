@@ -144,6 +144,34 @@ class ComponentReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_SIG_NOT_IN_INT, signal_name, "none")
 
+        # *** NEW CHECK SECTION ***
+        # check if any input interface signal is connected as output (target) of other element
+        for interface_element in self.input_interface_list:
+
+            # get interface element name
+            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # look for node instance where interface element is target
+            keyword = "$TARGET$ " + str(interface_element_name)
+
+            # go through all nodes for each interface element
+            for node in self.node_list:
+                # find keyword in node
+                keyword_position = node.find(keyword)
+                # if keyword within given node is found
+                if keyword_position != -1:
+                    # get node source
+                    node_source = node[0:keyword_position - 1]
+                    # get node target
+                    node_target = node[keyword_position:len(node)]
+
+                    # if node target is same as keyword, then it means that
+                    # input interface element is connected as target
+                    if node_target == keyword:
+                        # record error
+                        ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
+                                                  interface_element_name,
+                                                  node_source)
+
     # Function:
     # find_first_input_signal_name()
     #

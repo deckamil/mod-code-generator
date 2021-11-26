@@ -78,6 +78,27 @@ class PackageReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_STR_NOT_IN_INT, structure_name, "none")
 
+        # *** NEW CHECK SECTION ***
+        # check if input interface structure is connected as output (target) of other element
+        keyword = "$TARGET$ Input Interface"
+
+        # go through all nodes for interface element
+        for node in self.node_list:
+            # find keyword in node
+            keyword_position = node.find(keyword)
+            # if keyword within given node is found
+            if keyword_position != -1:
+                # get node source
+                node_source = node[0:keyword_position - 1]
+                # get node target
+                node_target = node[keyword_position:len(node)]
+
+                # if node target is same as keyword, then it means that
+                # input interface element is connected as target
+                if node_target == keyword:
+                    # record error
+                    ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC, node_source, "none")
+
     # Function:
     # read_data_targets()
     #
