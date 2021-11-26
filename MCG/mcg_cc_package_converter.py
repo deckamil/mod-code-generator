@@ -42,14 +42,14 @@ from mcg_cc_logger import Logger
 class PackageConverter(Converter):
 
     # Method:
-    # convert_component_invocation()
+    # convert_component_interaction()
     #
     # Description:
-    # This method is responsible for conversion of sorted node with component invocation into configuration file.
+    # This method is responsible for conversion of component interaction into configuration file.
     #
     # Returns:
     # This method does not return anything.
-    def convert_component_invocation(self, sorted_node):
+    def convert_component_interaction(self, sorted_node):
 
         # find target last position within sorted node
         target_last_position = sorted_node.rfind("$TARGET$")
@@ -66,7 +66,7 @@ class PackageConverter(Converter):
         # append interaction comment to configuration file
         self.configuration_file.append(str("COM Component Interaction ") + str(component_name) + str(" ") +
                                        str(component_uid))
-        # append output structure name and component name to conversion line
+        # append beginning of component interaction to conversion line
         conversion_line = str("INV ") + str(output_structure_name) + str(" = ") + str(component_name) + str(" (")
 
         # count number of keyword "$TARGET$"
@@ -93,22 +93,21 @@ class PackageConverter(Converter):
             # update start_index to point where to search for next input structure name within sorted node
             start_index = target_position + Supporter.TARGET_OFFSET
 
-        # close component invocation
+        # close component interaction
         conversion_line = conversion_line + str(")")
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
     # Method:
-    # convert_output_assignment()
+    # convert_structure_assignment()
     #
     # Description:
-    # This method is responsible for conversion of sorted node with output structures assignment
-    # into configuration file
+    # This method is responsible for conversion of structure assignment into configuration file.
     #
     # Returns:
     # This method does not return anything.
-    def convert_output_assignment(self, sorted_node):
+    def convert_structure_assignment(self, sorted_node):
 
         # append Output Interface structure to conversion line
         conversion_line = str("ASI Output Interface = (")
@@ -138,7 +137,7 @@ class PackageConverter(Converter):
             # update start_index to point where to search for next output structure name within sorted node
             start_index = target_position + Supporter.TARGET_OFFSET
 
-        # close output structure assignment
+        # close structure assignment
         conversion_line = conversion_line + str(")")
 
         # append conversion line to configuration file
@@ -181,23 +180,23 @@ class PackageConverter(Converter):
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
 
-            # component invocation marker shows whether component invocation was found or not
-            component_invocation_found = False
+            # component interaction marker shows whether component interaction was found or not
+            component_interaction_found = False
 
-            # if sorted node contains component invocation
+            # if sorted node contains component interaction
             for interaction in self.interaction_list:
                 keyword = "$TARGET$ " + str(interaction) + " $TARGET$"
                 # if keyword for given interaction is found
                 if keyword in sorted_node:
-                    # convert component invocation
-                    self.convert_component_invocation(sorted_node)
-                    # change component invocation marker
-                    component_invocation_found = True
+                    # convert component interaction
+                    self.convert_component_interaction(sorted_node)
+                    # change component interaction marker
+                    component_interaction_found = True
 
-            # if component invocation has not been found and sorted node does not have empty target
-            if (not component_invocation_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
-                # convert output assignment
-                self.convert_output_assignment(sorted_node)
+            # if component interaction has not been found and sorted node does not have empty target
+            if (not component_interaction_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
+                # convert structure assignment
+                self.convert_structure_assignment(sorted_node)
 
         # append end marker of function body section to configuration file
         self.configuration_file.append(str("BODY END"))

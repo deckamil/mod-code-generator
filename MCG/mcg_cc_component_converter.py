@@ -42,14 +42,14 @@ from mcg_cc_logger import Logger
 class ComponentConverter(Converter):
 
     # Method:
-    # convert_action()
+    # convert_action_interaction()
     #
     # Description:
-    # This method is responsible for conversion of sorted node with action into configuration file.
+    # This method is responsible for conversion of action interaction into configuration file.
     #
     # Returns:
     # This method does not return anything.
-    def convert_action(self, sorted_node, action_type, math_symbol):
+    def convert_action_interaction(self, sorted_node, action_type, math_symbol):
 
         # find target last position within sorted node
         target_last_position = sorted_node.rfind("$TARGET$")
@@ -59,7 +59,7 @@ class ComponentConverter(Converter):
         output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # append interaction comment to configuration file
         self.configuration_file.append(str("COM Action Interaction ") + str(action_type) + str(" ") + str(action_uid))
-        # append output signal name to conversion line
+        # append beginning of action interaction to conversion line
         conversion_line = str("INS ") + str(output_signal_name) + str(" = ")
 
         # count number of keyword "target"
@@ -93,7 +93,7 @@ class ComponentConverter(Converter):
     # convert_signal_assignment()
     #
     # Description:
-    # This method is responsible for conversion of sorted node with signal assignment into configuration file.
+    # This method is responsible for conversion of signal assignment into configuration file.
     #
     # Returns:
     # This method does not return anything.
@@ -152,19 +152,19 @@ class ComponentConverter(Converter):
             # if sorted node contains ADD action
             if " ADD " in sorted_node:
                 # convert ADD action
-                self.convert_action(sorted_node, "ADD", "+")
+                self.convert_action_interaction(sorted_node, "ADD", "+")
 
             # if sorted node contains SUB action
             if " SUB " in sorted_node:
                 # convert ADD action
-                self.convert_action(sorted_node, "SUB", "-")
+                self.convert_action_interaction(sorted_node, "SUB", "-")
 
-            # if sorted node contains signal target signal
+            # check if sorted node contains any action
             action_type_found = Supporter.check_if_reference_contains_action_type(sorted_node)
 
             # if sorted node does not contain any action
             if (not action_type_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
-                # convert signal target signal
+                # convert signal assignment
                 self.convert_signal_assignment(sorted_node)
 
         # append end marker of function body section to configuration file
