@@ -6,7 +6,7 @@
 #       Converter Component (CC).
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -43,7 +43,7 @@ class ErrorHandler(object):
     error_list = []
 
     # SIGNAL errors
-    SIG_ERR_MORE_SOURCES = 1
+    SIG_ERR_MORE_INPUTS = 1
     SIG_ERR_NO_SIG_UID_TARGET = 20
 
     # ACTION errors
@@ -54,6 +54,7 @@ class ErrorHandler(object):
     ACT_ERR_ACT_IS_TARGET = 73
 
     # STRUCTURE errors
+    STR_ERR_MORE_INPUTS = 101
     STR_ERR_NO_COM_STR_UID_TARGET = 120
 
     # COMPONENT errors
@@ -92,10 +93,10 @@ class ErrorHandler(object):
     def record_error(error_code, error_info1, error_info2):
 
         # SIGNAL errors, range 1-50
-        if error_code == ErrorHandler.SIG_ERR_MORE_SOURCES:
+        if error_code == ErrorHandler.SIG_ERR_MORE_INPUTS:
             # set error notification
             error = "ERROR " + str(error_code) + ": Signal " + str(error_info1) + \
-                    " has more than one source within component content"
+                    " has more than one input connection (source) within component content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
@@ -143,6 +144,13 @@ class ErrorHandler(object):
             ErrorHandler.error_list.append(error)
 
         # STRUCTURE errors, range 101-150
+        elif error_code == ErrorHandler.STR_ERR_MORE_INPUTS:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Structure " + str(error_info1) + \
+                    " has more than one input connection (source) within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
         elif error_code == ErrorHandler.STR_ERR_NO_COM_STR_UID_TARGET:
             # set error notification
             error = "ERROR " + str(error_code) + ": Could not find target component or structure with uid=" + \
@@ -219,27 +227,27 @@ class ErrorHandler(object):
         elif error_code == ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM:
             # set error notification
             error = "ERROR " + str(error_code) + ": Input Interface signal " + str(error_info1) + \
-                    " is connected as output (target) of " + str(error_info2) + " within component content"
+                    " is connected as output (target) from " + str(error_info2) + " within component content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM:
             # set error notification
             error = "ERROR " + str(error_code) + ": Output Interface signal " + str(error_info1) + \
-                    " is connected as input (source) of " + str(error_info2) + " within component content"
+                    " is connected as input (source) to " + str(error_info2) + " within component content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC:
             # set error notification
-            error = "ERROR " + str(error_code) + ": Input Interface structure is connected as output (target) of " \
+            error = "ERROR " + str(error_code) + ": Input Interface structure is connected as output (target) from " \
                     + str(error_info1) + " within package content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC:
             # set error notification
-            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as input (source) of " \
+            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as input (source) to " \
                     + str(error_info1) + " within package content"
             # append error to error list
             ErrorHandler.error_list.append(error)

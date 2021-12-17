@@ -6,7 +6,7 @@
 #       Converter Component (CC) classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -44,7 +44,7 @@ class Supporter(object):
 
     # This parameter defines offset of signal name after "$FIRST$" marker in merged node or line of .exml file,
     # i.e. number of characters after occurrence of "$FIRST$" marker, where beginning of signal name occurs, an example:
-    # $FIRST$ some_signal $FIRST$
+    # $FIRST$ some_signal
     FIRST_INPUT_SIGNAL_OFFSET = 8
 
     # This parameter defines offset of action or component uid before end of action or component definition,
@@ -53,60 +53,3 @@ class Supporter(object):
     # name and uid, an example:
     # ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
     UID_OFFSET = -37
-
-    # This list defines all allowed types of actions, which could be used within activity diagram
-    # to define signal interactions.
-    action_type_list = ["ADD", "SUB"]
-
-    # This list defines all types of actions, which require to distinguish in addition first input signal.
-    action_type_req_first_input_signal_list = ["SUB"]
-
-    # Method:
-    # check_if_reference_contains_action_type()
-    #
-    # Description:
-    # This method checks if reference contains any action type.
-    #
-    # Returns:
-    # This method returns action marker.
-    @staticmethod
-    def check_if_reference_contains_action_type(reference):
-        # action marker shows whether reference contains action type
-        action_type_found = False
-
-        # for all allowed type of actions
-        for action_type in Supporter.action_type_list:
-            # if action type is found within reference
-            if action_type in reference:
-                # change action marker
-                action_type_found = True
-                # exit loop
-                break
-
-        # return action marker
-        return action_type_found
-
-    # Method:
-    # check_if_reference_contains_action_type_req_first_input_signal()
-    #
-    # Description:
-    # This method checks if reference contains any action type requiring first input signal.
-    #
-    # Returns:
-    # This method returns action marker.
-    @staticmethod
-    def check_if_reference_contains_action_type_req_first_input_signal(reference):
-        # action marker shows whether reference contains action type requiring first input signal
-        action_type_req_first_input_signal_found = False
-
-        # for all allowed type of actions requiring first input signal
-        for action_type_req_first_input_signal in Supporter.action_type_req_first_input_signal_list:
-            # if action type requiring first input signal is found within reference
-            if action_type_req_first_input_signal in reference:
-                # change action marker
-                action_type_req_first_input_signal_found = True
-                # exit loop
-                break
-
-        # return action marker
-        return action_type_req_first_input_signal_found

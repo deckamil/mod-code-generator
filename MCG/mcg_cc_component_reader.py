@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,6 +42,13 @@ from mcg_cc_logger import Logger
 # This is child class responsible for reading of component .exml file content.
 class ComponentReader(FileReader):
 
+    # This list defines all allowed types of actions, which could be used within activity diagram
+    # to define signal interactions.
+    action_type_list = ["ADD", "SUB"]
+
+    # This list defines all types of actions, which require to distinguish in addition first input signal.
+    action_type_req_first_input_signal_list = ["SUB"]
+
     # Function:
     # check_correctness()
     #
@@ -55,40 +62,48 @@ class ComponentReader(FileReader):
         # check correctness
         Logger.save_in_log_file("*** check correctness")
 
-        # *** NEW CHECK SECTION ***
-        # check if any signal on data list has more than one source
+        # *******************************************************************
+        # check if any signal on data list has more than one input connection
         for signal_name in self.data_list:
+            # look for connection instance where signal name is target
             keyword = "$TARGET$ " + str(signal_name)
-            keyword_occurrence = 0
+            input_counter = 0
 
-            # go through all nodes for each signal
-            for node in self.node_list:
+            # go through all connections for each signal
+            for connection in self.connection_list:
+                # find keyword in connection
+                keyword_position = connection.find(keyword)
+                # if keyword within given connection is found
+                if keyword_position != -1:
+                    # get connection target
+                    connection_target = connection[keyword_position:len(connection)]
 
-                # if keyword within the node
-                if keyword in node:
-                    # increment keyword counter
-                    keyword_occurrence = keyword_occurrence + 1
+                    # if connection target is same as keyword, then it means that
+                    # signal has input connection (source)
+                    if connection_target == keyword:
+                        # increment input counter
+                        input_counter = input_counter + 1
 
-            # if keyword has more than one occurrence
-            if keyword_occurrence > 1:
+            # if signal has more than one input connection
+            if input_counter > 1:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_SOURCES, signal_name, "none")
+                ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_INPUTS, signal_name, "none")
 
-        # *** NEW CHECK SECTION ***
+        # ******************************************************
         # check if any action on interaction list is not allowed
         for interaction in self.interaction_list:
             # get action type
             action_type = interaction[0:len(interaction) + Supporter.UID_OFFSET]
 
             # check if action type is allowed
-            action_type_found = Supporter.check_if_reference_contains_action_type(action_type)
+            action_type_found = ComponentReader.check_if_reference_contains_action_type(action_type)
 
             # if action type is not allowed
             if not action_type_found:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
 
-        # *** NEW CHECK SECTION ***
+        # ************************************************************************
         # check if any signal used on diagram does not come from interface element
         for signal_name in self.data_list:
             # signal marker shows whether signal was found or not within interface element
@@ -103,7 +118,7 @@ class ComponentReader(FileReader):
                     interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                     # if diagram signal is identified as interface element
-                    if (signal_name in interface_element_name) and (interface_element_name in signal_name):
+                    if signal_name == interface_element_name:
                         # change signal marker
                         signal_found = True
                         # break "for interface_element in" loop
@@ -118,7 +133,7 @@ class ComponentReader(FileReader):
                     interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                     # if diagram signal is identified as interface element
-                    if (signal_name in interface_element_name) and (interface_element_name in signal_name):
+                    if signal_name == interface_element_name:
                         # change signal marker
                         signal_found = True
                         # break "for interface_element in" loop
@@ -133,7 +148,7 @@ class ComponentReader(FileReader):
                     interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
 
                     # if diagram signal is identified as interface element
-                    if (signal_name in interface_element_name) and (interface_element_name in signal_name):
+                    if signal_name == interface_element_name:
                         # change signal marker
                         signal_found = True
                         # break "for interface_element in" loop
@@ -144,33 +159,32 @@ class ComponentReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_SIG_NOT_IN_INT, signal_name, "none")
 
-        # *** NEW CHECK SECTION ***
-        # check if any input interface signal is connected as output (target) of other element
+        # *****************************************************************************
+        # check if any input interface signal is connected as output from other element
         for interface_element in self.input_interface_list:
-
             # get interface element name
             interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-            # look for node instance where interface element is target
+            # look for connection instance where interface element is target
             keyword = "$TARGET$ " + str(interface_element_name)
 
-            # go through all nodes for each interface element
-            for node in self.node_list:
-                # find keyword in node
-                keyword_position = node.find(keyword)
-                # if keyword within given node is found
+            # go through all connections for each interface element
+            for connection in self.connection_list:
+                # find keyword in connection
+                keyword_position = connection.find(keyword)
+                # if keyword within given connection is found
                 if keyword_position != -1:
-                    # get node source
-                    node_source = node[0:keyword_position - 1]
-                    # get node target
-                    node_target = node[keyword_position:len(node)]
+                    # get connection source
+                    connection_source = connection[0:keyword_position - 1]
+                    # get connection target
+                    connection_target = connection[keyword_position:len(connection)]
 
-                    # if node target is same as keyword, then it means that
-                    # input interface element is connected as target
-                    if node_target == keyword:
+                    # if connection target is same as keyword, then it means that
+                    # input interface element is connected output from other element
+                    if connection_target == keyword:
                         # record error
                         ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
                                                   interface_element_name,
-                                                  node_source)
+                                                  connection_source)
 
     # Function:
     # find_first_input_signal_name()
@@ -223,6 +237,56 @@ class ComponentReader(FileReader):
         # return first input signal name
         return first_input_signal_name
 
+    # Method:
+    # check_if_reference_contains_action_type()
+    #
+    # Description:
+    # This method checks if reference contains any action type.
+    #
+    # Returns:
+    # This method returns action marker.
+    @staticmethod
+    def check_if_reference_contains_action_type(reference):
+        # action marker shows whether reference contains action type
+        action_type_found = False
+
+        # for all allowed type of actions
+        for action_type in ComponentReader.action_type_list:
+            # if action type is found within reference
+            if action_type == reference:
+                # change action marker
+                action_type_found = True
+                # exit loop
+                break
+
+        # return action marker
+        return action_type_found
+
+    # Method:
+    # check_if_reference_contains_action_type_req_first_input_signal()
+    #
+    # Description:
+    # This method checks if reference contains any action type requiring first input signal.
+    #
+    # Returns:
+    # This method returns action marker.
+    @staticmethod
+    def check_if_reference_contains_action_type_req_first_input_signal(reference):
+        # action marker shows whether reference contains action type requiring first input signal
+        action_type_req_first_input_signal_found = False
+
+        # for all allowed type of actions requiring first input signal
+        for action_type_req_first_input_signal in ComponentReader.action_type_req_first_input_signal_list:
+            # if action type requiring first input signal is found within reference
+            if action_type_req_first_input_signal == reference:
+                # change action marker
+                action_type_req_first_input_signal_found = True
+                # exit loop
+                break
+
+        # return action marker
+        return action_type_req_first_input_signal_found
+
     # Function:
     # read_data_targets()
     #
@@ -263,8 +327,8 @@ class ComponentReader(FileReader):
 
                     # if line contains </DEPENDENCIES> then signal does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not signal_has_targets):
-                        # append node to node list
-                        self.node_list.append(str(signal_name) + " $TARGET$ $EMPTY$")
+                        # append connection to connection list
+                        self.connection_list.append(str(signal_name) + " $TARGET$ $EMPTY$")
                         # exit "for j in range" loop
                         break
 
@@ -288,7 +352,7 @@ class ComponentReader(FileReader):
                             first_input_signal_needed = False
 
                             # check if target action requires first input signal
-                            action_type_req_first_input_signal_found = Supporter. \
+                            action_type_req_first_input_signal_found = ComponentReader. \
                                 check_if_reference_contains_action_type_req_first_input_signal(target_action_type)
 
                             # if this type of action requires first input signal
@@ -299,17 +363,16 @@ class ComponentReader(FileReader):
                                                                                             target_action_uid)
 
                                 # if first input signal name is same as current signal
-                                if (signal_name in first_input_signal_name) and \
-                                        (first_input_signal_name in signal_name):
+                                if signal_name == first_input_signal_name:
                                     # first input signal is needed
                                     first_input_signal_needed = True
 
-                            # append node to node list
+                            # append connection to connection list
                             if first_input_signal_needed:
-                                self.node_list.append("$FIRST$ " + str(signal_name) + " $FIRST$ $TARGET$ " +
-                                                      str(target_action))
+                                self.connection_list.append("$FIRST$ " + str(signal_name) + " $TARGET$ " +
+                                                            str(target_action))
                             else:
-                                self.node_list.append(str(signal_name) + " $TARGET$ " + str(target_action))
+                                self.connection_list.append(str(signal_name) + " $TARGET$ " + str(target_action))
 
                         # if signal is target of given signal
                         if ("<ID name=" in self.activity_file[j + 2]) and \
@@ -334,8 +397,8 @@ class ComponentReader(FileReader):
                                 ErrorHandler.record_error(ErrorHandler.SIG_ERR_NO_SIG_UID_TARGET,
                                                           target_signal_uid,
                                                           signal_name)
-                            # append node to node list
-                            self.node_list.append(str(signal_name) + " $TARGET$ " + str(target_signal_name))
+                            # append connection to connection list
+                            self.connection_list.append(str(signal_name) + " $TARGET$ " + str(target_signal_name))
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -426,8 +489,8 @@ class ComponentReader(FileReader):
                                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_NO_SIG_UID_TARGET,
                                                           target_signal_uid,
                                                           action)
-                            # append node to node list
-                            self.node_list.append(str(action) + " $TARGET$ " + str(target_signal_name))
+                            # append connection to connection list
+                            self.connection_list.append(str(action) + " $TARGET$ " + str(target_signal_name))
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -467,9 +530,9 @@ class ComponentReader(FileReader):
 
         # display additional details after component reading
         Logger.save_in_log_file("")
-        Logger.save_in_log_file("Nodes:")
-        for node in self.node_list:
-            Logger.save_in_log_file("          " + str(node))
+        Logger.save_in_log_file("Connections:")
+        for connection in self.connection_list:
+            Logger.save_in_log_file("          " + str(connection))
         Logger.save_in_log_file("Actions:")
         for interaction in self.interaction_list:
             Logger.save_in_log_file("          " + str(interaction))
@@ -493,7 +556,7 @@ class ComponentReader(FileReader):
         component_reader_list = []
         component_reader_list.insert(ComponentReader.MODEL_ELEMENT_NAME_INDEX, self.model_element_name)
         component_reader_list.insert(ComponentReader.ACTIVITY_SOURCE_INDEX, self.activity_source)
-        component_reader_list.insert(ComponentReader.NODE_LIST_INDEX, self.node_list)
+        component_reader_list.insert(ComponentReader.CONNECTION_LIST_INDEX, self.connection_list)
         component_reader_list.insert(ComponentReader.INTERACTION_LIST_INDEX, self.interaction_list)
         component_reader_list.insert(ComponentReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
         component_reader_list.insert(ComponentReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)

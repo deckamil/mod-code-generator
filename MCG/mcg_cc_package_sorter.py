@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,9 +30,9 @@
 
 
 from mcg_cc_sorter import Sorter
-from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 from mcg_cc_file_reader import FileReader
+from mcg_cc_node import Node
 
 
 # Class:
@@ -74,72 +74,48 @@ class PackageSorter(Sorter):
                 break
 
     # Method:
-    # merge_output_assignment()
+    # replace_output_assignment()
     #
     # Description:
-    # This method merges sorted nodes with output structure assignment into one sorted node on sorted node list.
+    # This method replaces nodes, where node input is assignment to Output Interface structure, with one node.
     #
     # Returns:
     # This method does not return anything.
-    def merge_output_assignment(self):
+    def replace_output_assignment(self):
 
-        # merge output assignment
-        Logger.save_in_log_file("*** merge output assignment")
+        # replace output assignment
+        Logger.save_in_log_file("*** replace output assignment")
 
-        # sorted node, where output structure assignment is merged
-        sorted_node_with_merged_output_assignment = ""
+        # replacement of sorted nodes, with structure assignment to Output Interface
+        sorted_node_replacement = Node()
+        # set interaction in node replacement
+        sorted_node_replacement.node_interaction = str("ASSIGNMENT")
+        # set output in node replacement
+        sorted_node_replacement.node_output = str("Output Interface")
 
-        # search output structures within sorted node starting from this position
+        # set initial index
         index = 0
 
-        # merge sorted node with output structure assignment
+        # replace sorted nodes, with structure assignment to Output Interface
         for i in range(index, len(self.sorted_node_list)):
-            # count number of keyword "target"
-            target_number = self.sorted_node_list[index].count("$TARGET$")
-
-            # if sorted node contains only one target and it is Output Interface structure
-            if (target_number == 1) and ("$TARGET$ Output Interface" in self.sorted_node_list[index]):
-                # copy sorted node from given index
-                sorted_node = self.sorted_node_list[index]
+            # get sorted node
+            sorted_node = self.sorted_node_list[index]
+            # if sorted node contains ASSIGNMENT interaction and Output Interface is node output
+            if (sorted_node.node_interaction == "ASSIGNMENT") and (sorted_node.node_output == "Output Interface"):
+                # append node input to node replacement
+                sorted_node_replacement.node_input_list.append(sorted_node.node_input_list[0])
                 # remove sorted node from sorted node list
                 self.sorted_node_list.remove(sorted_node)
-                # find output structure position within sorted node
-                output_structure_position = sorted_node.rfind("$TARGET$")
-                # cut output structure name and target keyword from sorted node
-                sorted_node_cut = sorted_node[0:output_structure_position + Supporter.TARGET_OFFSET]
-
-                # append sorted node cut
-                if sorted_node_with_merged_output_assignment == "":
-                    sorted_node_with_merged_output_assignment = str(sorted_node_cut)
-                else:
-                    sorted_node_with_merged_output_assignment = sorted_node_with_merged_output_assignment + \
-                                                                str(sorted_node_cut)
-
                 # decrement index for next iteration, as one sorted node was removed
-                # therefore all next sorted nodes were pushed by one position
-                # towards beginning of list, e.g. [...,A,B,C] -> [...,B,C];
+                # therefore all next sorted nodes in sorted node list were pushed by
+                # one position towards beginning of the list, e.g. [...,A,B,C] -> [...,B,C];
                 # A was removed and now B is under previous position of A so at next
                 # iteration the same index need to be checked to examine B;
                 index = index - 1
             index = index + 1
 
-        # append Output Interface target
-        sorted_node_with_merged_output_assignment = sorted_node_with_merged_output_assignment + str("Output Interface")
-
-        # append sorted node to sorted node list
-        self.sorted_node_list.append(sorted_node_with_merged_output_assignment)
-
-        # place sorted nodes with empty target (keyword "$TARGET$ $EMPTY$") at the end of sorted node list
-        for sorted_node in self.sorted_node_list:
-
-            # if sorted node contains empty target
-            if "$TARGET$ $EMPTY$" in sorted_node:
-                # remove sorted node from sorted node list
-                self.sorted_node_list.remove(sorted_node)
-                # append sorted node at the end of sorted node list
-                self.sorted_node_list.append(sorted_node)
-                # exit "for sorted_node in" loop
-                break
+        # append node replacement to sorted node list
+        self.sorted_node_list.append(sorted_node_replacement)
 
     # Method:
     # sort_package()
@@ -154,35 +130,35 @@ class PackageSorter(Sorter):
         # package sorter
         Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
-        # sort nodes of same component in one place under node list
-        self.sort_interactions()
+        # sort connections of same component into one place on connections list
+        self.sort_connections()
 
-        # merge nodes of same component into one merged node on merged node list
-        self.merge_nodes()
+        # find nodes base on connections and interactions
+        self.find_nodes()
 
         # remove Input Interface and Output Interface elements from local data list
         self.remove_input_output_interface_element()
 
-        # count dependencies between merged nodes
-        self.count_dependencies()
+        # find dependencies between nodes
+        self.find_dependencies()
 
-        # sort merged nodes basing on their dependencies
+        # sort nodes basing on their dependencies
         self.sort_nodes()
 
-        # merge sorted nodes with output structure assignment
-        self.merge_output_assignment()
+        # replace nodes with structure assignment to Output Interface
+        self.replace_output_assignment()
 
         # process completed
         Logger.save_in_log_file("PROCESS COMPLETED")
 
         # display additional details after package sorting
         Logger.save_in_log_file("")
-        Logger.save_in_log_file("Sorted Interactions:")
+        Logger.save_in_log_file("Sorted Connections:")
         for node in self.node_list:
             Logger.save_in_log_file("          " + str(node))
-        Logger.save_in_log_file("Merged Nodes:")
-        for merged_node in self.merged_node_list:
-            Logger.save_in_log_file("          " + str(merged_node))
+        Logger.save_in_log_file("Nodes:")
+        for node in self.node_list:
+            Logger.save_in_log_file("          " + str(node))
         Logger.save_in_log_file("Sorted Nodes:")
         for sorted_node in self.sorted_node_list:
             Logger.save_in_log_file("          " + str(sorted_node))

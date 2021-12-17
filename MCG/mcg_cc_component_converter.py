@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,7 +30,6 @@
 
 
 from mcg_cc_converter import Converter
-from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 
 
@@ -49,42 +48,23 @@ class ComponentConverter(Converter):
     #
     # Returns:
     # This method does not return anything.
-    def convert_action_interaction(self, sorted_node, action_type, math_symbol):
+    def convert_action_interaction(self, sorted_node, math_symbol):
 
-        # find target last position within sorted node
-        target_last_position = sorted_node.rfind("$TARGET$")
-        # find action uid within sorted node
-        action_uid = sorted_node[target_last_position + Supporter.UID_OFFSET:target_last_position - 1]
-        # find output signal name within sorted node
-        output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
         # append interaction comment to configuration file
-        self.configuration_file.append(str("COM Action Interaction ") + str(action_type) + str(" ") + str(action_uid))
+        self.configuration_file.append(str("COM Action Interaction ") + str(sorted_node.node_interaction))
         # append beginning of action interaction to conversion line
-        conversion_line = str("INS ") + str(output_signal_name) + str(" = ")
-
-        # count number of keyword "target"
-        # number of "target" occurrences is required to calculate how many input signals are
-        # consumed by node with action, i.e. basing on the format and content of sorted node
-        # with action, the number of input signals is equal to (target_number - 1)
-        target_number = sorted_node.count("$TARGET$")
-
-        # search input signals within sorted node starting from this position
-        start_index = 0
+        conversion_line = str("INS ") + str(sorted_node.node_output) + str(" = ")
 
         # search for all input signal names within sorted node and put them into conversion line
-        for i in range(0, target_number - 1):
-            target_position = sorted_node.find("$TARGET$", start_index)
+        for i in range(0, len(sorted_node.node_input_list)):
             # find input signal name within sorted node
-            input_signal_name = sorted_node[start_index:target_position - 1]
+            node_input = sorted_node.node_input_list[i]
             # append input signal name to conversion line
-            conversion_line = conversion_line + str(input_signal_name)
+            conversion_line = conversion_line + str(node_input)
             # if sorted node processing is not completed
-            if i < target_number - 2:
+            if i < len(sorted_node.node_input_list) - 1:
                 # append math symbol to conversion line
                 conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
-
-            # update start_index to point where to search for next input signal name within sorted node
-            start_index = target_position + Supporter.TARGET_OFFSET
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
@@ -99,15 +79,13 @@ class ComponentConverter(Converter):
     # This method does not return anything.
     def convert_signal_assignment(self, sorted_node):
 
-        # find target last position within sorted node
-        target_last_position = sorted_node.rfind("$TARGET$")
         # find output signal name within sorted node
-        output_signal_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
+        node_output = sorted_node.node_output
         # find input signal name within sorted node
-        input_signal_name = sorted_node[0:target_last_position - 1]
+        node_input = sorted_node.node_input_list[0]
 
         # append input and output signal to conversion line
-        conversion_line = str("INS ") + str(output_signal_name) + str(" = ") + str(input_signal_name)
+        conversion_line = str("INS ") + str(node_output) + str(" = ") + str(node_input)
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
@@ -150,21 +128,18 @@ class ComponentConverter(Converter):
         for sorted_node in self.sorted_node_list:
 
             # if sorted node contains ADD action
-            if " ADD " in sorted_node:
+            if "ADD " in sorted_node.node_interaction:
                 # convert ADD action
-                self.convert_action_interaction(sorted_node, "ADD", "+")
+                self.convert_action_interaction(sorted_node, "+")
 
             # if sorted node contains SUB action
-            if " SUB " in sorted_node:
+            if "SUB " in sorted_node.node_interaction:
                 # convert ADD action
-                self.convert_action_interaction(sorted_node, "SUB", "-")
+                self.convert_action_interaction(sorted_node, "-")
 
-            # check if sorted node contains any action
-            action_type_found = Supporter.check_if_reference_contains_action_type(sorted_node)
-
-            # if sorted node does not contain any action
-            if (not action_type_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
-                # convert signal assignment
+            # if sorted node contains ASSIGNMENT action
+            if "ASSIGNMENT" in sorted_node.node_interaction:
+                # convert ASSIGNMENT action
                 self.convert_signal_assignment(sorted_node)
 
         # append end marker of function body section to configuration file

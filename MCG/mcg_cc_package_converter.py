@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -51,47 +51,23 @@ class PackageConverter(Converter):
     # This method does not return anything.
     def convert_component_interaction(self, sorted_node):
 
-        # find target last position within sorted node
-        target_last_position = sorted_node.rfind("$TARGET$")
-        # find component position within sorted node
-        component_position = sorted_node.rfind("$TARGET$", 0, target_last_position)
-        # find component within sorted node
-        component = sorted_node[component_position + Supporter.TARGET_OFFSET:target_last_position - 1]
         # find component name
-        component_name = component[0:len(component) + Supporter.UID_OFFSET]
-        # find component uid
-        component_uid = component[len(component_name) + 1:len(component)]
-        # find output structure name within sorted node
-        output_structure_name = sorted_node[target_last_position + Supporter.TARGET_OFFSET:len(sorted_node)]
+        component_name = sorted_node.node_interaction[0:len(sorted_node.node_interaction) + Supporter.UID_OFFSET]
         # append interaction comment to configuration file
-        self.configuration_file.append(str("COM Component Interaction ") + str(component_name) + str(" ") +
-                                       str(component_uid))
+        self.configuration_file.append(str("COM Component Interaction ") + str(sorted_node.node_interaction))
         # append beginning of component interaction to conversion line
-        conversion_line = str("INV ") + str(output_structure_name) + str(" = ") + str(component_name) + str(" (")
-
-        # count number of keyword "$TARGET$"
-        # number of "$TARGET$" occurrences is required to calculate how many input structures are
-        # consumed by node with component, i.e. basing on the format and content of sorted node
-        # with component, the number of input structures is equal to (target_number - 1)
-        target_number = sorted_node.count("$TARGET$")
-
-        # search input structures within sorted node starting from this position
-        start_index = 0
+        conversion_line = str("INV ") + str(sorted_node.node_output) + str(" = ") + str(component_name) + str(" (")
 
         # search for all input structure names within sorted node and put them into conversion line
-        for i in range(0, target_number - 1):
-            target_position = sorted_node.find("$TARGET$", start_index)
+        for i in range(0, len(sorted_node.node_input_list)):
             # find input structure name within sorted node
-            input_structure_name = sorted_node[start_index:target_position - 1]
+            node_input = sorted_node.node_input_list[i]
             # append input structure name to conversion line
-            conversion_line = conversion_line + str(input_structure_name)
+            conversion_line = conversion_line + str(node_input)
             # if sorted node processing is not completed
-            if i < target_number - 2:
-                # append comma symbol to conversion line
+            if i < len(sorted_node.node_input_list) - 1:
+                # append separator symbol to conversion line
                 conversion_line = conversion_line + str(", ")
-
-            # update start_index to point where to search for next input structure name within sorted node
-            start_index = target_position + Supporter.TARGET_OFFSET
 
         # close component interaction
         conversion_line = conversion_line + str(")")
@@ -112,30 +88,16 @@ class PackageConverter(Converter):
         # append Output Interface structure to conversion line
         conversion_line = str("ASI Output Interface = (")
 
-        # count number of keyword "$TARGET$"
-        # number of "$TARGET$" occurrences is required to calculate how many output structures are
-        # consumed by node with assignment to Output Interface, i.e. basing on the format and content
-        # of sorted node with assignment to Output Interface, the number of output structures is equal
-        # to target_number
-        target_number = sorted_node.count("$TARGET$")
-
-        # search output structures within sorted node starting from this position
-        start_index = 0
-
-        # search for all output structure names within sorted node and put them into conversion line
-        for i in range(0, target_number):
-            target_position = sorted_node.find("$TARGET$", start_index)
-            # find output structure name within sorted node
-            output_structure_name = sorted_node[start_index:target_position - 1]
-            # append output structure name to conversion line
-            conversion_line = conversion_line + str(output_structure_name)
+        # search for all input structure names within sorted node and put them into conversion line
+        for i in range(0, len(sorted_node.node_input_list)):
+            # find input structure name within sorted node
+            node_input = sorted_node.node_input_list[i]
+            # append input structure name to conversion line
+            conversion_line = conversion_line + str(node_input)
             # if sorted node processing is not completed
-            if i < target_number - 1:
-                # append pass symbol to conversion line
+            if i < len(sorted_node.node_input_list) - 1:
+                # append separator symbol to conversion line
                 conversion_line = conversion_line + str(", ")
-
-            # update start_index to point where to search for next output structure name within sorted node
-            start_index = target_position + Supporter.TARGET_OFFSET
 
         # close structure assignment
         conversion_line = conversion_line + str(")")
@@ -180,21 +142,11 @@ class PackageConverter(Converter):
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
 
-            # component interaction marker shows whether component interaction was found or not
-            component_interaction_found = False
-
-            # if sorted node contains component interaction
-            for interaction in self.interaction_list:
-                keyword = "$TARGET$ " + str(interaction) + " $TARGET$"
-                # if keyword for given interaction is found
-                if keyword in sorted_node:
-                    # convert component interaction
-                    self.convert_component_interaction(sorted_node)
-                    # change component interaction marker
-                    component_interaction_found = True
-
-            # if component interaction has not been found and sorted node does not have empty target
-            if (not component_interaction_found) and ("$TARGET$ $EMPTY$" not in sorted_node):
+            # if sorted node does not contain ASSIGNMENT interaction
+            if sorted_node.node_interaction != "ASSIGNMENT":
+                # convert component interaction
+                self.convert_component_interaction(sorted_node)
+            else:
                 # convert structure assignment
                 self.convert_structure_assignment(sorted_node)
 

@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -60,7 +60,7 @@ class FileReader(Reader):
     # indexes of reader list
     MODEL_ELEMENT_NAME_INDEX = 0
     ACTIVITY_SOURCE_INDEX = 1
-    NODE_LIST_INDEX = 2
+    CONNECTION_LIST_INDEX = 2
     INTERACTION_LIST_INDEX = 3
     INPUT_INTERFACE_LIST_INDEX = 4
     OUTPUT_INTERFACE_LIST_INDEX = 5
@@ -86,7 +86,7 @@ class FileReader(Reader):
         self.output_interface_file = file_finder_list[FileFinder.OUTPUT_INTERFACE_FILE_INDEX]
         self.local_data_source = file_finder_list[FileFinder.LOCAL_DATA_SOURCE_INDEX]
         self.local_data_file = file_finder_list[FileFinder.LOCAL_DATA_FILE_INDEX]
-        self.node_list = []
+        self.connection_list = []
         self.data_list = []
         self.interaction_list = []
         self.input_interface_list = []

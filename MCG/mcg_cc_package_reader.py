@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           26 NOV 2021
+#   DATE:           17 DEC 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,7 +54,38 @@ class PackageReader(FileReader):
         # check correctness
         Logger.save_in_log_file("*** check correctness")
 
-        # *** NEW CHECK SECTION ***
+        # **********************************************************************
+        # check if any structure on data list has more than one input connection
+        for structure_name in self.data_list:
+            # look for connection instance where structure name is target
+            keyword = "$TARGET$ " + str(structure_name)
+            input_counter = 0
+
+            # Output Interface structure is expected to have at least one input connection
+            # therefore it is excluded from this check activity
+            if structure_name != "Output Interface":
+
+                # go through all connections for each structure
+                for connection in self.connection_list:
+                    # find keyword in connection
+                    keyword_position = connection.find(keyword)
+                    # if keyword within given connection is found
+                    if keyword_position != -1:
+                        # get connection target
+                        connection_target = connection[keyword_position:len(connection)]
+
+                        # if connection target is same as keyword, then it means that
+                        # structure has input connection (source)
+                        if connection_target == keyword:
+                            # increment input counter
+                            input_counter = input_counter + 1
+
+                # if structure has more than one input connection
+                if input_counter > 1:
+                    # record error
+                    ErrorHandler.record_error(ErrorHandler.STR_ERR_MORE_INPUTS, structure_name, "none")
+
+        # ***************************************************************************
         # check if any structure used on diagram does not come from interface element
         for structure_name in self.data_list:
             # structure marker shows whether structure was found or not within interface element
@@ -78,26 +109,26 @@ class PackageReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_STR_NOT_IN_INT, structure_name, "none")
 
-        # *** NEW CHECK SECTION ***
-        # check if input interface structure is connected as output (target) of other element
+        # ****************************************************************************
+        # check if input interface structure is connected as output from other element
         keyword = "$TARGET$ Input Interface"
 
-        # go through all nodes for interface element
-        for node in self.node_list:
-            # find keyword in node
-            keyword_position = node.find(keyword)
-            # if keyword within given node is found
+        # go through all connections for interface element
+        for connection in self.connection_list:
+            # find keyword in connection
+            keyword_position = connection.find(keyword)
+            # if keyword within given connection is found
             if keyword_position != -1:
-                # get node source
-                node_source = node[0:keyword_position - 1]
-                # get node target
-                node_target = node[keyword_position:len(node)]
+                # get connection source
+                connection_source = connection[0:keyword_position - 1]
+                # get connection target
+                connection_target = connection[keyword_position:len(connection)]
 
-                # if node target is same as keyword, then it means that
-                # input interface element is connected as target
-                if node_target == keyword:
+                # if connection target is same as keyword, then it means that
+                # input interface element is connected as output from other element
+                if connection_target == keyword:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC, node_source, "none")
+                    ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC, connection_source, "none")
 
     # Function:
     # read_data_targets()
@@ -139,8 +170,8 @@ class PackageReader(FileReader):
 
                     # if line contains </DEPENDENCIES> then structure does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not structure_has_targets):
-                        # append node to node list
-                        self.node_list.append(str(structure_name) + " $TARGET$ $EMPTY$")
+                        # append connection to connection list
+                        self.connection_list.append(str(structure_name) + " $TARGET$ $EMPTY$")
                         # exit "for j in range" loop
                         break
 
@@ -181,8 +212,8 @@ class PackageReader(FileReader):
                                 target_element = target_structure_name
                             else:
                                 target_element = str(target_component_name) + " " + str(target_uid)
-                            # append node to node list
-                            self.node_list.append(str(structure_name) + " $TARGET$ " + str(target_element))
+                            # append connection to connection list
+                            self.connection_list.append(str(structure_name) + " $TARGET$ " + str(target_element))
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -208,7 +239,7 @@ class PackageReader(FileReader):
         # search for components in activity file
         for i in range(0, len(self.activity_file)):
 
-            # if given line contains definition of node
+            # if given line contains definition of connection
             if ("<ID name=" in self.activity_file[i]) and ("Standard.InstanceNode" in self.activity_file[i]) and \
                     ("<ATTRIBUTES>" in self.activity_file[i + 1]):
 
@@ -284,8 +315,8 @@ class PackageReader(FileReader):
                                         ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_STR_UID_TARGET,
                                                                   target_uid,
                                                                   component)
-                                    # append node to node list
-                                    self.node_list.append(str(component) + " $TARGET$ " +
+                                    # append connection to connection list
+                                    self.connection_list.append(str(component) + " $TARGET$ " +
                                                           str(target_structure_name))
 
                             # if line contains </COMP> that means end of targets for given component
@@ -331,9 +362,9 @@ class PackageReader(FileReader):
 
         # display additional details after package reading
         Logger.save_in_log_file("")
-        Logger.save_in_log_file("Nodes:")
-        for node in self.node_list:
-            Logger.save_in_log_file("          " + str(node))
+        Logger.save_in_log_file("Connections:")
+        for connection in self.connection_list:
+            Logger.save_in_log_file("          " + str(connection))
         Logger.save_in_log_file("Components:")
         for interaction in self.interaction_list:
             Logger.save_in_log_file("          " + str(interaction))
@@ -357,7 +388,7 @@ class PackageReader(FileReader):
         package_reader_list = []
         package_reader_list.insert(PackageReader.MODEL_ELEMENT_NAME_INDEX, self.model_element_name)
         package_reader_list.insert(PackageReader.ACTIVITY_SOURCE_INDEX, self.activity_source)
-        package_reader_list.insert(PackageReader.NODE_LIST_INDEX, self.node_list)
+        package_reader_list.insert(PackageReader.CONNECTION_LIST_INDEX, self.connection_list)
         package_reader_list.insert(PackageReader.INTERACTION_LIST_INDEX, self.interaction_list)
         package_reader_list.insert(PackageReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
         package_reader_list.insert(PackageReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
