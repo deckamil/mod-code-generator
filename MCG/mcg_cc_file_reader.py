@@ -5,8 +5,8 @@
 #       class or Reader class and is responsible for reading of .exml file
 #       content.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           17 JAN 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,7 +57,15 @@ class FileReader(Reader):
     # by find_interface_elements() method
     INTERFACE_ELEMENT_TYPE_INDEX = 1
 
-    # indexes of reader list
+    # This list defines all allowed interface signal types
+    interface_signal_type_list = ["INT8", "INT16", "INT32", "INT64",
+                                  "UINT8", "UINT16", "UINT32", "UINT64",
+                                  "FLOAT32", "FLOAT64"]
+
+    # This list defines all allowed interface structure types
+    interface_structure_type_list = ["DATA"]
+
+    # Indexes of reader list
     MODEL_ELEMENT_NAME_INDEX = 0
     ACTIVITY_SOURCE_INDEX = 1
     CONNECTION_LIST_INDEX = 2
@@ -225,3 +233,43 @@ class FileReader(Reader):
 
         # find local data interface elements
         self.local_data_list = FileReader.find_interface_elements(self.local_data_file)
+
+    # Method:
+    # check_interface_element_type()
+    #
+    # Description:
+    # This method checks if interface element has correct data type.
+    #
+    # Returns:
+    # This method returns interface marker.
+    @staticmethod
+    def check_interface_element_type(interface_element_type, interface_element):
+        # interface marker shows whether correct interface type was found or not within interface element
+        interface_type_found = False
+
+        # if signal is interface element under check
+        if interface_element == "signal":
+
+            # for all allowed interface types
+            for interface_signal_type in FileReader.interface_signal_type_list:
+                # if interface signal type is found within interface element type
+                if interface_signal_type == interface_element_type:
+                    # change interface marker
+                    interface_type_found = True
+                    # exit loop
+                    break
+
+        # else if structure is interface element under check
+        else:
+
+            # for all allowed interface types
+            for interface_structure_type in FileReader.interface_structure_type_list:
+                # if interface structure type is found within interface element type
+                if interface_structure_type == interface_element_type:
+                    # change interface marker
+                    interface_type_found = True
+                    # exit loop
+                    break
+
+        # return interface marker
+        return interface_type_found
