@@ -5,8 +5,8 @@
 #       class of FileReader class and is responsible for reading of component content,
 #       i.e. activity diagram and interface details from .exml files.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           17 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -62,6 +62,25 @@ class ComponentReader(FileReader):
         # check correctness
         Logger.save_in_log_file("*** check correctness")
 
+        # check signal-related errors
+        self.check_signal_errors()
+
+        # check action-related errors
+        self.check_action_errors()
+
+        # check interface-related errors
+        self.check_interface_errors()
+
+    # Function:
+    # check_signal_errors()
+    #
+    # Description:
+    # This function checks any signal-related errors and issues.
+    #
+    # Returns:
+    # This function does not return anything.
+    def check_signal_errors(self):
+
         # *******************************************************************
         # check if any signal on data list has more than one input connection
         for signal_name in self.data_list:
@@ -89,6 +108,16 @@ class ComponentReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_INPUTS, signal_name, "none")
 
+    # Function:
+    # check_action_errors()
+    #
+    # Description:
+    # This function checks any action-related errors and issues.
+    #
+    # Returns:
+    # This function does not return anything.
+    def check_action_errors(self):
+
         # ******************************************************
         # check if any action on interaction list is not allowed
         for interaction in self.interaction_list:
@@ -102,6 +131,16 @@ class ComponentReader(FileReader):
             if not action_type_found:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
+
+    # Function:
+    # check_interface_errors()
+    #
+    # Description:
+    # This function checks any interface-related errors and issues.
+    #
+    # Returns:
+    # This function does not return anything.
+    def check_interface_errors(self):
 
         # ************************************************************************
         # check if any signal used on diagram does not come from interface element
