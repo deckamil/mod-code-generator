@@ -5,8 +5,8 @@
 #       class of FileReader class and is responsible for reading of package content,
 #       i.e. activity diagram and interface details from .exml files.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           17 JAN 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,6 +54,22 @@ class PackageReader(FileReader):
         # check correctness
         Logger.save_in_log_file("*** check correctness")
 
+        # check structure-related errors
+        self.check_structure_errors()
+
+        # check interface-related errors
+        self.check_interface_errors()
+
+    # Function:
+    # check_structure_errors()
+    #
+    # Description:
+    # This function checks any structure-related errors and issues.
+    #
+    # Returns:
+    # This function does not return anything.
+    def check_structure_errors(self):
+
         # **********************************************************************
         # check if any structure on data list has more than one input connection
         for structure_name in self.data_list:
@@ -84,6 +100,16 @@ class PackageReader(FileReader):
                 if input_counter > 1:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.STR_ERR_MORE_INPUTS, structure_name, "none")
+
+    # Function:
+    # check_interface_errors()
+    #
+    # Description:
+    # This function checks any interface-related errors and issues.
+    #
+    # Returns:
+    # This function does not return anything.
+    def check_interface_errors(self):
 
         # ***************************************************************************
         # check if any structure used on diagram does not come from interface element
