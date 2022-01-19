@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           17 JAN 2021
+#   DATE:           19 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,12 +57,12 @@ class FileReader(Reader):
     # by find_interface_elements() method
     INTERFACE_ELEMENT_TYPE_INDEX = 1
 
-    # This list defines all allowed interface signal types
+    # This list defines all valid interface signal types
     interface_signal_type_list = ["INT8", "INT16", "INT32", "INT64",
                                   "UINT8", "UINT16", "UINT32", "UINT64",
                                   "FLOAT32", "FLOAT64"]
 
-    # This list defines all allowed interface structure types
+    # This list defines all valid interface structure types
     interface_structure_type_list = ["DATA"]
 
     # Indexes of reader list
@@ -100,6 +100,46 @@ class FileReader(Reader):
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_data_list = []
+
+    # Method:
+    # check_if_interface_element_type()
+    #
+    # Description:
+    # This method checks if reference contains valid interface element type
+    #
+    # Returns:
+    # This method returns interface marker.
+    @staticmethod
+    def check_if_interface_element_type(ref_interface_element_type, interface_element):
+        # interface element type marker shows whether valid interface element type was found or not within reference
+        interface_element_type_found = False
+
+        # if signal is interface element under check
+        if interface_element == "signal":
+
+            # for all allowed signal types
+            for interface_signal_type in FileReader.interface_signal_type_list:
+                # if interface signal type is the same as in reference
+                if interface_signal_type == ref_interface_element_type:
+                    # change interface element type marker
+                    interface_element_type_found = True
+                    # exit loop
+                    break
+
+        # else if structure is interface element under check
+        else:
+
+            # for all allowed structure types
+            for interface_structure_type in FileReader.interface_structure_type_list:
+                # if interface structure type is the same as in reference
+                if interface_structure_type == ref_interface_element_type:
+                    # change interface element type marker
+                    interface_element_type_found = True
+                    # exit loop
+                    break
+
+        # return interface element type marker
+        return interface_element_type_found
 
     # Method:
     # find_target_element_name()
@@ -233,43 +273,3 @@ class FileReader(Reader):
 
         # find local data interface elements
         self.local_data_list = FileReader.find_interface_elements(self.local_data_file)
-
-    # Method:
-    # check_interface_element_type()
-    #
-    # Description:
-    # This method checks if interface element has correct data type.
-    #
-    # Returns:
-    # This method returns interface marker.
-    @staticmethod
-    def check_interface_element_type(interface_element_type, interface_element):
-        # interface marker shows whether correct interface type was found or not within interface element
-        interface_type_found = False
-
-        # if signal is interface element under check
-        if interface_element == "signal":
-
-            # for all allowed interface types
-            for interface_signal_type in FileReader.interface_signal_type_list:
-                # if interface signal type is found within interface element type
-                if interface_signal_type == interface_element_type:
-                    # change interface marker
-                    interface_type_found = True
-                    # exit loop
-                    break
-
-        # else if structure is interface element under check
-        else:
-
-            # for all allowed interface types
-            for interface_structure_type in FileReader.interface_structure_type_list:
-                # if interface structure type is found within interface element type
-                if interface_structure_type == interface_element_type:
-                    # change interface marker
-                    interface_type_found = True
-                    # exit loop
-                    break
-
-        # return interface marker
-        return interface_type_found

@@ -5,8 +5,8 @@
 #       for error recording, which may occur during run of Mod Code Generator (MCG)
 #       Converter Component (CC).
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           19 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -70,6 +70,12 @@ class ErrorHandler(object):
     INT_ERR_NO_LOC_DAT_IN_PAC = 206
     INT_ERR_SIG_NOT_IN_INT = 210
     INT_ERR_STR_NOT_IN_INT = 211
+    INT_ERR_INC_INP_INT_TYPE_IN_COM = 212
+    INT_ERR_INC_OUT_INT_TYPE_IN_COM = 213
+    INT_ERR_INC_LOC_DAT_TYPE_IN_COM = 214
+    INT_ERR_INC_INP_INT_TYPE_IN_PAC = 215
+    INT_ERR_INC_OUT_INT_TYPE_IN_PAC = 216
+    INT_ERR_INC_LOC_DAT_TYPE_IN_PAC = 217
     INT_ERR_INP_INT_SIG_IS_TAR_IN_COM = 220
     INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM = 221
     INT_ERR_INP_INT_STR_IS_TAR_IN_PAC = 222
@@ -111,7 +117,7 @@ class ErrorHandler(object):
         elif error_code == ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED:
             # set error notification
             error = "ERROR " + str(error_code) + ": Action " + str(error_info1) + \
-                    " is not recognized as allowed one within component content"
+                    " has invalid type within component content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
@@ -224,30 +230,72 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
+        elif error_code == ErrorHandler.INT_ERR_INC_INP_INT_TYPE_IN_COM:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Input Interface signal " + str(error_info1) + \
+                    " has invalid type " + str(error_info2) + " within component content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INC_OUT_INT_TYPE_IN_COM:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Output Interface signal " + str(error_info1) + \
+                    " has invalid type " + str(error_info2) + " within component content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INC_LOC_DAT_TYPE_IN_COM:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Local Data signal " + str(error_info1) + \
+                    " has invalid type " + str(error_info2) + " within component content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INC_INP_INT_TYPE_IN_PAC:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Input Interface signal " + str(error_info1) + \
+                    " has invalid type " + str(error_info2) + " within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INC_OUT_INT_TYPE_IN_PAC:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Output Interface signal " + str(error_info1) + \
+                    " has invalid type " + str(error_info2) + " within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_INC_LOC_DAT_TYPE_IN_COM:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Local Data structure " + str(error_info1) + \
+                    " has invalid type " + str(error_info2) + " within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
         elif error_code == ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM:
             # set error notification
             error = "ERROR " + str(error_code) + ": Input Interface signal " + str(error_info1) + \
-                    " is connected as output (target) from " + str(error_info2) + " within component content"
+                    " is connected as output (target) of " + str(error_info2) + " within component content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM:
             # set error notification
             error = "ERROR " + str(error_code) + ": Output Interface signal " + str(error_info1) + \
-                    " is connected as input (source) to " + str(error_info2) + " within component content"
+                    " is connected as input (source) of " + str(error_info2) + " within component content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC:
             # set error notification
-            error = "ERROR " + str(error_code) + ": Input Interface structure is connected as output (target) from " \
+            error = "ERROR " + str(error_code) + ": Input Interface structure is connected as output (target) of " \
                     + str(error_info1) + " within package content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC:
             # set error notification
-            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as input (source) to " \
+            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as input (source) of " \
                     + str(error_info1) + " within package content"
             # append error to error list
             ErrorHandler.error_list.append(error)

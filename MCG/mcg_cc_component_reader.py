@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           17 JAN 2022
+#   DATE:           19 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,12 +42,11 @@ from mcg_cc_logger import Logger
 # This is child class responsible for reading of component .exml file content.
 class ComponentReader(FileReader):
 
-    # This list defines all allowed types of actions, which could be used within activity diagram
-    # to define signal interactions.
+    # This list defines all valid action types.
     action_type_list = ["ADD", "SUB"]
 
-    # This list defines all types of actions, which require to distinguish in addition first input signal.
-    action_type_req_first_input_signal_list = ["SUB"]
+    # This list defines all valid action types, which requires in addition first input signal marker.
+    action_type_with_first_input_signal_list = ["SUB"]
 
     # Function:
     # check_correctness()
@@ -119,15 +118,15 @@ class ComponentReader(FileReader):
     def check_action_errors(self):
 
         # ******************************************************
-        # check if any action on interaction list is not allowed
+        # check if any action type is not valid
         for interaction in self.interaction_list:
             # get action type
             action_type = interaction[0:len(interaction) + Supporter.UID_OFFSET]
 
-            # check if action type is allowed
-            action_type_found = ComponentReader.check_if_reference_contains_action_type(action_type)
+            # check if action type is valid
+            action_type_found = ComponentReader.check_if_action_type(action_type)
 
-            # if action type is not allowed
+            # if action type is not valid
             if not action_type_found:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
@@ -199,7 +198,61 @@ class ComponentReader(FileReader):
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_SIG_NOT_IN_INT, signal_name, "none")
 
         # *****************************************************************************
-        # check if any input interface signal is connected as output from other element
+        # check if any input interface signal type in not valid
+        for interface_element in self.input_interface_list:
+            # get interface element name
+            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[ComponentReader.INTERFACE_ELEMENT_TYPE_INDEX]
+
+            # check if interface element type is valid
+            interface_element_type_found = ComponentReader.check_if_interface_element_type(interface_element_type,
+                                                                                           "signal")
+
+            # if interface element type is not valid
+            if not interface_element_type_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_INP_INT_TYPE_IN_COM, interface_element_name,
+                                          interface_element_type)
+
+        # *****************************************************************************
+        # check if any output interface signal type in not valid
+        for interface_element in self.output_interface_list:
+            # get interface element name
+            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[ComponentReader.INTERFACE_ELEMENT_TYPE_INDEX]
+
+            # check if interface element type is valid
+            interface_element_type_found = ComponentReader.check_if_interface_element_type(interface_element_type,
+                                                                                           "signal")
+
+            # if interface element type is not valid
+            if not interface_element_type_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_OUT_INT_TYPE_IN_COM, interface_element_name,
+                                          interface_element_type)
+
+        # *****************************************************************************
+        # check if any local data signal type in not valid
+        for interface_element in self.local_data_list:
+            # get interface element name
+            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[ComponentReader.INTERFACE_ELEMENT_TYPE_INDEX]
+
+            # check if interface element type is valid
+            interface_element_type_found = ComponentReader.check_if_interface_element_type(interface_element_type,
+                                                                                           "signal")
+
+            # if interface element type is not valid
+            if not interface_element_type_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_LOC_DAT_TYPE_IN_COM, interface_element_name,
+                                          interface_element_type)
+
+        # *****************************************************************************
+        # check if any input interface signal is connected as output (target) of other element
         for interface_element in self.input_interface_list:
             # get interface element name
             interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
@@ -218,12 +271,63 @@ class ComponentReader(FileReader):
                     connection_target = connection[keyword_position:len(connection)]
 
                     # if connection target is same as keyword, then it means that
-                    # input interface element is connected output from other element
+                    # input interface element is connected as output (target) of another element
                     if connection_target == keyword:
                         # record error
                         ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
                                                   interface_element_name,
                                                   connection_source)
+
+    # Method:
+    # check_if_action_type()
+    #
+    # Description:
+    # This method checks if reference contains valid action type.
+    #
+    # Returns:
+    # This method returns action marker.
+    @staticmethod
+    def check_if_action_type(ref_action_type):
+        # action type marker shows whether valid acton type was found or not within reference
+        action_type_found = False
+
+        # for all allowed action types
+        for action_type in ComponentReader.action_type_list:
+            # if action type is the same as in reference
+            if action_type == ref_action_type:
+                # change action type marker
+                action_type_found = True
+                # exit loop
+                break
+
+        # return action type marker
+        return action_type_found
+
+    # Method:
+    # check_if_action_type_with_first_input_signal()
+    #
+    # Description:
+    # This method checks if reference contains valid action type, which requires in addition first input signal marker.
+    #
+    # Returns:
+    # This method returns action marker.
+    @staticmethod
+    def check_if_action_type_with_first_input_signal(ref_action_type_with_first_input_signal):
+        # action type marker shows whether valid action type, which requires in addition first input signal marker,
+        # was found or not within reference
+        action_type_with_first_input_signal_found = False
+
+        # for all allowed action types, which require in addition first input signal marker
+        for action_type_with_first_input_signal in ComponentReader.action_type_with_first_input_signal_list:
+            # if action type is the same as in reference
+            if action_type_with_first_input_signal == ref_action_type_with_first_input_signal:
+                # change action type marker
+                action_type_with_first_input_signal_found = True
+                # exit loop
+                break
+
+        # return action type marker
+        return action_type_with_first_input_signal_found
 
     # Function:
     # find_first_input_signal_name()
@@ -275,56 +379,6 @@ class ComponentReader(FileReader):
 
         # return first input signal name
         return first_input_signal_name
-
-    # Method:
-    # check_if_reference_contains_action_type()
-    #
-    # Description:
-    # This method checks if reference contains any action type.
-    #
-    # Returns:
-    # This method returns action marker.
-    @staticmethod
-    def check_if_reference_contains_action_type(reference):
-        # action marker shows whether reference contains action type
-        action_type_found = False
-
-        # for all allowed type of actions
-        for action_type in ComponentReader.action_type_list:
-            # if action type is found within reference
-            if action_type == reference:
-                # change action marker
-                action_type_found = True
-                # exit loop
-                break
-
-        # return action marker
-        return action_type_found
-
-    # Method:
-    # check_if_reference_contains_action_type_req_first_input_signal()
-    #
-    # Description:
-    # This method checks if reference contains any action type requiring first input signal.
-    #
-    # Returns:
-    # This method returns action marker.
-    @staticmethod
-    def check_if_reference_contains_action_type_req_first_input_signal(reference):
-        # action marker shows whether reference contains action type requiring first input signal
-        action_type_req_first_input_signal_found = False
-
-        # for all allowed type of actions requiring first input signal
-        for action_type_req_first_input_signal in ComponentReader.action_type_req_first_input_signal_list:
-            # if action type requiring first input signal is found within reference
-            if action_type_req_first_input_signal == reference:
-                # change action marker
-                action_type_req_first_input_signal_found = True
-                # exit loop
-                break
-
-        # return action marker
-        return action_type_req_first_input_signal_found
 
     # Function:
     # read_data_targets()
@@ -391,11 +445,11 @@ class ComponentReader(FileReader):
                             first_input_signal_needed = False
 
                             # check if target action requires first input signal
-                            action_type_req_first_input_signal_found = ComponentReader. \
-                                check_if_reference_contains_action_type_req_first_input_signal(target_action_type)
+                            action_type_with_first_input_signal_found = ComponentReader. \
+                                check_if_action_type_with_first_input_signal(target_action_type)
 
                             # if this type of action requires first input signal
-                            if action_type_req_first_input_signal_found:
+                            if action_type_with_first_input_signal_found:
 
                                 # find first input signal name in file content
                                 first_input_signal_name = self.find_first_input_signal_name(target_action,

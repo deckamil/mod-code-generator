@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           17 JAN 2021
+#   DATE:           19 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -135,8 +135,62 @@ class PackageReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_STR_NOT_IN_INT, structure_name, "none")
 
+        # *****************************************************************************
+        # check if any input interface signal type in not valid
+        for interface_element in self.input_interface_list:
+            # get interface element name
+            interface_element_name = interface_element[PackageReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[PackageReader.INTERFACE_ELEMENT_TYPE_INDEX]
+
+            # check if interface element type is valid
+            interface_element_type_found = PackageReader.check_if_interface_element_type(interface_element_type,
+                                                                                         "signal")
+
+            # if interface element type is not valid
+            if not interface_element_type_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_INP_INT_TYPE_IN_PAC, interface_element_name,
+                                          interface_element_type)
+
+        # *****************************************************************************
+        # check if any output interface signal type in not valid
+        for interface_element in self.output_interface_list:
+            # get interface element name
+            interface_element_name = interface_element[PackageReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[PackageReader.INTERFACE_ELEMENT_TYPE_INDEX]
+
+            # check if interface element type is valid
+            interface_element_type_found = PackageReader.check_if_interface_element_type(interface_element_type,
+                                                                                         "signal")
+
+            # if interface element type is not valid
+            if not interface_element_type_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_OUT_INT_TYPE_IN_PAC, interface_element_name,
+                                          interface_element_type)
+
+        # *****************************************************************************
+        # check if any local data structure type in not valid
+        for interface_element in self.local_data_list:
+            # get interface element name
+            interface_element_name = interface_element[PackageReader.INTERFACE_ELEMENT_NAME_INDEX]
+            # get interface element type
+            interface_element_type = interface_element[PackageReader.INTERFACE_ELEMENT_TYPE_INDEX]
+
+            # check if interface element type is valid
+            interface_element_type_found = PackageReader.check_if_interface_element_type(interface_element_type,
+                                                                                         "structure")
+
+            # if interface element type is not valid
+            if not interface_element_type_found:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_LOC_DAT_TYPE_IN_PAC, interface_element_name,
+                                          interface_element_type)
+
         # ****************************************************************************
-        # check if input interface structure is connected as output from other element
+        # check if input interface structure is connected as output (target) of another element
         keyword = "$TARGET$ Input Interface"
 
         # go through all connections for interface element
@@ -151,7 +205,7 @@ class PackageReader(FileReader):
                 connection_target = connection[keyword_position:len(connection)]
 
                 # if connection target is same as keyword, then it means that
-                # input interface element is connected as output from other element
+                # input interface element is connected as output (target) of another element
                 if connection_target == keyword:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC, connection_source, "none")
