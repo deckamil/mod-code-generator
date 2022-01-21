@@ -4,8 +4,8 @@
 #       This module contains definition of Sorter class, which is responsible
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,6 +32,7 @@ from mcg_cc_file_reader import FileReader
 from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 from mcg_cc_node import Node
+from mcg_cc_connection import Connection
 
 
 # Class:
@@ -82,14 +83,13 @@ class Sorter(object):
 
         # repeat for each interaction recorded on interaction list
         # sort connections of given interaction in one place within connection list
-        # first, connections with inputs to interaction are sorted (keyword "$TARGET$ + interaction"),
-        # then, connection with output from interaction is placed after them (keyword "interaction + $TARGET$")
+        # first, connections with inputs to interaction are sorted (interaction is connection target),
+        # then, connection with output from interaction is placed after them (interaction is connection source)
         for i in range(0, len(self.interaction_list)):
             # go through all connections for each interaction on interaction list
             for connection in self.connection_list:
-                keyword = "$TARGET$ " + str(self.interaction_list[i])
-                # if keyword for given action is found
-                if keyword in connection:
+                # if interaction is connection target
+                if connection.connection_target == self.interaction_list[i]:
                     # remove connection from current position on the list
                     self.connection_list.remove(connection)
                     # insert connection under new position defined by index
@@ -98,9 +98,8 @@ class Sorter(object):
                     index = index + 1
             # go through all connections for each interaction on interaction list
             for connection in self.connection_list:
-                keyword = str(self.interaction_list[i]) + " $TARGET$"
-                # if keyword for given action is found
-                if keyword in connection:
+                # if interaction is connection source
+                if connection.connection_source == self.interaction_list[i]:
                     # remove connection from current position on the list
                     self.connection_list.remove(connection)
                     # insert connection under new position defined by index
@@ -108,10 +107,10 @@ class Sorter(object):
                     # increment index to put next connection right after this connection
                     index = index + 1
 
-        # place connections with empty target (keyword "$TARGET$ $EMPTY$") at the end of connection list
+        # place connections with no target (connection target is $EMPTY$") at the end of connection list
         for i in range(index, len(self.connection_list)):
             # if data does not have any target
-            if "$TARGET$ $EMPTY$" in self.connection_list[index]:
+            if self.connection_list[index].connection_target == "$EMPTY$":
                 # copy connection from given index
                 connection = self.connection_list[index]
                 # remove connection
@@ -141,66 +140,54 @@ class Sorter(object):
 
         # find node details for each interaction
         for interaction in self.interaction_list:
-            # clean node instance
+            # new node instance
             node = Node()
             # set node interaction
             node.node_interaction = interaction
 
             # go through all connections for each interaction on interaction list
             for connection in self.connection_list:
-                # if given interaction is found in connection
-                if interaction in connection:
 
-                    # chek in connection contains interaction input
-                    keyword = "$TARGET$ " + str(interaction)
-                    # if connection contains interaction input
-                    if keyword in connection:
-                        # find target position within connection
-                        target_position = connection.find("$TARGET$")
-                        # get node input
-                        node_input = connection[0:target_position - 1]
-                        # append node input
-                        node.node_input_list.append(node_input)
+                # if interaction is connection target, then connection source is note input
+                if connection.connection_target == interaction:
+                    # get node input
+                    node_input = connection.connection_source
+                    # append node input
+                    node.node_input_list.append(node_input)
 
-                    # check if connection contains interaction output
-                    keyword = str(interaction) + " $TARGET$"
-                    # if connection contains interaction output
-                    if keyword in connection:
-                        # find target position within connection
-                        target_position = connection.find("$TARGET$")
-                        # get node output
-                        node_output = connection[target_position + Supporter.TARGET_OFFSET:len(connection)]
-                        # set node output
-                        node.node_output = node_output
+                # if interaction is connection source, then connection target is node output
+                elif connection.connection_source == interaction:
+                    # get node output
+                    node_output = connection.connection_target
+                    # set node output
+                    node.node_output = node_output
 
             # append node to node list
             self.node_list.append(node)
 
-        # find node details for connections with data assignment, i.e. without interaction and $EMPTY$ marker
+        # find node details for connections with data assignment, i.e. without interaction or $EMPTY$ marker
         for connection in self.connection_list:
 
-            # interaction marker show whether interaction was found or not within node
+            # interaction marker show whether interaction was found or not within connection
             interaction_found = False
 
-            # check if node contains interaction
+            # check if connection contains interaction
             for interaction in self.interaction_list:
-                # if interaction is found within node
-                if interaction in connection:
+                # if interaction is found within connection
+                if (connection.connection_source == interaction) or (connection.connection_target == interaction):
                     # change interaction marker
                     interaction_found = True
                     # exit loop
                     break
 
-            # if any interaction was not found within connection and connection does not contain "$EMPTY$" keyword
-            if (not interaction_found) and ("$EMPTY$" not in connection):
-                # clean node instance
+            # if any interaction was not found within connection and connection does not contain "$EMPTY$" target
+            if (not interaction_found) and (connection.connection_target != "$EMPTY$"):
+                # new node instance
                 node = Node()
-                # find target position within connection
-                target_position = connection.find("$TARGET$")
                 # get node input
-                node_input = connection[0:target_position - 1]
+                node_input = connection.connection_source
                 # get node output
-                node_output = connection[target_position + Supporter.TARGET_OFFSET:len(connection)]
+                node_output = connection.connection_target
                 # append node input
                 node.node_input_list.append(node_input)
                 # set node interaction

@@ -5,7 +5,7 @@
 #       between two model elements from activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           19 JAN 2022
+#   DATE:           21 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,13 +57,13 @@ class Connection(object):
     # Returns:
     # This method return string representation of object data.
     def __str__(self):
-        # append input marker
-        line = str("$INPUTS$: ")
+        # representation string
+        line = ""
 
-        # append connection source
+        # append source marker and data
         line = line + str("$SOURCE$: ") + str(self.connection_source) + str(" ")
 
-        # append output marker and data
+        # append target marker and data
         line = line + str("$TARGET$: ") + str(self.connection_target)
 
         # return string representation

@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           19 JAN 2022
+#   DATE:           21 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,6 +33,7 @@ from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
+from mcg_cc_connection import Connection
 
 
 # Class:
@@ -83,24 +84,16 @@ class ComponentReader(FileReader):
         # *******************************************************************
         # check if any signal on data list has more than one input connection
         for signal_name in self.data_list:
-            # look for connection instance where signal name is target
-            keyword = "$TARGET$ " + str(signal_name)
+            # input counter shows how many inputs (sources) are connected to given signal
             input_counter = 0
 
             # go through all connections for each signal
             for connection in self.connection_list:
-                # find keyword in connection
-                keyword_position = connection.find(keyword)
-                # if keyword within given connection is found
-                if keyword_position != -1:
-                    # get connection target
-                    connection_target = connection[keyword_position:len(connection)]
-
-                    # if connection target is same as keyword, then it means that
-                    # signal has input connection (source)
-                    if connection_target == keyword:
-                        # increment input counter
-                        input_counter = input_counter + 1
+                # if connection target is same as signal name, then it means that
+                # signal has input connection (source)
+                if connection.connection_target == signal_name:
+                    # increment input counter
+                    input_counter = input_counter + 1
 
             # if signal has more than one input connection
             if input_counter > 1:
@@ -256,27 +249,16 @@ class ComponentReader(FileReader):
         for interface_element in self.input_interface_list:
             # get interface element name
             interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-            # look for connection instance where interface element is target
-            keyword = "$TARGET$ " + str(interface_element_name)
 
             # go through all connections for each interface element
             for connection in self.connection_list:
-                # find keyword in connection
-                keyword_position = connection.find(keyword)
-                # if keyword within given connection is found
-                if keyword_position != -1:
-                    # get connection source
-                    connection_source = connection[0:keyword_position - 1]
-                    # get connection target
-                    connection_target = connection[keyword_position:len(connection)]
-
-                    # if connection target is same as keyword, then it means that
-                    # input interface element is connected as output (target) of another element
-                    if connection_target == keyword:
-                        # record error
-                        ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
-                                                  interface_element_name,
-                                                  connection_source)
+                # if connection target is same as interface element name, then it means that
+                # input interface element is connected as output (target) of another element
+                if connection.connection_target == interface_element_name:
+                    # record error
+                    ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
+                                              interface_element_name,
+                                              connection.connection_source)
 
     # Method:
     # check_if_action_type()
@@ -413,6 +395,9 @@ class ComponentReader(FileReader):
                 # search for targets
                 for j in range(i, len(self.activity_file)):
 
+                    # new connection instance
+                    connection = Connection()
+
                     # if line contains <COMP that means the signal has some targets
                     if "<COMP" in self.activity_file[j]:
                         # change signal marker
@@ -420,8 +405,12 @@ class ComponentReader(FileReader):
 
                     # if line contains </DEPENDENCIES> then signal does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not signal_has_targets):
+                        # set connection source
+                        connection.connection_source = signal_name
+                        # set connection $EMPTY$ target
+                        connection.connection_target = "$EMPTY$"
                         # append connection to connection list
-                        self.connection_list.append(str(signal_name) + " $TARGET$ $EMPTY$")
+                        self.connection_list.append(connection)
                         # exit "for j in range" loop
                         break
 
@@ -460,12 +449,16 @@ class ComponentReader(FileReader):
                                     # first input signal is needed
                                     first_input_signal_needed = True
 
-                            # append connection to connection list
+                            # set connection source with or without $FIRST$ input signal marker
                             if first_input_signal_needed:
-                                self.connection_list.append("$FIRST$ " + str(signal_name) + " $TARGET$ " +
-                                                            str(target_action))
+                                connection.connection_source = "$FIRST$ " + signal_name
                             else:
-                                self.connection_list.append(str(signal_name) + " $TARGET$ " + str(target_action))
+                                connection.connection_source = signal_name
+
+                            # set connection target
+                            connection.connection_target = target_action
+                            # append connection to connection list
+                            self.connection_list.append(connection)
 
                         # if signal is target of given signal
                         if ("<ID name=" in self.activity_file[j + 2]) and \
@@ -490,8 +483,13 @@ class ComponentReader(FileReader):
                                 ErrorHandler.record_error(ErrorHandler.SIG_ERR_NO_SIG_UID_TARGET,
                                                           target_signal_uid,
                                                           signal_name)
+
+                            # set connection source
+                            connection.connection_source = signal_name
+                            # set connection target
+                            connection.connection_target = target_signal_name
                             # append connection to connection list
-                            self.connection_list.append(str(signal_name) + " $TARGET$ " + str(target_signal_name))
+                            self.connection_list.append(connection)
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -539,6 +537,9 @@ class ComponentReader(FileReader):
                 # search for targets
                 for j in range(i, len(self.activity_file)):
 
+                    # new connection instance
+                    connection = Connection()
+
                     # if line contains <COMP that means the action has some targets
                     if "<COMP" in self.activity_file[j]:
                         # change action marker
@@ -582,8 +583,13 @@ class ComponentReader(FileReader):
                                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_NO_SIG_UID_TARGET,
                                                           target_signal_uid,
                                                           action)
+
+                            # set connection source
+                            connection.connection_source = action
+                            # set connection target
+                            connection.connection_target = target_signal_name
                             # append connection to connection list
-                            self.connection_list.append(str(action) + " $TARGET$ " + str(target_signal_name))
+                            self.connection_list.append(connection)
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
