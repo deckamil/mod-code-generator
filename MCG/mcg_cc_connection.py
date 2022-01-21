@@ -57,14 +57,11 @@ class Connection(object):
     # Returns:
     # This method return string representation of object data.
     def __str__(self):
-        # representation string
-        line = ""
-
         # append source marker and data
-        line = line + str("$SOURCE$: ") + str(self.connection_source) + str(" ")
+        line = "$SOURCE$: " + self.connection_source + " "
 
         # append target marker and data
-        line = line + str("$TARGET$: ") + str(self.connection_target)
+        line = line + "$TARGET$: " + self.connection_target
 
         # return string representation
         return line

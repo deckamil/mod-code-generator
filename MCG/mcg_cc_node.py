@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_node.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Node class, which allows to hold together
-#       all details of unique interactions form activity diagram, i.e. node inputs,
+#       This module contains definition of Node class, which holds together all
+#       details of model node form activity diagram, i.e. node inputs,
 #       node interaction and node output.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,7 +33,7 @@
 # Node()
 #
 # Description:
-# This is base class responsible for storing details of unique interaction from activity diagram.
+# This is base class responsible for storing details of model node from activity diagram.
 class Node(object):
 
     # Method:
@@ -60,17 +60,17 @@ class Node(object):
     # This method return string representation of object data.
     def __str__(self):
         # append input marker
-        line = str("$INPUTS$: ")
+        line = "$INPUTS$: "
 
-        # append input data to line
+        # append input data
         for node_input in self.node_input_list:
-            line = line + str(node_input) + str(" ")
+            line = line + node_input + " "
 
         # append interaction marker and data
-        line = line + str("$INTERACTION$: ") + str(self.node_interaction) + str(" ")
+        line = line + "$INTERACTION$: " + self.node_interaction + " "
 
         # append output marker and data
-        line = line + str("$OUTPUT$: ") + str(self.node_output)
+        line = line + "$OUTPUT$: " + self.node_output
 
         # return string representation
         return line
