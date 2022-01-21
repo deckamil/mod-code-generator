@@ -5,8 +5,8 @@
 #       class of Sorter class and is responsible for sorting of package content,
 #       i.e. nodes of activity diagram.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -154,8 +154,8 @@ class PackageSorter(Sorter):
         # display additional details after package sorting
         Logger.save_in_log_file("")
         Logger.save_in_log_file("Sorted Connections:")
-        for node in self.node_list:
-            Logger.save_in_log_file("          " + str(node))
+        for connection in self.connection_list:
+            Logger.save_in_log_file("          " + str(connection))
         Logger.save_in_log_file("Nodes:")
         for node in self.node_list:
             Logger.save_in_log_file("          " + str(node))

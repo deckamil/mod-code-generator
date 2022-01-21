@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           19 JAN 2022
+#   DATE:           21 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,6 +32,7 @@
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
+from mcg_cc_connection import Connection
 
 
 # Class:
@@ -73,8 +74,7 @@ class PackageReader(FileReader):
         # **********************************************************************
         # check if any structure on data list has more than one input connection
         for structure_name in self.data_list:
-            # look for connection instance where structure name is target
-            keyword = "$TARGET$ " + str(structure_name)
+            # input counter shows how many inputs (sources) are connected to given structure
             input_counter = 0
 
             # Output Interface structure is expected to have at least one input connection
@@ -83,18 +83,11 @@ class PackageReader(FileReader):
 
                 # go through all connections for each structure
                 for connection in self.connection_list:
-                    # find keyword in connection
-                    keyword_position = connection.find(keyword)
-                    # if keyword within given connection is found
-                    if keyword_position != -1:
-                        # get connection target
-                        connection_target = connection[keyword_position:len(connection)]
-
-                        # if connection target is same as keyword, then it means that
-                        # structure has input connection (source)
-                        if connection_target == keyword:
-                            # increment input counter
-                            input_counter = input_counter + 1
+                    # if connection target is same as structure name, then it means that
+                    # structure has input connection (source)
+                    if connection.connection_target == structure_name:
+                        # increment input counter
+                        input_counter = input_counter + 1
 
                 # if structure has more than one input connection
                 if input_counter > 1:
@@ -191,24 +184,14 @@ class PackageReader(FileReader):
 
         # ****************************************************************************
         # check if input interface structure is connected as output (target) of another element
-        keyword = "$TARGET$ Input Interface"
-
-        # go through all connections for interface element
         for connection in self.connection_list:
-            # find keyword in connection
-            keyword_position = connection.find(keyword)
-            # if keyword within given connection is found
-            if keyword_position != -1:
-                # get connection source
-                connection_source = connection[0:keyword_position - 1]
-                # get connection target
-                connection_target = connection[keyword_position:len(connection)]
-
-                # if connection target is same as keyword, then it means that
-                # input interface element is connected as output (target) of another element
-                if connection_target == keyword:
-                    # record error
-                    ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC, connection_source, "none")
+            # if connection target is same as interface element name, then it means that
+            # input interface element is connected as output (target) of another element
+            if connection.connection_target == "Input Interface":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC,
+                                          connection.connection_source,
+                                          "none")
 
     # Function:
     # read_data_targets()
@@ -243,6 +226,9 @@ class PackageReader(FileReader):
                 # search for targets
                 for j in range(i, len(self.activity_file)):
 
+                    # new connection instance
+                    connection = Connection()
+
                     # if line contains <COMP that means the structure has some targets
                     if "<COMP" in self.activity_file[j]:
                         # change structure marker
@@ -250,8 +236,12 @@ class PackageReader(FileReader):
 
                     # if line contains </DEPENDENCIES> then structure does not have any target
                     if ("</DEPENDENCIES>" in self.activity_file[j]) and (not structure_has_targets):
+                        # set connection source
+                        connection.connection_source = structure_name
+                        # set connection $EMPTY$ target
+                        connection.connection_target = "$EMPTY$"
                         # append connection to connection list
-                        self.connection_list.append(str(structure_name) + " $TARGET$ $EMPTY$")
+                        self.connection_list.append(connection)
                         # exit "for j in range" loop
                         break
 
@@ -292,8 +282,13 @@ class PackageReader(FileReader):
                                 target_element = target_structure_name
                             else:
                                 target_element = str(target_component_name) + " " + str(target_uid)
+
+                            # set connection source
+                            connection.connection_source = structure_name
+                            # set connection target
+                            connection.connection_target = target_element
                             # append connection to connection list
-                            self.connection_list.append(str(structure_name) + " $TARGET$ " + str(target_element))
+                            self.connection_list.append(connection)
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -319,7 +314,7 @@ class PackageReader(FileReader):
         # search for components in activity file
         for i in range(0, len(self.activity_file)):
 
-            # if given line contains definition of connection
+            # if given line contains definition of model object
             if ("<ID name=" in self.activity_file[i]) and ("Standard.InstanceNode" in self.activity_file[i]) and \
                     ("<ATTRIBUTES>" in self.activity_file[i + 1]):
 
@@ -327,8 +322,8 @@ class PackageReader(FileReader):
                 line = self.activity_file[i]
                 # get line number
                 line_number = i + 1
-                # get component uid
-                component_uid = PackageReader.get_uid(line, line_number)
+                # get object uid
+                object_uid = PackageReader.get_uid(line, line_number)
 
                 # search for component definition
                 for j in range(i, len(self.activity_file)):
@@ -344,6 +339,8 @@ class PackageReader(FileReader):
                         line_number = j + 2
                         # get component name
                         component_name = PackageReader.get_name(line, line_number)
+                        # get component uid
+                        component_uid = object_uid
                         # get component
                         component = str(component_name) + " " + str(component_uid)
                         # append component name to interaction list
@@ -354,6 +351,9 @@ class PackageReader(FileReader):
 
                         # search for targets
                         for k in range(j, len(self.activity_file)):
+
+                            # new connection instance
+                            connection = Connection()
 
                             # if line contains <COMP that means the component has some targets
                             if "<COMP" in self.activity_file[k]:
@@ -395,9 +395,13 @@ class PackageReader(FileReader):
                                         ErrorHandler.record_error(ErrorHandler.COM_ERR_NO_STR_UID_TARGET,
                                                                   target_uid,
                                                                   component)
+
+                                    # set connection source
+                                    connection.connection_source = component
+                                    # set connection target
+                                    connection.connection_target = target_structure_name
                                     # append connection to connection list
-                                    self.connection_list.append(str(component) + " $TARGET$ " +
-                                                          str(target_structure_name))
+                                    self.connection_list.append(connection)
 
                             # if line contains </COMP> that means end of targets for given component
                             if "</COMP>" in self.activity_file[k]:

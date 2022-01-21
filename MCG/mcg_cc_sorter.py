@@ -29,10 +29,8 @@
 
 
 from mcg_cc_file_reader import FileReader
-from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 from mcg_cc_node import Node
-from mcg_cc_connection import Connection
 
 
 # Class:
