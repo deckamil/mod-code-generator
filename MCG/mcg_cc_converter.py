@@ -4,8 +4,8 @@
 #       This module contains definition of Converter class, which is responsible
 #       for conversion of model element content into configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           24 NOV 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           26 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,6 +30,7 @@
 
 import datetime
 from mcg_cc_file_reader import FileReader
+from mcg_cc_file_finder import FileFinder
 from mcg_cc_sorter import Sorter
 from mcg_cc_logger import Logger
 
@@ -53,11 +54,11 @@ class Converter(object):
     #
     # Returns:
     # This method does not return anything.
-    def __init__(self, reader_list, sorter_list):
+    def __init__(self, file_finder_list, reader_list, sorter_list):
 
         # initialize object data
-        self.model_element_name = reader_list[FileReader.MODEL_ELEMENT_NAME_INDEX]
-        self.activity_source = reader_list[FileReader.ACTIVITY_SOURCE_INDEX]
+        self.model_element_name = file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX]
+        self.activity_source = file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX]
         self.input_interface_list = reader_list[FileReader.INPUT_INTERFACE_LIST_INDEX]
         self.output_interface_list = reader_list[FileReader.OUTPUT_INTERFACE_LIST_INDEX]
         self.local_data_list = reader_list[FileReader.LOCAL_DATA_LIST_INDEX]

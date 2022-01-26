@@ -670,8 +670,6 @@ class ComponentReader(FileReader):
 
         # append collected data to component reader list
         component_reader_list = []
-        component_reader_list.insert(ComponentReader.MODEL_ELEMENT_NAME_INDEX, self.model_element_name)
-        component_reader_list.insert(ComponentReader.ACTIVITY_SOURCE_INDEX, self.activity_source)
         component_reader_list.insert(ComponentReader.CONNECTION_LIST_INDEX, self.connection_list)
         component_reader_list.insert(ComponentReader.INTERACTION_LIST_INDEX, self.interaction_list)
         component_reader_list.insert(ComponentReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)

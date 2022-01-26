@@ -481,8 +481,6 @@ class PackageReader(FileReader):
 
         # append collected data to package reader list
         package_reader_list = []
-        package_reader_list.insert(PackageReader.MODEL_ELEMENT_NAME_INDEX, self.model_element_name)
-        package_reader_list.insert(PackageReader.ACTIVITY_SOURCE_INDEX, self.activity_source)
         package_reader_list.insert(PackageReader.CONNECTION_LIST_INDEX, self.connection_list)
         package_reader_list.insert(PackageReader.INTERACTION_LIST_INDEX, self.interaction_list)
         package_reader_list.insert(PackageReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)

@@ -6,7 +6,7 @@
 #       content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           19 JAN 2022
+#   DATE:           26 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -66,13 +66,11 @@ class FileReader(Reader):
     interface_structure_type_list = ["DATA"]
 
     # Indexes of reader list
-    MODEL_ELEMENT_NAME_INDEX = 0
-    ACTIVITY_SOURCE_INDEX = 1
-    CONNECTION_LIST_INDEX = 2
-    INTERACTION_LIST_INDEX = 3
-    INPUT_INTERFACE_LIST_INDEX = 4
-    OUTPUT_INTERFACE_LIST_INDEX = 5
-    LOCAL_DATA_LIST_INDEX = 6
+    CONNECTION_LIST_INDEX = 0
+    INTERACTION_LIST_INDEX = 1
+    INPUT_INTERFACE_LIST_INDEX = 2
+    OUTPUT_INTERFACE_LIST_INDEX = 3
+    LOCAL_DATA_LIST_INDEX = 4
 
     # Method:
     # __init__()
@@ -85,14 +83,9 @@ class FileReader(Reader):
     def __init__(self, file_finder_list):
 
         # initialize object data
-        self.model_element_name = file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX]
-        self.activity_source = file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX]
         self.activity_file = file_finder_list[FileFinder.ACTIVITY_FILE_INDEX]
-        self.input_interface_source = file_finder_list[FileFinder.INPUT_INTERFACE_SOURCE_INDEX]
         self.input_interface_file = file_finder_list[FileFinder.INPUT_INTERFACE_FILE_INDEX]
-        self.output_interface_source = file_finder_list[FileFinder.OUTPUT_INTERFACE_SOURCE_INDEX]
         self.output_interface_file = file_finder_list[FileFinder.OUTPUT_INTERFACE_FILE_INDEX]
-        self.local_data_source = file_finder_list[FileFinder.LOCAL_DATA_SOURCE_INDEX]
         self.local_data_file = file_finder_list[FileFinder.LOCAL_DATA_FILE_INDEX]
         self.connection_list = []
         self.data_list = []

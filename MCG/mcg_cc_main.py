@@ -7,8 +7,8 @@
 #       file. The configuration file will be used by Mod Code Generator (MCG) Code
 #       Generator Component (CGC) to generate C code from the model.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           20 NOV 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           26 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -75,7 +75,7 @@ class Main(object):
         # display short notice
         print()
         print("Mod Code Generator (MCG)")
-        print("Copyright (C) 2021 Kamil Deć github.com/deckamil")
+        print("Copyright (C) 2021-2022 Kamil Deć github.com/deckamil")
         print("This is Converter Component (CC) of Mod Code Generator (MCG)")
         print()
         print("License GPLv3+: GNU GPL version 3 or later.")
@@ -193,7 +193,7 @@ class Main(object):
                                           "Standard.Component")
 
                 # initialize component converter
-                component_converter = ComponentConverter(component_reader_list, component_sorter_list)
+                component_converter = ComponentConverter(file_finder_list, component_reader_list, component_sorter_list)
                 # convert component content
                 component_converter.convert_component()
 
@@ -252,7 +252,7 @@ class Main(object):
                                           "Standard.Package")
 
                 # initialize package converter
-                package_converter = PackageConverter(package_reader_list, package_sorter_list)
+                package_converter = PackageConverter(file_finder_list, package_reader_list, package_sorter_list)
                 # convert package content
                 package_converter.convert_package()
 
