@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2022
+#   DATE:           26 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -259,6 +259,23 @@ class ComponentReader(FileReader):
                     ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
                                               interface_element_name,
                                               connection.connection_source)
+
+        # *****************************************************************************
+        # check if any output interface signal is connected as input (source) of other element
+        for interface_element in self.output_interface_list:
+            # get interface element name
+            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
+
+            # go through all connections for each interface element
+            for connection in self.connection_list:
+                # if connection source is same as interface element name, then it means that
+                # output interface element is connected as input (source) of another element
+                if (connection.connection_source == interface_element_name) and \
+                        (connection.connection_target != "$EMPTY$"):
+                    # record error
+                    ErrorHandler.record_error(ErrorHandler.INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM,
+                                              interface_element_name,
+                                              connection.connection_target)
 
     # Method:
     # check_if_action_type()

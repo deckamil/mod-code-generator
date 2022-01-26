@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2022
+#   DATE:           26 JAN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -191,6 +191,17 @@ class PackageReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_STR_IS_TAR_IN_PAC,
                                           connection.connection_source,
+                                          "none")
+
+        # ****************************************************************************
+        # check if output interface structure is connected as input (source) of another element
+        for connection in self.connection_list:
+            # if connection source is same as interface element name, then it means that
+            # output interface element is connected as input (source) of another element
+            if (connection.connection_source == "Output Interface") and (connection.connection_target != "$EMPTY$"):
+                # record error
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC,
+                                          connection.connection_target,
                                           "none")
 
     # Function:
