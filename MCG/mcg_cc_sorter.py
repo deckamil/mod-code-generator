@@ -5,7 +5,7 @@
 #       for sorting of model element content, i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2021
+#   DATE:           26 JAN 2021
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,8 +54,6 @@ class Sorter(object):
     def __init__(self, reader_list):
 
         # initialize object data
-        self.model_element_name = reader_list[FileReader.MODEL_ELEMENT_NAME_INDEX]
-        self.activity_source = reader_list[FileReader.ACTIVITY_SOURCE_INDEX]
         self.connection_list = reader_list[FileReader.CONNECTION_LIST_INDEX]
         self.interaction_list = reader_list[FileReader.INTERACTION_LIST_INDEX]
         self.local_data_list = reader_list[FileReader.LOCAL_DATA_LIST_INDEX]
