@@ -6,7 +6,7 @@
 #       i.e. nodes of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2021
+#   DATE:           20 FEB 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).

@@ -5,8 +5,8 @@
 #       class of Sorter class and is responsible for sorting of component content,
 #       i.e. nodes of activity diagram.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           20 FEB 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).

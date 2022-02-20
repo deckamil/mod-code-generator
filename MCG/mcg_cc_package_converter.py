@@ -5,8 +5,8 @@
 #       class of Converter class and is responsible for conversion of package content
 #       into configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           20 FEB 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
