@@ -6,7 +6,7 @@
 #       i.e. activity diagram and interface details from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           20 FEB 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -44,10 +44,10 @@ from mcg_cc_connection import Connection
 class ComponentReader(FileReader):
 
     # This list defines all valid action types.
-    action_type_list = ["ADD", "SUB"]
+    action_type_list = ["ADD", "SUB", "MUL", "DIV"]
 
     # This list defines all valid action types, which requires in addition first input signal marker.
-    action_type_with_first_input_signal_list = ["SUB"]
+    action_type_with_first_input_signal_list = ["SUB", "DIV"]
 
     # Function:
     # check_correctness()

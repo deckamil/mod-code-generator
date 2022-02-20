@@ -5,8 +5,8 @@
 #       class of Converter class and is responsible for conversion of component content
 #       into configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           20 FEB 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -134,8 +134,18 @@ class ComponentConverter(Converter):
 
             # if sorted node contains SUB action
             if "SUB " in sorted_node.node_interaction:
-                # convert ADD action
+                # convert SUB action
                 self.convert_action_interaction(sorted_node, "-")
+
+            # if sorted node contains MUL action
+            if "MUL " in sorted_node.node_interaction:
+                # convert MUL action
+                self.convert_action_interaction(sorted_node, "*")
+
+            # if sorted node contains DIV action
+            if "DIV " in sorted_node.node_interaction:
+                # convert DIV action
+                self.convert_action_interaction(sorted_node, "/")
 
             # if sorted node contains ASSIGNMENT action
             if "ASSIGNMENT" in sorted_node.node_interaction:
