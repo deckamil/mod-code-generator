@@ -1,1 +1,28 @@
-Mod Code Generator Repository
+*** Introduction ***
+
+This repository contains the Mod Code Generator (MCG) program, which is code
+generator tool that allows for C code generation from the Modelio environment.
+
+The MCG program consists of two main components:
+    - the Converter Component, which is responsible for conversion of a model
+      created within the Modelio environment into configuration file,
+    - the Code Generator Component, which is responsible for code generation
+      from the configuration file.
+
+
+*** Prerequisites ***
+
+To take advantage of the full capabilities of the MCG program, please obtain:
+    - Modelio v4.1.00
+    - Python v3.9.6
+
+The required Modelio and Python releases can be found at:
+
+<https://www.modelio.org/>
+<https://www.python.org/>
+
+
+*** Build, Usage and Licensing ***
+
+All further details related with the MCG program can be found in the Mod Code
+Generator Manual document under this repository.
