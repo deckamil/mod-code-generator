@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           9 MAR 2022
+#   DATE:           11 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,6 +32,7 @@
 from sys import argv
 from mcg_cgc_logger import Logger
 # from mcg_cgc_error_handler import ErrorHandler
+from mcg_cgc_config_checker import ConfigChecker
 
 
 # Class:
@@ -77,10 +78,12 @@ class Main(object):
         if len(argv) - 1 == Main.NUMBER_OF_MCG_CGC_CMD_LINE_ARGS:
 
             # get configuration file path from cmd line argument
-            model_dir_path = str(argv[Main.CONFIG_FILE_PATH_INDEX])
+            config_file_path = str(argv[Main.CONFIG_FILE_PATH_INDEX])
             # get output directory path from cmd line argument
             output_dir_path = str(argv[Main.OUTPUT_DIR_PATH_INDEX])
 
+            # set path to configuration file
+            ConfigChecker.set_config_file_path(config_file_path)
             # set path to log file
             Logger.set_log_file_path(output_dir_path)
 

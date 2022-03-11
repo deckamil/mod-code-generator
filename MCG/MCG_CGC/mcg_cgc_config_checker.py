@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           9 MAR 2022
+#   DATE:           11 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -26,4 +26,51 @@
 #
 #       You should have received a copy of the GNU General Public License
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+# Class:
+# ConfigChecker()
+#
+# Description:
+# This is base class responsible for verification of the configuration file.
+class ConfigChecker(object):
+
+    # initialize class data
+    config_file = []
+
+    # indexes of config checker list
+    CONFIG_FILE_VALIDITY_INDEX = 0
+    CONFIG_FILE_INDEX = 1
+
+    # Method:
+    # set_config_file_path()
+    #
+    # Description:
+    # This method sets path to configuration file, which contain input configuration to MCG CGC.
+    #
+    # Returns:
+    # This method does not return anything.
+    @staticmethod
+    def set_config_file_path(config_file_path):
+
+        # open file and read content, then close file
+        config_file_disk = open(config_file_path, "r")
+        config_file = config_file_disk.readlines()
+        config_file = [line.strip() for line in config_file]
+        config_file_disk.close()
+
+        # set config file
+        ConfigChecker.config_file = config_file
+
+    # Method:
+    # check_config_file()
+    #
+    # Description:
+    # This method checks if content of configuration file is correct.
+    #
+    # Returns:
+    # This method returns config checker list, which contains configuration file.
+    @staticmethod
+    def check_config_file():
+        tbd = ""
 
