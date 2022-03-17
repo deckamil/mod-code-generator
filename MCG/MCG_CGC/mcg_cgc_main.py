@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           11 MAR 2022
+#   DATE:           17 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,15 +31,12 @@
 
 from sys import argv
 from mcg_cgc_logger import Logger
-# from mcg_cgc_error_handler import ErrorHandler
+from mcg_cgc_error_handler import ErrorHandler
 from mcg_cgc_config_checker import ConfigChecker
 
 
-# Class:
-# Main()
-#
 # Description:
-# This is base class, which uses other MCG CGC classes to generate C code.
+# This is main class, which controls C code generation process from the configuration file.
 class Main(object):
 
     # This parameter defines expected number of command line arguments passed to MCG CGC,
@@ -52,14 +49,8 @@ class Main(object):
     CONFIG_FILE_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
 
-    # Method:
-    # main()
-    #
     # Description:
-    # This is main method of MCG CGC Main class.
-    #
-    # Returns:
-    # This method does not return anything.
+    # This is main method, which display short notice and start code generation process.
     @staticmethod
     def main():
 
@@ -88,7 +79,7 @@ class Main(object):
             Logger.set_log_file_path(output_dir_path)
 
             # generate code
-            # Main.generate_code()
+            Main.generate_code()
 
         # else display info and exit
         else:
@@ -100,6 +91,27 @@ class Main(object):
             print("")
             print("Keep specific order of arguments, as pointed in usage above.")
             print("See Mod Code Generator Manual for further information.")
+
+    # Description:
+    # This method invokes process of code generation from the configuration file.
+    @staticmethod
+    def generate_code():
+
+        # saves log file header
+        Logger.save_log_file_header()
+
+        # read the configuration file
+        ConfigChecker.read_config_file()
+        # check errors
+        ErrorHandler.check_errors()
+
+        # check content of the configuration file
+        ConfigChecker.check_config_file()
+        # check errors
+        ErrorHandler.check_errors()
+
+        # saves log file footer
+        Logger.save_log_file_footer()
 
 
 # Mod Code Generator (MCG) Code Generator Component (CGC) entrance

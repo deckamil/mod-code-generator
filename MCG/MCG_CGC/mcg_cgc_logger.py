@@ -5,7 +5,7 @@
 #       for log recording during MCG CGC run.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           9 MAR 2022
+#   DATE:           17 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,25 +31,16 @@
 import datetime
 
 
-# Class:
-# Logger()
-#
 # Description:
-# This is base class responsible for log recording during MCG CGC run.
+# This class is responsible for log recording during MCG CGC run.
 class Logger(object):
 
     # initialize class data
     log_file_disk = ""
     log_file_path = ""
 
-    # Method:
-    # set_log_file_path()
-    #
     # Description:
     # This method sets path to log file, which will contain events record from MCG CGC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def set_log_file_path(output_dir_path):
 
@@ -60,14 +51,8 @@ class Logger(object):
         Logger.log_file_disk = open(Logger.log_file_path, "w")
         Logger.log_file_disk.close()
 
-    # Method:
-    # save_log_file_header()
-    #
     # Description:
     # This method saves header info in log file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_log_file_header():
 
@@ -84,14 +69,8 @@ class Logger(object):
         # close file
         Logger.log_file_disk.close()
 
-    # Method:
-    # save_log_file_footer()
-    #
     # Description:
     # This method saves footer info in log file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_log_file_footer():
 
@@ -108,14 +87,8 @@ class Logger(object):
         # close file
         Logger.log_file_disk.close()
 
-    # Method:
-    # save_in_log_file()
-    #
     # Description:
     # This method prints and saves info in log file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_in_log_file(info):
 
