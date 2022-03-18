@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           17 MAR 2022
+#   DATE:           18 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,11 +39,14 @@ class ConfigChecker(object):
     config_file_path = ""
     config_file = []
     file_index = 0
+    number_of_config_file_lines = 0
     checker_state = ""
 
     # checker states
-    CHECK_HEADER = 0
+    FIND_HEADER = 0
     FIND_DATE_OR_NEW_MODULE = 1
+    FIND_NEW_MODULE = 2
+    SKIP_AND_FIND_NEW_MODULE = 3
     CHECK_COMPONENT = 100
     CHECK_PACKAGE = 200
     CHECK_FOOTER = 300
@@ -74,6 +77,8 @@ class ConfigChecker(object):
 
         # set config file
         ConfigChecker.config_file = config_file
+        # set number of config file lines
+        ConfigChecker.number_of_config_file_lines = len(config_file)
 
     # Description:
     # This is main method of the class, which checks if content of configuration file is correct.
@@ -81,42 +86,50 @@ class ConfigChecker(object):
     def check_config_file():
 
         # set entry state
-        ConfigChecker.checker_state = ConfigChecker.CHECK_HEADER
+        ConfigChecker.checker_state = ConfigChecker.FIND_HEADER
 
         # continue checking until verification of the configuration file is completed
         while ConfigChecker.checker_state != ConfigChecker.CHECK_COMPLETED:
 
-            # check header
-            if ConfigChecker.checker_state == ConfigChecker.CHECK_HEADER:
-                ConfigChecker.check_header()
+            # find header
+            if ConfigChecker.checker_state == ConfigChecker.FIND_HEADER:
+                ConfigChecker.find_header()
 
-            # find date or new module markers
+            # find date or new module
             elif ConfigChecker.checker_state == ConfigChecker.FIND_DATE_OR_NEW_MODULE:
                 ConfigChecker.find_date_or_new_module()
 
+            # find new module
+            elif ConfigChecker.checker_state == ConfigChecker.FIND_NEW_MODULE:
+                ConfigChecker.find_new_module()
+
+            # skip current part and find new module
+            elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_NEW_MODULE:
+                ConfigChecker.skip_and_find_new_module()
+
             # check component
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT:
-                tbd = ""
+                ConfigChecker.check_component()
 
             # check package
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE:
-                tbd = ""
+                ConfigChecker.check_package()
 
             # check footer
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_FOOTER:
-                tbd = ""
+                ConfigChecker.find_footer()
 
     # Description:
-    # This method checks header consistency in the configuration file.
+    # This method looks for config start in the configuration file.
     @staticmethod
-    def check_header():
+    def find_header():
 
         # if line is empty
         if ConfigChecker.config_file[ConfigChecker.file_index] == "":
             # increment file index and repeat same state process
             ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-        # else if start marker is correct
+        # else if config start marker is found
         elif ConfigChecker.config_file[ConfigChecker.file_index] == "MCG CGC CONFIG START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
@@ -126,14 +139,116 @@ class ConfigChecker(object):
         # else when line contains unexpected data
         else:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEADER_UN_LINE, ConfigChecker.file_index, "none")
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEADER_UN_LINE, ConfigChecker.file_index+1, "none")
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
             ConfigChecker.checker_state = ConfigChecker.FIND_DATE_OR_NEW_MODULE
 
     # Description:
-    # This method looks for date or new module markers in the configuration file.
+    # This method looks for date or new module section in the configuration file.
     @staticmethod
     def find_date_or_new_module():
+
+        # if line is empty
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+            # increment file index and repeat same state process
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # else if date marker is found
+        elif "MCG CGC CONFIG DATE " in ConfigChecker.config_file[ConfigChecker.file_index]:
+            # increment file index
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
+
+        # else if component start marker is found
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+
+        # else if package start marker is found
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
+
+        # else when line contains unexpected data
+        else:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_DATA_OR_MOD_UN_LINE, ConfigChecker.file_index+1, "none")
+            # increment file index
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
+
+    # Description:
+    # This method looks for new module section in the configuration file.
+    @staticmethod
+    def find_new_module():
+
+        # if line is empty
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+            # increment file index and repeat same state process
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # else if component start marker is found
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+
+        # else if package start marker is found
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
+
+        # else when line contains unexpected data
+        else:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_UN_LINE, ConfigChecker.file_index+1, "none")
+            # increment file index
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_NEW_MODULE
+
+    # Description:
+    # This method skips current part of the configuration file and looks for new module section.
+    @staticmethod
+    def skip_and_find_new_module():
+
+        # if line is empty
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+            # increment file index and repeat same state process
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # else if component start marker is found
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+
+        # else if package start marker is found
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
+
+        # else when line contains unexpected data
+        else:
+            # increment file index and repeat same state process
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+    # Description:
+    # This method checks correctness of component section in the configuration file.
+    @staticmethod
+    def check_component():
+        ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+    # Description:
+    # This method checks correctness of package section in the configuration file.
+    @staticmethod
+    def check_package():
+        ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+    # Description:
+    # This method looks for config end in the configuration file.
+    @staticmethod
+    def find_footer():
         ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
