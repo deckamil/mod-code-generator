@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           18 MAR 2022
+#   DATE:           19 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -124,8 +124,15 @@ class ConfigChecker(object):
     @staticmethod
     def find_header():
 
-        # if line is empty
-        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+        # if file index is out of range
+        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEADER_EOF, ConfigChecker.file_index + 1, "none")
+            # complete process
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+        # else if line is empty
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
             # increment file index and repeat same state process
             ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -150,8 +157,15 @@ class ConfigChecker(object):
     @staticmethod
     def find_date_or_new_module():
 
-        # if line is empty
-        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+        # if file index is out of range
+        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_DATA_OR_MOD_EOF, ConfigChecker.file_index + 1, "none")
+            # complete process
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+        # else if line is empty
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
             # increment file index and repeat same state process
             ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -186,8 +200,15 @@ class ConfigChecker(object):
     @staticmethod
     def find_new_module():
 
-        # if line is empty
-        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+        # if file index is out of range
+        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_EOF, ConfigChecker.file_index + 1, "none")
+            # complete process
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+        # else if line is empty
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
             # increment file index and repeat same state process
             ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -215,8 +236,15 @@ class ConfigChecker(object):
     @staticmethod
     def skip_and_find_new_module():
 
-        # if line is empty
-        if ConfigChecker.config_file[ConfigChecker.file_index] == "":
+        # if file index is out of range
+        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_EOF, ConfigChecker.file_index + 1, "none")
+            # complete process
+            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+        # else if line is empty
+        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
             # increment file index and repeat same state process
             ConfigChecker.file_index = ConfigChecker.file_index + 1
 

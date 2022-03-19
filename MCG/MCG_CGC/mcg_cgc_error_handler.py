@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           18 MAR 2022
+#   DATE:           19 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,9 +39,12 @@ class ErrorHandler(object):
     error_list = []
 
     # CHECKER errors
-    CHK_ERR_HEADER_UN_LINE = 1
-    CHK_ERR_DATA_OR_MOD_UN_LINE = 2
-    CHK_ERR_MOD_UN_LINE = 3
+    CHK_ERR_HEADER_EOF = 1
+    CHK_ERR_HEADER_UN_LINE = 2
+    CHK_ERR_DATA_OR_MOD_EOF = 3
+    CHK_ERR_DATA_OR_MOD_UN_LINE = 4
+    CHK_ERR_MOD_EOF = 5
+    CHK_ERR_MOD_UN_LINE = 6
 
     # Description:
     # This method records error (i.e. append error to error list), found during run of MCG CGC.
@@ -49,10 +52,24 @@ class ErrorHandler(object):
     def record_error(error_code, error_info1, error_info2):
 
         # CHECKER errors, range 1-100
-        if error_code == ErrorHandler.CHK_ERR_HEADER_UN_LINE:
+        if error_code == ErrorHandler.CHK_ERR_HEADER_EOF:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
+                    str(error_info1) + " before config start was found"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_HEADER_UN_LINE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
                     "unexpected content instead of empty line or config start"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_DATA_OR_MOD_EOF:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
+                    str(error_info1) + " before date or start of new module section was found"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
@@ -60,6 +77,13 @@ class ErrorHandler(object):
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
                     "unexpected content instead of empty line or date or start of new module section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_MOD_EOF:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
+                    str(error_info1) + " before start of new module section was found"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
