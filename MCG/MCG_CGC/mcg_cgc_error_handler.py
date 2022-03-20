@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           19 MAR 2022
+#   DATE:           20 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -41,10 +41,22 @@ class ErrorHandler(object):
     # CHECKER errors
     CHK_ERR_HEADER_EOF = 1
     CHK_ERR_HEADER_UN_LINE = 2
-    CHK_ERR_DATA_OR_MOD_EOF = 3
-    CHK_ERR_DATA_OR_MOD_UN_LINE = 4
-    CHK_ERR_MOD_EOF = 5
-    CHK_ERR_MOD_UN_LINE = 6
+    CHK_ERR_DATA_OR_MOD_START_EOF = 3
+    CHK_ERR_DATA_OR_MOD_START_UN_LINE = 4
+    CHK_ERR_MOD_START_EOF = 5
+    CHK_ERR_MOD_START_UN_LINE = 6
+    CHK_ERR_COM_EOF = 7
+    CHK_ERR_COM_SRC_UN_LINE = 8
+    CHK_ERR_COM_NAM_UN_LINE = 9
+    CHK_ERR_COM_IN_ST_UN_LINE = 10
+    CHK_ERR_COM_IN_UN_LINE = 11
+    CHK_ERR_COM_OUT_ST_UN_LINE = 12
+    CHK_ERR_COM_OUT_UN_LINE = 13
+    CHK_ERR_COM_LOC_ST_UN_LINE = 14
+    CHK_ERR_COM_LOC_UN_LINE = 15
+    CHK_ERR_COM_BOD_ST_UN_LINE = 16
+    CHK_ERR_COM_BOD_UN_LINE = 17
+    CHK_ERR_COM_END_UN_LINE = 18
 
     # Description:
     # This method records error (i.e. append error to error list), found during run of MCG CGC.
@@ -66,31 +78,119 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_DATA_OR_MOD_EOF:
+        elif error_code == ErrorHandler.CHK_ERR_DATA_OR_MOD_START_EOF:
             # set error notification
             error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
                     str(error_info1) + " before date or start of new module section was found"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_DATA_OR_MOD_UN_LINE:
+        elif error_code == ErrorHandler.CHK_ERR_DATA_OR_MOD_START_UN_LINE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
                     "unexpected content instead of empty line or date or start of new module section"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_MOD_EOF:
+        elif error_code == ErrorHandler.CHK_ERR_MOD_START_EOF:
             # set error notification
             error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
                     str(error_info1) + " before start of new module section was found"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_MOD_UN_LINE:
+        elif error_code == ErrorHandler.CHK_ERR_MOD_START_UN_LINE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
                     "unexpected content instead of empty line or start of new module section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_EOF:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
+                    str(error_info1) + " while checking component section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_SRC_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or component source info"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_NAM_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or component name info"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_IN_ST_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or start of input interface section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_IN_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or input data definition or end of input interface " \
+                    "section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_OUT_ST_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or start of output interface section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_OUT_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or output data definition or end of output interface " \
+                    "section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_LOC_ST_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or start of local data section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_LOC_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or local data definition or end of local data " \
+                    "section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_BOD_ST_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or start of body section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_BOD_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or body data definition or end of body data " \
+                    "section"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_COM_END_UN_LINE:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
+                    "unexpected content instead of empty line or end of component section"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
