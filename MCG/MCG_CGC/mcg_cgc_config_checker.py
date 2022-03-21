@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           20 MAR 2022
+#   DATE:           21 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -43,8 +43,8 @@ class ConfigChecker(object):
     checker_state = ""
 
     # checker states
-    FIND_HEADER = 0
-    FIND_DATE_OR_NEW_MODULE = 1
+    FIND_HEADER_START = 0
+    FIND_HEADER_DATE = 1
     FIND_NEW_MODULE = 2
     SKIP_AND_FIND_NEW_MODULE = 3
     CHECK_COMPONENT = 100
@@ -86,18 +86,30 @@ class ConfigChecker(object):
     def check_config_file():
 
         # set entry state
-        ConfigChecker.checker_state = ConfigChecker.FIND_HEADER
+        ConfigChecker.checker_state = ConfigChecker.FIND_HEADER_START
 
         # continue checking until verification of the configuration file is completed
         while ConfigChecker.checker_state != ConfigChecker.CHECK_COMPLETED:
 
-            # find header
-            if ConfigChecker.checker_state == ConfigChecker.FIND_HEADER:
-                ConfigChecker.find_header()
+            # when file index is out of range
+            if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_EOF, ConfigChecker.file_index + 1, "")
+                # complete process
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
 
-            # find date or new module
-            elif ConfigChecker.checker_state == ConfigChecker.FIND_DATE_OR_NEW_MODULE:
-                ConfigChecker.find_date_or_new_module()
+            # when line is empty
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+            # find header start
+            elif ConfigChecker.checker_state == ConfigChecker.FIND_HEADER_START:
+                ConfigChecker.find_header_start()
+
+            # find header date
+            elif ConfigChecker.checker_state == ConfigChecker.FIND_HEADER_DATE:
+                ConfigChecker.find_header_date()
 
             # find new module
             elif ConfigChecker.checker_state == ConfigChecker.FIND_NEW_MODULE:
@@ -120,80 +132,42 @@ class ConfigChecker(object):
                 ConfigChecker.find_footer()
 
     # Description:
-    # This method looks for config start in the configuration file.
+    # This method looks for header start marker in the configuration file.
     @staticmethod
-    def find_header():
-
-        # when file index is out of range
-        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
-            # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEADER_EOF, ConfigChecker.file_index + 1, "")
-            # complete process
-            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
-
-        # when line is empty
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
-            # increment file index and repeat same state process
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
+    def find_header_start():
 
         # when config start marker is found
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "MCG CGC CONFIG START":
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "MCG CGC CONFIG START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
-            ConfigChecker.checker_state = ConfigChecker.FIND_DATE_OR_NEW_MODULE
+            ConfigChecker.checker_state = ConfigChecker.FIND_HEADER_DATE
 
         # or when line contains unexpected data
         else:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEADER_UN_LINE, ConfigChecker.file_index+1, "")
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEAD_ST_UN, ConfigChecker.file_index+1, "")
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
-            ConfigChecker.checker_state = ConfigChecker.FIND_DATE_OR_NEW_MODULE
+            ConfigChecker.checker_state = ConfigChecker.FIND_HEADER_DATE
 
     # Description:
-    # This method looks for date or new module section in the configuration file.
+    # This method looks for header date marker in the configuration file.
     @staticmethod
-    def find_date_or_new_module():
-
-        # when file index is out of range
-        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
-            # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_DATA_OR_MOD_START_EOF, ConfigChecker.file_index + 1, "")
-            # complete process
-            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
-
-        # when line is empty
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
-            # increment file index and repeat same state process
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
+    def find_header_date():
 
         # when date marker is found
-        elif "MCG CGC CONFIG DATE " in ConfigChecker.config_file[ConfigChecker.file_index]:
+        if "MCG CGC CONFIG DATE" in ConfigChecker.config_file[ConfigChecker.file_index]:
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
             ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
 
-        # when component start marker is found
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
-            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
-
-        # when package start marker is found
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
-            ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
-
         # or when line contains unexpected data
         else:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_DATA_OR_MOD_START_UN_LINE, ConfigChecker.file_index+1, "")
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEAD_DA_UN, ConfigChecker.file_index+1, "")
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
@@ -204,20 +178,8 @@ class ConfigChecker(object):
     @staticmethod
     def find_new_module():
 
-        # when file index is out of range
-        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
-            # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_START_EOF, ConfigChecker.file_index + 1, "")
-            # complete process
-            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
-
-        # when line is empty
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
-            # increment file index and repeat same state process
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-
         # when component start marker is found
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
@@ -233,7 +195,7 @@ class ConfigChecker(object):
         # or when line contains unexpected data
         else:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_START_UN_LINE, ConfigChecker.file_index+1, "")
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_ST_UN, ConfigChecker.file_index+1, "")
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
@@ -244,20 +206,8 @@ class ConfigChecker(object):
     @staticmethod
     def skip_and_find_new_module():
 
-        # when file index is out of range
-        if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
-            # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_START_EOF, ConfigChecker.file_index + 1, "")
-            # complete process
-            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
-
-        # when line is empty
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
-            # increment file index and repeat same state process
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-
         # when component start marker is found
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # move to next state
@@ -279,9 +229,6 @@ class ConfigChecker(object):
     # This method checks correctness of component section in the configuration file.
     @staticmethod
     def check_component():
-
-        # internal method state
-        check_component_state = ""
 
         # method states
         CHECK_COMPONENT_SOURCE = 101
@@ -309,7 +256,7 @@ class ConfigChecker(object):
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_EOF, ConfigChecker.file_index + 1, "")
                 # complete component check
                 check_component_state = COMPONENT_CHECK_COMPLETED
-                # complete process
+                # complete config check
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
 
             # when line is empty
@@ -321,7 +268,7 @@ class ConfigChecker(object):
             elif check_component_state == CHECK_COMPONENT_SOURCE:
 
                 # when component source marker is found
-                if "COMPONENT SOURCE " in ConfigChecker.config_file[ConfigChecker.file_index]:
+                if "COMPONENT SOURCE" in ConfigChecker.config_file[ConfigChecker.file_index]:
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -330,7 +277,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_SRC_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_SRC_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -349,7 +296,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_NAM_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_NAM_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -368,7 +315,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_ST_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_ST_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -393,7 +340,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -412,7 +359,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_ST_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_ST_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -437,7 +384,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -456,7 +403,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_ST_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_ST_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -481,7 +428,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -500,7 +447,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_ST_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_ST_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -529,7 +476,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -550,7 +497,7 @@ class ConfigChecker(object):
                 # or when line contains unexpected data
                 else:
                     # record error
-                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_END_UN_LINE, ConfigChecker.file_index + 1, "")
+                    ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_END_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # complete component check
