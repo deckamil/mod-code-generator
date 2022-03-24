@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           21 MAR 2022
+#   DATE:           24 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,17 +40,51 @@ class ConfigChecker(object):
     config_file = []
     file_index = 0
     number_of_config_file_lines = 0
-    checker_state = ""
 
-    # checker states
+    # verification state
+    checker_state = ""
+    check_component_state = ""
+    check_package_state = ""
+
+    # possible checker states
     FIND_HEADER_START = 0
     FIND_HEADER_DATE = 1
     FIND_NEW_MODULE = 2
     SKIP_AND_FIND_NEW_MODULE = 3
     CHECK_COMPONENT = 100
+    SKIP_AND_FIND_COMPONENT_SECTION = 500
     CHECK_PACKAGE = 200
+    SKIP_AND_FIND_PACKAGE_SECTION = 600
     CHECK_FOOTER = 300
     CHECK_COMPLETED = 400
+
+    # possible component verification states
+    CHECK_COMPONENT_SOURCE = 101
+    CHECK_COMPONENT_NAME = 102
+    CHECK_COMPONENT_INPUT_INTERFACE_START = 103
+    CHECK_COMPONENT_INPUT_INTERFACE = 104
+    CHECK_COMPONENT_OUTPUT_INTERFACE_START = 105
+    CHECK_COMPONENT_OUTPUT_INTERFACE = 106
+    CHECK_COMPONENT_LOCAL_DATA_START = 107
+    CHECK_COMPONENT_LOCAL_DATA = 108
+    CHECK_COMPONENT_BODY_START = 109
+    CHECK_COMPONENT_BODY = 110
+    CHECK_COMPONENT_END = 111
+    COMPONENT_CHECK_COMPLETED = 112
+
+    # possible package verification states
+    CHECK_PACKAGE_SOURCE = 201
+    CHECK_PACKAGE_NAME = 202
+    CHECK_PACKAGE_INPUT_INTERFACE_START = 203
+    CHECK_PACKAGE_INPUT_INTERFACE = 204
+    CHECK_PACKAGE_OUTPUT_INTERFACE_START = 205
+    CHECK_PACKAGE_OUTPUT_INTERFACE = 206
+    CHECK_PACKAGE_LOCAL_DATA_START = 207
+    CHECK_PACKAGE_LOCAL_DATA = 208
+    CHECK_PACKAGE_BODY_START = 209
+    CHECK_PACKAGE_BODY = 210
+    CHECK_PACKAGE_END = 211
+    PACKAGE_CHECK_COMPLETED = 212
 
     # indexes of config checker list
     CONFIG_FILE_VALIDITY_INDEX = 0
@@ -119,6 +153,10 @@ class ConfigChecker(object):
             elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_NEW_MODULE:
                 ConfigChecker.skip_and_find_new_module()
 
+            # skip current part of component section and find next one
+            elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION:
+                ConfigChecker.skip_and_find_component_section()
+
             # check component
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT:
                 ConfigChecker.check_component()
@@ -182,15 +220,19 @@ class ConfigChecker(object):
         if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
+            # move to check component state
             ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+            # move to recognized internal state
+            ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_SOURCE
 
         # when package start marker is found
         elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
+            # move to check package state
             ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
+            # move to recognized internal state
+            ConfigChecker.check_component_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
         # or when line contains unexpected data
         else:
@@ -210,15 +252,19 @@ class ConfigChecker(object):
         if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
+            # move to check component state
             ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+            # move to recognized internal state
+            ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_SOURCE
 
         # when package start marker is found
         elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
+            # move to check package state
             ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
+            # move to recognized internal state
+            ConfigChecker.check_component_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
         # or when line contains unexpected data
         else:
@@ -230,280 +276,465 @@ class ConfigChecker(object):
     @staticmethod
     def check_component():
 
-        # method states
-        CHECK_COMPONENT_SOURCE = 101
-        CHECK_COMPONENT_NAME = 102
-        CHECK_COMPONENT_INPUT_INTERFACE_START = 103
-        CHECK_COMPONENT_INPUT_INTERFACE = 104
-        CHECK_COMPONENT_OUTPUT_INTERFACE_START = 105
-        CHECK_COMPONENT_OUTPUT_INTERFACE = 106
-        CHECK_COMPONENT_LOCAL_DATA_START = 107
-        CHECK_COMPONENT_LOCAL_DATA = 108
-        CHECK_COMPONENT_BODY_START = 109
-        CHECK_COMPONENT_BODY = 110
-        CHECK_COMPONENT_END = 111
-        COMPONENT_CHECK_COMPLETED = 112
-
-        # set entry state
-        check_component_state = CHECK_COMPONENT_SOURCE
-
-        # continue checking until verification of the configuration file is completed
-        while check_component_state != COMPONENT_CHECK_COMPLETED:
+        # continue checking until verification of the component section is completed
+        while ConfigChecker.check_component_state != ConfigChecker.COMPONENT_CHECK_COMPLETED:
 
             # when file index is out of range
             if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_EOF, ConfigChecker.file_index + 1, "")
-                # complete component check
-                check_component_state = COMPONENT_CHECK_COMPLETED
-                # complete config check
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_EOF, ConfigChecker.file_index + 1, "")
+                # finish configuration check
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+                # finish component check
+                ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
             # when line is empty
             elif ConfigChecker.config_file[ConfigChecker.file_index] == "":
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-            # check component source
-            elif check_component_state == CHECK_COMPONENT_SOURCE:
+            # for component source state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_SOURCE:
 
-                # when component source marker is found
+                # if component source is found
                 if "COMPONENT SOURCE" in ConfigChecker.config_file[ConfigChecker.file_index]:
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_NAME
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_NAME
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_SRC_UN, ConfigChecker.file_index + 1, "")
-                    # increment file index
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # move to next state
-                    check_component_state = CHECK_COMPONENT_NAME
+                    # move to skip and find component section state
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-            # check component name
-            elif check_component_state == CHECK_COMPONENT_NAME:
+            # for component name state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_NAME:
 
-                # when component name marker is found
+                # if component name is found
                 if "COMPONENT NAME " in ConfigChecker.config_file[ConfigChecker.file_index]:
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_INPUT_INTERFACE_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_NAM_UN, ConfigChecker.file_index + 1, "")
-                    # increment file index
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # move to next state
-                    check_component_state = CHECK_COMPONENT_INPUT_INTERFACE_START
+                    # move to skip and find component section state
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-            # check component input interface start
-            elif check_component_state == CHECK_COMPONENT_INPUT_INTERFACE_START:
+            # for component input interface start state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START:
 
-                # when component input interface start marker is found
+                # if component input interface start is found
                 if ConfigChecker.config_file[ConfigChecker.file_index] == "INPUT INTERFACE START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_INPUT_INTERFACE
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_ST_UN, ConfigChecker.file_index + 1, "")
-                    # increment file index
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # move to next state
-                    check_component_state = CHECK_COMPONENT_INPUT_INTERFACE
+                    # move to skip and find component section state
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-            # check component input interface
-            elif check_component_state == CHECK_COMPONENT_INPUT_INTERFACE:
+            # for component input interface state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE:
 
-                # when type and name in input interface is found
+                # if type and name in input interface is found
                 if ("type " in ConfigChecker.config_file[ConfigChecker.file_index]) and \
                         (" name " in ConfigChecker.config_file[ConfigChecker.file_index]):
                     # increment file index and repeat same state process
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-                # when component input interface end marker is found
+                # of if component input interface end is found
                 elif ConfigChecker.config_file[ConfigChecker.file_index] == "INPUT INTERFACE END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_OUTPUT_INTERFACE_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_OUTPUT_INTERFACE_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
 
-            # check component output interface start
-            elif check_component_state == CHECK_COMPONENT_OUTPUT_INTERFACE_START:
+            # for component output interface start state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START:
 
-                # when component output interface start marker is found
+                # if component output interface start is found
                 if ConfigChecker.config_file[ConfigChecker.file_index] == "OUTPUT INTERFACE START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_OUTPUT_INTERFACE
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_ST_UN, ConfigChecker.file_index + 1, "")
-                    # increment file index
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # move to next state
-                    check_component_state = CHECK_COMPONENT_OUTPUT_INTERFACE
+                    # move to skip and find component section state
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-            # check component output interface
-            elif check_component_state == CHECK_COMPONENT_OUTPUT_INTERFACE:
+            # for component output interface state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE:
 
-                # when type and name in output interface is found
+                # if type and name in output interface is found
                 if ("type " in ConfigChecker.config_file[ConfigChecker.file_index]) and \
                         (" name " in ConfigChecker.config_file[ConfigChecker.file_index]):
                     # increment file index and repeat same state process
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-                # when component output interface end marker is found
+                # or if component output interface end is found
                 elif ConfigChecker.config_file[ConfigChecker.file_index] == "OUTPUT INTERFACE END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_LOCAL_DATA_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_LOCAL_DATA_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
 
-            # check component local data start
-            elif check_component_state == CHECK_COMPONENT_LOCAL_DATA_START:
+            # for component local data start state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START:
 
-                # when component local data start marker is found
+                # if component local data start is found
                 if ConfigChecker.config_file[ConfigChecker.file_index] == "LOCAL DATA START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_LOCAL_DATA
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_ST_UN, ConfigChecker.file_index + 1, "")
-                    # increment file index
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # move to next state
-                    check_component_state = CHECK_COMPONENT_LOCAL_DATA
+                    # move to skip and find component section state
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-            # check component local data
-            elif check_component_state == CHECK_COMPONENT_LOCAL_DATA:
+            # for component local data state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_LOCAL_DATA:
 
-                # when type and name in local data is found
+                # if type and name in local data is found
                 if ("type " in ConfigChecker.config_file[ConfigChecker.file_index]) and \
                         (" name " in ConfigChecker.config_file[ConfigChecker.file_index]):
                     # increment file index and repeat same state process
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-                # when component local data end marker is found
+                # or if component local data end is found
                 elif ConfigChecker.config_file[ConfigChecker.file_index] == "LOCAL DATA END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_BODY_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_BODY_START
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_BODY_START
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_BODY_START
 
-            # check component body start
-            elif check_component_state == CHECK_COMPONENT_BODY_START:
+            # for component body start state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_BODY_START:
 
-                # when component body start marker is found
+                # if component body start is found
                 if ConfigChecker.config_file[ConfigChecker.file_index] == "BODY START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_BODY
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_BODY
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_ST_UN, ConfigChecker.file_index + 1, "")
-                    # increment file index
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # move to next state
-                    check_component_state = CHECK_COMPONENT_BODY
+                    # move to skip and find component section state
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-            # check component body
-            elif check_component_state == CHECK_COMPONENT_BODY:
+            # for component body state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_BODY:
 
-                # when comment is found
+                # if comment is found
                 if "COM " in ConfigChecker.config_file[ConfigChecker.file_index]:
                     # increment file index and repeat same state process
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-                # when instruction is found
-                if "INS" in ConfigChecker.config_file[ConfigChecker.file_index]:
+                # or if instruction is found
+                elif "INS" in ConfigChecker.config_file[ConfigChecker.file_index]:
                     # increment file index and repeat same state process
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-                # when component body end marker is found
+                # or if component body end is found
                 elif ConfigChecker.config_file[ConfigChecker.file_index] == "BODY END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_END
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_END
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
-                    check_component_state = CHECK_COMPONENT_END
+                    ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_END
 
-            # check component end
-            elif check_component_state == CHECK_COMPONENT_END:
+            # for component end state check
+            elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_END:
 
-                # when component end marker is found
+                # if component end is found
                 if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # complete component check
-                    check_component_state = COMPONENT_CHECK_COMPLETED
-                    # find new module
+                    # move to find new module state
                     ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
 
-                # or when line contains unexpected data
+                # or if line contains unexpected data
                 else:
                     # record error
                     ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_END_UN, ConfigChecker.file_index + 1, "")
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
-                    # complete component check
-                    check_component_state = COMPONENT_CHECK_COMPLETED
-                    # find new module
+                    # move to find new module state
                     ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
+                    # finish component check
+                    ConfigChecker.check_component_state = ConfigChecker.COMPONENT_CHECK_COMPLETED
+
+    # Description:
+    # This method looks for next valid component section to continue verification of the configuration file,
+    # after error was detected in component section.
+    @staticmethod
+    def skip_and_find_component_section():
+
+        # get copy of file index
+        temporary_file_index = ConfigChecker.file_index
+
+        # skipping flag
+        skipp_config = True
+
+        # continue skipping until some section of the configuration file is recognized
+        while skipp_config:
+
+            # when temporary file index is out of range
+            if temporary_file_index >= ConfigChecker.number_of_config_file_lines:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_EOF, temporary_file_index + 1, "")
+                # finish skipping
+                skipp_config = False
+                # finish configuration check
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
+
+            # when component source if found
+            elif "COMPONENT SOURCE" in ConfigChecker.config_file[temporary_file_index]:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_SOURCE
+
+            # when component name is found
+            elif "COMPONENT NAME " in ConfigChecker.config_file[temporary_file_index]:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_NAME
+
+            # when input interface start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "INPUT INTERFACE START":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START
+
+            # when input interface end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "INPUT INTERFACE END":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE
+
+            # when output interface start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "OUTPUT INTERFACE START":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
+
+            # when output interface end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "OUTPUT INTERFACE END":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE
+
+            # when local data start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "LOCAL DATA START":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
+
+            # when local data end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "LOCAL DATA END":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA
+
+            # when body start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "BODY START":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_BODY_START
+
+            # when body end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "BODY END":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_BODY
+
+            # when component end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT END":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT
+                # move to recognized internal state
+                ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_END
+
+            # when package start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE START":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
+                                          temporary_file_index + 1)
+                # set file index
+                ConfigChecker.file_index = temporary_file_index
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # finish skipping
+                skipp_config = False
+                # move to check component state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE
+                # move to recognized internal state
+                ConfigChecker.check_package_state = ConfigChecker.CHECK_PACKAGE_SOURCE
+
+            # if any configuration section was not recognized
+            else:
+                # increment temporary file index and repeat process
+                temporary_file_index = temporary_file_index + 1
 
     # Description:
     # This method checks correctness of package section in the configuration file.

@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           21 MAR 2022
+#   DATE:           24 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,10 +40,10 @@ class ErrorHandler(object):
 
     # CHECKER errors
     CHK_ERR_EOF = 1
-    CHK_ERR_HEAD_ST_UN = 2
-    CHK_ERR_HEAD_DA_UN = 3
-    CHK_ERR_MOD_ST_UN = 4
-    CHK_ERR_COM_EOF = 5
+    CHK_ERR_SKIPPED = 2
+    CHK_ERR_HEAD_ST_UN = 3
+    CHK_ERR_HEAD_DA_UN = 4
+    CHK_ERR_MOD_ST_UN = 5
     CHK_ERR_COM_SRC_UN = 6
     CHK_ERR_COM_NAM_UN = 7
     CHK_ERR_COM_IN_ST_UN = 8
@@ -69,6 +69,13 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
+        elif error_code == ErrorHandler.CHK_ERR_SKIPPED:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Expected section of the configuration file was not found, " \
+                    "therefore verification was skipped from line " + str(error_info1) + " to " + str(error_info2)
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
         elif error_code == ErrorHandler.CHK_ERR_HEAD_ST_UN:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
@@ -87,13 +94,6 @@ class ErrorHandler(object):
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
                     "unexpected content instead of empty line or start of new module section"
-            # append error to error list
-            ErrorHandler.error_list.append(error)
-
-        elif error_code == ErrorHandler.CHK_ERR_COM_EOF:
-            # set error notification
-            error = "ERROR " + str(error_code) + ": End of the configuration file was reached at line " + \
-                    str(error_info1) + " while checking component section"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
