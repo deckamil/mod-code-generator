@@ -5,7 +5,7 @@
 #       for conversion of model element content into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           25 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -102,8 +102,7 @@ class Converter(object):
         date = datetime.datetime.now()
 
         # write header info to configuration file on hard disk
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG START\n"))
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n\n"))
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG START ") + str(date) + str("\n\n"))
 
         # close file
         Converter.configuration_file_disk.close()
@@ -126,8 +125,7 @@ class Converter(object):
         date = datetime.datetime.now()
 
         # write footer info to configuration file on hard disk
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n"))
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG END\n"))
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG END ") + str(date))
 
         # close file
         Converter.configuration_file_disk.close()

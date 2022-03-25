@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           24 MAR 2022
+#   DATE:           25 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,8 +47,7 @@ class ConfigChecker(object):
     check_package_state = ""
 
     # possible checker states
-    FIND_HEADER_START = 0
-    FIND_HEADER_DATE = 1
+    CHECK_HEADER = 0
     FIND_NEW_MODULE = 2
     SKIP_AND_FIND_NEW_MODULE = 3
     CHECK_COMPONENT = 100
@@ -120,7 +119,7 @@ class ConfigChecker(object):
     def check_config_file():
 
         # set entry state
-        ConfigChecker.checker_state = ConfigChecker.FIND_HEADER_START
+        ConfigChecker.checker_state = ConfigChecker.CHECK_HEADER
 
         # continue checking until verification of the configuration file is completed
         while ConfigChecker.checker_state != ConfigChecker.CHECK_COMPLETED:
@@ -129,7 +128,7 @@ class ConfigChecker(object):
             if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_EOF, ConfigChecker.file_index + 1, "")
-                # complete process
+                # end configuration check
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPLETED
 
             # when line is empty
@@ -137,13 +136,9 @@ class ConfigChecker(object):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-            # find header start
-            elif ConfigChecker.checker_state == ConfigChecker.FIND_HEADER_START:
-                ConfigChecker.find_header_start()
-
-            # find header date
-            elif ConfigChecker.checker_state == ConfigChecker.FIND_HEADER_DATE:
-                ConfigChecker.find_header_date()
+            # check header
+            elif ConfigChecker.checker_state == ConfigChecker.CHECK_HEADER:
+                ConfigChecker.check_header()
 
             # find new module
             elif ConfigChecker.checker_state == ConfigChecker.FIND_NEW_MODULE:
@@ -153,13 +148,13 @@ class ConfigChecker(object):
             elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_NEW_MODULE:
                 ConfigChecker.skip_and_find_new_module()
 
-            # skip current part of component section and find next one
-            elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION:
-                ConfigChecker.skip_and_find_component_section()
-
             # check component
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT:
                 ConfigChecker.check_component()
+
+            # skip current part of component section and find next one
+            elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_COMPONENT_SECTION:
+                ConfigChecker.skip_and_find_component_section()
 
             # check package
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE:
@@ -170,46 +165,19 @@ class ConfigChecker(object):
                 ConfigChecker.find_footer()
 
     # Description:
-    # This method looks for header start marker in the configuration file.
+    # This method checks correctness of header in the configuration file.
     @staticmethod
-    def find_header_start():
+    def check_header():
 
-        # when config start marker is found
-        if ConfigChecker.config_file[ConfigChecker.file_index] == "MCG CGC CONFIG START":
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
-            ConfigChecker.checker_state = ConfigChecker.FIND_HEADER_DATE
-
-        # or when line contains unexpected data
-        else:
+        # when config start marker is NOT found
+        if "MCG CGC CONFIG START" not in ConfigChecker.config_file[ConfigChecker.file_index]:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEAD_ST_UN, ConfigChecker.file_index+1, "")
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
-            ConfigChecker.checker_state = ConfigChecker.FIND_HEADER_DATE
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_HEADER, ConfigChecker.file_index + 1, "")
 
-    # Description:
-    # This method looks for header date marker in the configuration file.
-    @staticmethod
-    def find_header_date():
-
-        # when date marker is found
-        if "MCG CGC CONFIG DATE" in ConfigChecker.config_file[ConfigChecker.file_index]:
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
-            ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
-
-        # or when line contains unexpected data
-        else:
-            # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_HEAD_DA_UN, ConfigChecker.file_index+1, "")
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # move to next state
-            ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
+        # increment file index
+        ConfigChecker.file_index = ConfigChecker.file_index + 1
+        # find beginning of module section
+        ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
 
     # Description:
     # This method looks for new module section in the configuration file.
