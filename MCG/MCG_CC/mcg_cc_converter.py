@@ -183,28 +183,28 @@ class Converter(object):
     #
     # Returns:
     # This method does not return anything.
-    def convert_interfaces(self):
+    def convert_interfaces(self, model_element_type):
 
         # convert interfaces
         Logger.save_in_log_file("*** convert interfaces")
 
         # append start marker of input interface section to configuration file
-        self.configuration_file.append(str("INPUT INTERFACE START"))
+        self.configuration_file.append(str(model_element_type) + str(" INPUT INTERFACE START"))
         # append input interface details to configuration file
         self.convert_specific_interface(self.input_interface_list)
         # append end marker of input interface section to configuration file
-        self.configuration_file.append(str("INPUT INTERFACE END"))
+        self.configuration_file.append(str(model_element_type) + str(" INPUT INTERFACE END"))
 
         # append start marker of output interface section to configuration file
-        self.configuration_file.append(str("OUTPUT INTERFACE START"))
+        self.configuration_file.append(str(model_element_type) + str(" OUTPUT INTERFACE START"))
         # append output interface details to configuration file
         self.convert_specific_interface(self.output_interface_list)
         # append end marker of output interface section to configuration file
-        self.configuration_file.append(str("OUTPUT INTERFACE END"))
+        self.configuration_file.append(str(model_element_type) + str(" OUTPUT INTERFACE END"))
 
         # append start marker of local parameters section to configuration file
-        self.configuration_file.append(str("LOCAL DATA START"))
+        self.configuration_file.append(str(model_element_type) + str(" LOCAL DATA START"))
         # append local data details to configuration file
         self.convert_specific_interface(self.local_data_list)
         # append end marker of local parameters section to configuration file
-        self.configuration_file.append(str("LOCAL DATA END"))
+        self.configuration_file.append(str(model_element_type) + str(" LOCAL DATA END"))

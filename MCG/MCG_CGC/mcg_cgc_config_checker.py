@@ -303,7 +303,7 @@ class ConfigChecker(object):
             elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START:
 
                 # if component input interface start is found
-                if ConfigChecker.config_file[ConfigChecker.file_index] == "INPUT INTERFACE START":
+                if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT INPUT INTERFACE START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -328,7 +328,7 @@ class ConfigChecker(object):
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
                 # of if component input interface end is found
-                elif ConfigChecker.config_file[ConfigChecker.file_index] == "INPUT INTERFACE END":
+                elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT INPUT INTERFACE END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -347,7 +347,7 @@ class ConfigChecker(object):
             elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START:
 
                 # if component output interface start is found
-                if ConfigChecker.config_file[ConfigChecker.file_index] == "OUTPUT INTERFACE START":
+                if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT OUTPUT INTERFACE START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -372,7 +372,7 @@ class ConfigChecker(object):
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
                 # or if component output interface end is found
-                elif ConfigChecker.config_file[ConfigChecker.file_index] == "OUTPUT INTERFACE END":
+                elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT OUTPUT INTERFACE END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -391,7 +391,7 @@ class ConfigChecker(object):
             elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START:
 
                 # if component local data start is found
-                if ConfigChecker.config_file[ConfigChecker.file_index] == "LOCAL DATA START":
+                if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT LOCAL DATA START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -416,7 +416,7 @@ class ConfigChecker(object):
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
                 # or if component local data end is found
-                elif ConfigChecker.config_file[ConfigChecker.file_index] == "LOCAL DATA END":
+                elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT LOCAL DATA END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -435,7 +435,7 @@ class ConfigChecker(object):
             elif ConfigChecker.check_component_state == ConfigChecker.CHECK_COMPONENT_BODY_START:
 
                 # if component body start is found
-                if ConfigChecker.config_file[ConfigChecker.file_index] == "BODY START":
+                if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT BODY START":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -464,7 +464,7 @@ class ConfigChecker(object):
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
                 # or if component body end is found
-                elif ConfigChecker.config_file[ConfigChecker.file_index] == "BODY END":
+                elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT BODY END":
                     # increment file index
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
                     # move to next state
@@ -558,7 +558,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_NAME
 
             # when input interface start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "INPUT INTERFACE START":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT INPUT INTERFACE START":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -572,7 +572,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START
 
             # when input interface end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "INPUT INTERFACE END":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT INPUT INTERFACE END":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -586,7 +586,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE
 
             # when output interface start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "OUTPUT INTERFACE START":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT OUTPUT INTERFACE START":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -600,7 +600,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
 
             # when output interface end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "OUTPUT INTERFACE END":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT OUTPUT INTERFACE END":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -614,7 +614,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE
 
             # when local data start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "LOCAL DATA START":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT LOCAL DATA START":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -628,7 +628,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
 
             # when local data end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "LOCAL DATA END":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT LOCAL DATA END":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -642,7 +642,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA
 
             # when body start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "BODY START":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT BODY START":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)
@@ -656,7 +656,7 @@ class ConfigChecker(object):
                 ConfigChecker.check_component_state = ConfigChecker.CHECK_COMPONENT_BODY_START
 
             # when body end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "BODY END":
+            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT BODY END":
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SKIPPED, ConfigChecker.file_index + 1,
                                           temporary_file_index + 1)

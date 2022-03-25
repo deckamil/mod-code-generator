@@ -6,7 +6,7 @@
 #       into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           25 MAR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -131,13 +131,13 @@ class PackageConverter(Converter):
         self.configuration_file.append(str("PACKAGE NAME ") + str(self.model_element_name))
 
         # convert interface details to configuration file
-        self.convert_interfaces()
+        self.convert_interfaces("PACKAGE")
 
         # convert body
         Logger.save_in_log_file("*** convert body")
 
         # append start marker of function body section to configuration file
-        self.configuration_file.append(str("BODY START"))
+        self.configuration_file.append(str("PACKAGE BODY START"))
 
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
@@ -151,7 +151,7 @@ class PackageConverter(Converter):
                 self.convert_structure_assignment(sorted_node)
 
         # append end marker of function body section to configuration file
-        self.configuration_file.append(str("BODY END"))
+        self.configuration_file.append(str("PACKAGE BODY END"))
 
         # append end marker of new package section to configuration file
         self.configuration_file.append(str("PACKAGE END"))
