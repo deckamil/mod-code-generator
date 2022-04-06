@@ -244,42 +244,42 @@ class ConfigChecker(object):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_NAME
 
-            # when input interface start is found
+            # when component input interface start is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT INPUT INTERFACE START":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START
 
-            # when input interface end is found
+            # when component input interface end is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT INPUT INTERFACE END":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE
 
-            # when output interface start is found
+            # when component output interface start is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT OUTPUT INTERFACE START":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
 
-            # when output interface end is found
+            # when component output interface end is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT OUTPUT INTERFACE END":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE
 
-            # when local data start is found
+            # when component local data start is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT LOCAL DATA START":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
 
-            # when local data end is found
+            # when component local data end is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT LOCAL DATA END":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA
 
-            # when body start is found
+            # when component body start is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT BODY START":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_BODY_START
 
-            # when body end is found
+            # when component body end is found
             elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT BODY END":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_BODY
@@ -295,6 +295,61 @@ class ConfigChecker(object):
                 temporary_file_index = temporary_file_index + 1
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
+
+            # when package source if found
+            elif "PACKAGE SOURCE" in ConfigChecker.config_file[temporary_file_index]:
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
+
+            # when package name is found
+            elif "PACKAGE NAME " in ConfigChecker.config_file[temporary_file_index]:
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
+
+            # when package input interface start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE INPUT INTERFACE START":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE_START
+
+            # when package input interface end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE INPUT INTERFACE END":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE
+
+            # when package output interface start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE OUTPUT INTERFACE START":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE_START
+
+            # when package output interface end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE OUTPUT INTERFACE END":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE
+
+            # when package local data start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE LOCAL DATA START":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_LOCAL_DATA_START
+
+            # when package local data end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE LOCAL DATA END":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_LOCAL_DATA
+
+            # when package body start is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE BODY START":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_BODY_START
+
+            # when package body end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE BODY END":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_BODY
+
+            # when package end is found
+            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE END":
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_END
 
             # if any configuration section was not recognized
             else:
