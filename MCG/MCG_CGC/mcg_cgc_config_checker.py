@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           27 MAR 2022
+#   DATE:           6 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,6 +40,8 @@ class ConfigChecker(object):
     config_file = []
     file_index = 0
     number_of_config_file_lines = 0
+    number_of_subsection_errors = 0
+    NUMBER_OF_REPETITIONS_BEFORE_SKIPPING = 5
 
     # verification state
     checker_state = ""
@@ -106,7 +108,7 @@ class ConfigChecker(object):
         ConfigChecker.number_of_config_file_lines = len(config_file)
 
     # Description:
-    # This is main method of the class, which checks if content of configuration file is correct.
+    # This is main method of the class, which checks if content of the configuration file is correct.
     @staticmethod
     def check_config_file():
 
@@ -152,7 +154,7 @@ class ConfigChecker(object):
 
             # check footer
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_FOOTER:
-                ConfigChecker.find_footer()
+                ConfigChecker.check_footer()
 
     # Description:
     # This method checks correctness of header in the configuration file.
@@ -173,6 +175,9 @@ class ConfigChecker(object):
     # This method looks for new module section in the configuration file.
     @staticmethod
     def find_new_module():
+
+        # clear counter of subsection errors
+        ConfigChecker.number_of_subsection_errors = 0
 
         # when component start marker is found
         if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
@@ -200,6 +205,9 @@ class ConfigChecker(object):
     # after error was detected in module section.
     @staticmethod
     def skip_and_find_module_section():
+
+        # clear counter of subsection errors
+        ConfigChecker.number_of_subsection_errors = 0
 
         # get copy of file index
         temporary_file_index = ConfigChecker.file_index
@@ -369,6 +377,8 @@ class ConfigChecker(object):
             elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT INPUT INTERFACE END":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
                 # move to next state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
 
@@ -376,8 +386,15 @@ class ConfigChecker(object):
             else:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_UN, ConfigChecker.file_index + 1, "")
-                # skip part of the configuration file and find next module section
-                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
 
         # for component output interface start check
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START:
@@ -409,6 +426,8 @@ class ConfigChecker(object):
             elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT OUTPUT INTERFACE END":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
                 # move to next state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
 
@@ -416,8 +435,15 @@ class ConfigChecker(object):
             else:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_UN, ConfigChecker.file_index + 1, "")
-                # skip part of the configuration file and find next module section
-                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
 
         # for component local data start check
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START:
@@ -449,6 +475,8 @@ class ConfigChecker(object):
             elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT LOCAL DATA END":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
                 # move to next state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_BODY_START
 
@@ -456,8 +484,15 @@ class ConfigChecker(object):
             else:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_UN, ConfigChecker.file_index + 1, "")
-                # skip part of the configuration file and find next module section
-                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
 
         # for component body start check
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_BODY_START:
@@ -493,6 +528,8 @@ class ConfigChecker(object):
             elif ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT BODY END":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
                 # move to next state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_END
 
@@ -500,8 +537,15 @@ class ConfigChecker(object):
             else:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_UN, ConfigChecker.file_index + 1, "")
-                # skip part of the configuration file and find next module section
-                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
 
         # for component end check
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_END:
@@ -527,7 +571,7 @@ class ConfigChecker(object):
         ConfigChecker.checker_state = ConfigChecker.END_CHECKING
 
     # Description:
-    # This method looks for config end in the configuration file.
+    # This method checks correctness of footer in the configuration file.
     @staticmethod
-    def find_footer():
+    def check_footer():
         ConfigChecker.checker_state = ConfigChecker.END_CHECKING
