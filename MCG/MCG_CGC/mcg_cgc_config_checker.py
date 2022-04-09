@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           6 APR 2022
+#   DATE:           9 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -196,7 +196,7 @@ class ConfigChecker(object):
         # or when line contains unexpected data
         else:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_MOD_ST_UN, ConfigChecker.file_index+1, "")
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_START, ConfigChecker.file_index+1, "")
             # skip part of the configuration file and find next module section
             ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -381,7 +381,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_SRC_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_SOURCE, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -398,7 +398,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_NAM_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_NAME, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -415,7 +415,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_ST_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -440,7 +440,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_IN_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE, ConfigChecker.file_index + 1, "")
                 # increment number of subsection errors
                 ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
                 # if number of subsection errors is greater than skipping threshold
@@ -464,7 +464,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_ST_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -489,7 +489,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_OUT_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE, ConfigChecker.file_index + 1, "")
                 # increment number of subsection errors
                 ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
                 # if number of subsection errors is greater than skipping threshold
@@ -513,7 +513,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_ST_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -538,7 +538,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_LOC_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE, ConfigChecker.file_index + 1, "")
                 # increment number of subsection errors
                 ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
                 # if number of subsection errors is greater than skipping threshold
@@ -562,7 +562,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_ST_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -591,7 +591,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_BOD_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, ConfigChecker.file_index + 1, "")
                 # increment number of subsection errors
                 ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
                 # if number of subsection errors is greater than skipping threshold
@@ -615,7 +615,7 @@ class ConfigChecker(object):
             # or if line contains unexpected data
             else:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.CHK_ERR_COM_END_UN, ConfigChecker.file_index + 1, "")
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_END, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
