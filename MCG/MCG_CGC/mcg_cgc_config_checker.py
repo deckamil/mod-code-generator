@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           9 APR 2022
+#   DATE:           19 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -193,10 +193,17 @@ class ConfigChecker(object):
             # start package verification
             ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
+        # when config end marker is found
+        elif "MCG CGC CONFIG END" in ConfigChecker.config_file[ConfigChecker.file_index]:
+            # increment file index
+            ConfigChecker.file_index = ConfigChecker.file_index + 1
+            # start footer verification
+            ConfigChecker.checker_state = ConfigChecker.CHECK_FOOTER
+
         # or when line contains unexpected data
         else:
             # record error
-            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_START, ConfigChecker.file_index+1, "")
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_START_OR_FOOTER, ConfigChecker.file_index+1, "")
             # skip part of the configuration file and find next module section
             ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
@@ -350,6 +357,13 @@ class ConfigChecker(object):
             elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE END":
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_END
+
+            # when config end marker is found
+            elif "MCG CGC CONFIG END" in ConfigChecker.config_file[ConfigChecker.file_index]:
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to expected state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_FOOTER
 
             # if any configuration section was not recognized
             else:
@@ -629,4 +643,24 @@ class ConfigChecker(object):
     # This method checks correctness of footer in the configuration file.
     @staticmethod
     def check_footer():
-        ConfigChecker.checker_state = ConfigChecker.END_CHECKING
+
+        # start searching for end of configuration file
+        continue_searching = True
+
+        # continue searching until EOF is found
+        while continue_searching:
+
+            # when file index is out of range
+            if ConfigChecker.file_index >= ConfigChecker.number_of_config_file_lines:
+                # stop searching
+                continue_searching = False
+                # end configuration check
+                ConfigChecker.checker_state = ConfigChecker.END_CHECKING
+
+            # when line is NOT empty
+            elif ConfigChecker.config_file[ConfigChecker.file_index] != "":
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_DATA_AFTER_FOOTER, ConfigChecker.file_index + 1, "")
+
+            # increment file index and repeat same state process
+            ConfigChecker.file_index = ConfigChecker.file_index + 1

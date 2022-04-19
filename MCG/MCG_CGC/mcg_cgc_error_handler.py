@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           9 APR 2022
+#   DATE:           19 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,7 +42,7 @@ class ErrorHandler(object):
     CHK_ERR_EOF = 1
     CHK_ERR_SKIPPED = 2
     CHK_ERR_FAULTY_HEADER = 10
-    CHK_ERR_FAULTY_START = 20
+    CHK_ERR_FAULTY_START_OR_FOOTER = 20
     CHK_ERR_FAULTY_NAME = 21
     CHK_ERR_FAULTY_SOURCE = 22
     CHK_ERR_FAULTY_INPUT_INTERFACE = 23
@@ -50,8 +50,7 @@ class ErrorHandler(object):
     CHK_ERR_FAULTY_LOCAL_INTERFACE = 25
     CHK_ERR_FAULTY_BODY = 26
     CHK_ERR_FAULTY_END = 27
-    CHK_ERR_FAULTY_FOOTER = 30
-    CHK_ERR_DATA_AFTER_FOOTER = 31
+    CHK_ERR_DATA_AFTER_FOOTER = 30
 
     # Description:
     # This method records error (i.e. append error to error list), found during run of MCG CGC.
@@ -76,14 +75,14 @@ class ErrorHandler(object):
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_HEADER:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of config start maker"
+                    "unexpected content instead of config start marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_FAULTY_START:
+        elif error_code == ErrorHandler.CHK_ERR_FAULTY_START_OR_FOOTER:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of module start maker"
+                    "unexpected content instead of module start or config end marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
@@ -136,16 +135,9 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_FAULTY_FOOTER:
-            # set error notification
-            error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of config end maker"
-            # append error to error list
-            ErrorHandler.error_list.append(error)
-
         elif error_code == ErrorHandler.CHK_ERR_DATA_AFTER_FOOTER:
             # set error notification
-            error = "ERROR " + str(error_code) + ": Unexpected data appear at line " + str(error_info1) + \
+            error = "ERROR " + str(error_code) + ": Unexpected data was found at line " + str(error_info1) + \
                     " after end of the configuration file"
             # append error to error list
             ErrorHandler.error_list.append(error)
