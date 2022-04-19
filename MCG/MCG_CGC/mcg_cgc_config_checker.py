@@ -43,6 +43,10 @@ class ConfigChecker(object):
     number_of_subsection_errors = 0
     NUMBER_OF_REPETITIONS_BEFORE_SKIPPING = 5
 
+    # expected marker positions in configuration file
+    TYPE_POSITION_IN_INTERFACE = 0
+    NAME_POSITION_IN_INTERFACE = 5
+
     # verification state
     checker_state = ""
 
@@ -437,8 +441,10 @@ class ConfigChecker(object):
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE:
 
             # if type and name in input interface is found
-            if ("type " in ConfigChecker.config_file[ConfigChecker.file_index]) and \
-                    (" name " in ConfigChecker.config_file[ConfigChecker.file_index]):
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.TYPE_POSITION_IN_INTERFACE) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.NAME_POSITION_IN_INTERFACE):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -486,8 +492,10 @@ class ConfigChecker(object):
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE:
 
             # if type and name in output interface is found
-            if ("type " in ConfigChecker.config_file[ConfigChecker.file_index]) and \
-                    (" name " in ConfigChecker.config_file[ConfigChecker.file_index]):
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.TYPE_POSITION_IN_INTERFACE) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.NAME_POSITION_IN_INTERFACE):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -535,8 +543,10 @@ class ConfigChecker(object):
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_LOCAL_DATA:
 
             # if type and name in local data is found
-            if ("type " in ConfigChecker.config_file[ConfigChecker.file_index]) and \
-                    (" name " in ConfigChecker.config_file[ConfigChecker.file_index]):
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.TYPE_POSITION_IN_INTERFACE) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.NAME_POSITION_IN_INTERFACE):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
