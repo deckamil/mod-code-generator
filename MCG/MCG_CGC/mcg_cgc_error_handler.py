@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           19 APR 2022
+#   DATE:           20 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -75,63 +75,63 @@ class ErrorHandler(object):
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_HEADER:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of config start marker"
+                    "unexpected content instead of correct config start marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_START_OR_FOOTER:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of module start or config end marker"
+                    "unexpected content instead of correct module start or config end marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_NAME:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of module name or marker"
+                    "unexpected content instead of correct module name or marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_SOURCE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of module source marker"
+                    "unexpected content instead of correct module source marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of input interface data or marker"
+                    "unexpected content instead of correct input interface definition or marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of output interface data or marker"
+                    "unexpected content instead of correct output interface definition or marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of local interface data or marker"
+                    "unexpected content instead of correct local interface definition or marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_BODY:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of body data or marker"
+                    "unexpected content instead of correct body definition or marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
         elif error_code == ErrorHandler.CHK_ERR_FAULTY_END:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of module end maker"
+                    "unexpected content instead of correct module end maker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 

@@ -44,9 +44,11 @@ class ConfigChecker(object):
     NUMBER_OF_REPETITIONS_BEFORE_SKIPPING = 5
 
     # expected marker positions in configuration file
-    TYPE_POSITION_IN_INTERFACE = 0
-    NAME_POSITION_IN_INTERFACE = 5
-    INSTRUCTION_POSITION_IN_BODY = 0
+    MODULE_SOURCE_POSITION_IN_CFG = 0
+    MODULE_NAME_POSITION_IN_CFG = 0
+    INTERFACE_TYPE_POSITION_IN_CFG = 0
+    INTERFACE_NAME_POSITION_IN_CFG = 5
+    BODY_DEFINITION_POSITION_IN_CFG = 0
 
     # verification state
     checker_state = ""
@@ -247,12 +249,14 @@ class ConfigChecker(object):
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
 
             # when component source if found
-            elif "COMPONENT SOURCE" in ConfigChecker.config_file[temporary_file_index]:
+            elif ConfigChecker.config_file[temporary_file_index].find("COMPONENT SOURCE") == \
+                    ConfigChecker.MODULE_SOURCE_POSITION_IN_CFG:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
 
             # when component name is found
-            elif "COMPONENT NAME " in ConfigChecker.config_file[temporary_file_index]:
+            elif ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") == \
+                    ConfigChecker.MODULE_NAME_POSITION_IN_CFG:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_NAME
 
@@ -309,12 +313,14 @@ class ConfigChecker(object):
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
             # when package source if found
-            elif "PACKAGE SOURCE" in ConfigChecker.config_file[temporary_file_index]:
+            elif ConfigChecker.config_file[temporary_file_index].find("PACKAGE SOURCE") == \
+                    ConfigChecker.MODULE_SOURCE_POSITION_IN_CFG:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
             # when package name is found
-            elif "PACKAGE NAME " in ConfigChecker.config_file[temporary_file_index]:
+            elif ConfigChecker.config_file[temporary_file_index].find("PACKAGE NAME ") == \
+                    ConfigChecker.MODULE_NAME_POSITION_IN_CFG:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
 
@@ -391,7 +397,8 @@ class ConfigChecker(object):
         if ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_SOURCE:
 
             # if component source is found
-            if "COMPONENT SOURCE" in ConfigChecker.config_file[ConfigChecker.file_index]:
+            if ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT SOURCE") == \
+                    ConfigChecker.MODULE_SOURCE_POSITION_IN_CFG:
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -408,7 +415,8 @@ class ConfigChecker(object):
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_NAME:
 
             # if component name is found
-            if "COMPONENT NAME " in ConfigChecker.config_file[ConfigChecker.file_index]:
+            if ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") == \
+                    ConfigChecker.MODULE_NAME_POSITION_IN_CFG:
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -443,9 +451,9 @@ class ConfigChecker(object):
 
             # if type and name in input interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
-                ConfigChecker.TYPE_POSITION_IN_INTERFACE) and \
+                ConfigChecker.INTERFACE_TYPE_POSITION_IN_CFG) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
-                     ConfigChecker.NAME_POSITION_IN_INTERFACE):
+                     ConfigChecker.INTERFACE_NAME_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -494,9 +502,9 @@ class ConfigChecker(object):
 
             # if type and name in output interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
-                ConfigChecker.TYPE_POSITION_IN_INTERFACE) and \
+                ConfigChecker.INTERFACE_TYPE_POSITION_IN_CFG) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
-                     ConfigChecker.NAME_POSITION_IN_INTERFACE):
+                     ConfigChecker.INTERFACE_NAME_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -545,9 +553,9 @@ class ConfigChecker(object):
 
             # if type and name in local data is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
-                ConfigChecker.TYPE_POSITION_IN_INTERFACE) and \
+                ConfigChecker.INTERFACE_TYPE_POSITION_IN_CFG) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
-                     ConfigChecker.NAME_POSITION_IN_INTERFACE):
+                     ConfigChecker.INTERFACE_NAME_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -596,9 +604,9 @@ class ConfigChecker(object):
 
             # if instruction or comment is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("INS ") ==
-                ConfigChecker.INSTRUCTION_POSITION_IN_BODY) or \
+                ConfigChecker.BODY_DEFINITION_POSITION_IN_CFG) or \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find("COM ") ==
-                     ConfigChecker.INSTRUCTION_POSITION_IN_BODY):
+                     ConfigChecker.BODY_DEFINITION_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
