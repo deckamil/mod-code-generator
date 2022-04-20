@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           19 APR 2022
+#   DATE:           20 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -46,6 +46,7 @@ class ConfigChecker(object):
     # expected marker positions in configuration file
     TYPE_POSITION_IN_INTERFACE = 0
     NAME_POSITION_IN_INTERFACE = 5
+    INSTRUCTION_POSITION_IN_BODY = 0
 
     # verification state
     checker_state = ""
@@ -593,13 +594,11 @@ class ConfigChecker(object):
         # for component body check
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_BODY:
 
-            # if comment is found
-            if "COM " in ConfigChecker.config_file[ConfigChecker.file_index]:
-                # increment file index and repeat same state process
-                ConfigChecker.file_index = ConfigChecker.file_index + 1
-
-            # or if instruction is found
-            elif "INS" in ConfigChecker.config_file[ConfigChecker.file_index]:
+            # if instruction or comment is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("INS ") ==
+                ConfigChecker.INSTRUCTION_POSITION_IN_BODY) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("COM ") ==
+                     ConfigChecker.INSTRUCTION_POSITION_IN_BODY):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
