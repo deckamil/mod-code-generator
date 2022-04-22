@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           20 APR 2022
+#   DATE:           22 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,20 +35,24 @@ from mcg_cgc_error_handler import ErrorHandler
 # This class is responsible for verification of the configuration file.
 class ConfigChecker(object):
 
-    # initialize class data
+    # class data
     config_file_path = ""
     config_file = []
     file_index = 0
+    module_name_list = []
     number_of_config_file_lines = 0
     number_of_subsection_errors = 0
     NUMBER_OF_REPETITIONS_BEFORE_SKIPPING = 5
 
-    # expected marker positions in configuration file
-    MODULE_SOURCE_POSITION_IN_CFG = 0
-    MODULE_NAME_POSITION_IN_CFG = 0
-    INTERFACE_TYPE_POSITION_IN_CFG = 0
-    INTERFACE_NAME_POSITION_IN_CFG = 5
-    BODY_DEFINITION_POSITION_IN_CFG = 0
+    # expected data/marker positions or properties of configuration file
+    BASE_POSITION = 0
+    MODULE_SOURCE_MARKER_POSITION_IN_CFG = BASE_POSITION
+    MODULE_NAME_MARKER_POSITION_IN_CFG = BASE_POSITION
+    MODULE_NAME_POSITION_IN_CFG = 15
+    INTERFACE_TYPE_MARKER_POSITION_IN_CFG = BASE_POSITION
+    INTERFACE_NAME_MARKER_POSITION_IN_CFG = BASE_POSITION
+    BODY_DEFINITION_MARKER_POSITION_IN_CFG = BASE_POSITION
+    MIN_MODULE_NAME_LINE_LENGTH_IN_CFG = MODULE_NAME_POSITION_IN_CFG + 1
 
     # verification state
     checker_state = ""
@@ -250,13 +254,15 @@ class ConfigChecker(object):
 
             # when component source if found
             elif ConfigChecker.config_file[temporary_file_index].find("COMPONENT SOURCE") == \
-                    ConfigChecker.MODULE_SOURCE_POSITION_IN_CFG:
+                    ConfigChecker.MODULE_SOURCE_MARKER_POSITION_IN_CFG:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
 
             # when component name is found
-            elif ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") == \
-                    ConfigChecker.MODULE_NAME_POSITION_IN_CFG:
+            elif (ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") ==
+                  ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
+                    (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
+                     ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_NAME
 
@@ -314,13 +320,15 @@ class ConfigChecker(object):
 
             # when package source if found
             elif ConfigChecker.config_file[temporary_file_index].find("PACKAGE SOURCE") == \
-                    ConfigChecker.MODULE_SOURCE_POSITION_IN_CFG:
+                    ConfigChecker.MODULE_SOURCE_MARKER_POSITION_IN_CFG:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
             # when package name is found
-            elif ConfigChecker.config_file[temporary_file_index].find("PACKAGE NAME ") == \
-                    ConfigChecker.MODULE_NAME_POSITION_IN_CFG:
+            elif (ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE NAME ") ==
+                  ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
+                    (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
+                     ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
 
@@ -398,7 +406,7 @@ class ConfigChecker(object):
 
             # if component source is found
             if ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT SOURCE") == \
-                    ConfigChecker.MODULE_SOURCE_POSITION_IN_CFG:
+                    ConfigChecker.MODULE_SOURCE_MARKER_POSITION_IN_CFG:
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -415,8 +423,10 @@ class ConfigChecker(object):
         elif ConfigChecker.checker_state == ConfigChecker.CHECK_COMPONENT_NAME:
 
             # if component name is found
-            if ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") == \
-                    ConfigChecker.MODULE_NAME_POSITION_IN_CFG:
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") ==
+                ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
+                    (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
+                     ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -451,9 +461,9 @@ class ConfigChecker(object):
 
             # if type and name in input interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
-                ConfigChecker.INTERFACE_TYPE_POSITION_IN_CFG) and \
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
-                     ConfigChecker.INTERFACE_NAME_POSITION_IN_CFG):
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -502,9 +512,9 @@ class ConfigChecker(object):
 
             # if type and name in output interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
-                ConfigChecker.INTERFACE_TYPE_POSITION_IN_CFG) and \
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
-                     ConfigChecker.INTERFACE_NAME_POSITION_IN_CFG):
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -553,9 +563,9 @@ class ConfigChecker(object):
 
             # if type and name in local data is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
-                ConfigChecker.INTERFACE_TYPE_POSITION_IN_CFG) and \
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
-                     ConfigChecker.INTERFACE_NAME_POSITION_IN_CFG):
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
@@ -604,9 +614,9 @@ class ConfigChecker(object):
 
             # if instruction or comment is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("INS ") ==
-                ConfigChecker.BODY_DEFINITION_POSITION_IN_CFG) or \
+                ConfigChecker.BODY_DEFINITION_MARKER_POSITION_IN_CFG) or \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find("COM ") ==
-                     ConfigChecker.BODY_DEFINITION_POSITION_IN_CFG):
+                     ConfigChecker.BODY_DEFINITION_MARKER_POSITION_IN_CFG):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
