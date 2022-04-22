@@ -48,11 +48,13 @@ class ConfigChecker(object):
     BASE_POSITION = 0
     MODULE_SOURCE_MARKER_POSITION_IN_CFG = BASE_POSITION
     MODULE_NAME_MARKER_POSITION_IN_CFG = BASE_POSITION
-    MODULE_NAME_POSITION_IN_CFG = 15
+    COMPONENT_NAME_POSITION_IN_CFG = 15
+    PACKAGE_NAME_POSITION_IN_CFG = 13
     INTERFACE_TYPE_MARKER_POSITION_IN_CFG = BASE_POSITION
     INTERFACE_NAME_MARKER_POSITION_IN_CFG = BASE_POSITION
     BODY_DEFINITION_MARKER_POSITION_IN_CFG = BASE_POSITION
-    MIN_MODULE_NAME_LINE_LENGTH_IN_CFG = MODULE_NAME_POSITION_IN_CFG + 1
+    MIN_COMPONENT_NAME_LINE_LENGTH_IN_CFG = COMPONENT_NAME_POSITION_IN_CFG + 1
+    MIN_PACKAGE_NAME_LINE_LENGTH_IN_CFG = PACKAGE_NAME_POSITION_IN_CFG + 1
 
     # verification state
     checker_state = ""
@@ -262,7 +264,7 @@ class ConfigChecker(object):
             elif (ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") ==
                   ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
                     (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
-                     ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
+                     ConfigChecker.MIN_COMPONENT_NAME_LINE_LENGTH_IN_CFG):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_NAME
 
@@ -328,7 +330,7 @@ class ConfigChecker(object):
             elif (ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE NAME ") ==
                   ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
                     (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
-                     ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
+                     ConfigChecker.MIN_PACKAGE_NAME_LINE_LENGTH_IN_CFG):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
 
@@ -426,11 +428,11 @@ class ConfigChecker(object):
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") ==
                 ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
                     (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
-                     ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
+                     ConfigChecker.MIN_COMPONENT_NAME_LINE_LENGTH_IN_CFG):
                 # get configuration file line
                 line = ConfigChecker.config_file[ConfigChecker.file_index]
                 # get module name
-                module_name = line[ConfigChecker.MODULE_NAME_POSITION_IN_CFG:len(line)]
+                module_name = line[ConfigChecker.COMPONENT_NAME_POSITION_IN_CFG:len(line)]
                 # check if same module name was already declared in the configuration file
                 ConfigChecker.check_if_same_module_name(module_name)
                 # increment file index
