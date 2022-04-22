@@ -427,6 +427,12 @@ class ConfigChecker(object):
                 ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
                     (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
                      ConfigChecker.MIN_MODULE_NAME_LINE_LENGTH_IN_CFG):
+                # get configuration file line
+                line = ConfigChecker.config_file[ConfigChecker.file_index]
+                # get module name
+                module_name = line[ConfigChecker.MODULE_NAME_POSITION_IN_CFG:len(line)]
+                # check if same module name was already declared in the configuration file
+                ConfigChecker.check_if_same_module_name(module_name)
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -691,3 +697,23 @@ class ConfigChecker(object):
 
             # increment file index and repeat same state process
             ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+    # Description:
+    # This method checks if given module name was already declared in the configuration file.
+    @staticmethod
+    def check_if_same_module_name(module_name):
+
+        # for all names from module name list
+        for name in ConfigChecker.module_name_list:
+            # check if name is same as given module name
+            if name == module_name:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SAME_MODULE_NAME, module_name, "")
+                # exit 'for name in' loop
+                break
+
+        # append name to list of module names
+        ConfigChecker.module_name_list.append(module_name)
+
+        # remove duplicates from module name list
+        ConfigChecker.module_name_list = list(set(ConfigChecker.module_name_list))

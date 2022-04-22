@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           20 APR 2022
+#   DATE:           22 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -51,6 +51,7 @@ class ErrorHandler(object):
     CHK_ERR_FAULTY_BODY = 26
     CHK_ERR_FAULTY_END = 27
     CHK_ERR_DATA_AFTER_FOOTER = 30
+    CHK_ERR_SAME_MODULE_NAME = 40
 
     # Description:
     # This method records error (i.e. append error to error list), found during run of MCG CGC.
@@ -139,6 +140,13 @@ class ErrorHandler(object):
             # set error notification
             error = "ERROR " + str(error_code) + ": Unexpected data was found at line " + str(error_info1) + \
                     " after end of the configuration file"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.CHK_ERR_SAME_MODULE_NAME:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Module name " + str(error_info1) + " was declared more than " \
+                    "one time in the configuration file"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
