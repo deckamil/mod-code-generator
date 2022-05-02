@@ -93,8 +93,7 @@ class ConfigChecker(object):
     CHECK_PACKAGE_END = 211
 
     # indexes of config checker list
-    CONFIG_FILE_VALIDITY_INDEX = 0
-    CONFIG_FILE_INDEX = 1
+    CONFIG_FILE_INDEX = 0
 
     # Description:
     # This method sets path to the configuration file.
@@ -168,6 +167,13 @@ class ConfigChecker(object):
             # check footer
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_FOOTER:
                 ConfigChecker.check_footer()
+
+        # append config file to config checker list
+        config_checker_list = []
+        config_checker_list.insert(ConfigChecker.CONFIG_FILE_INDEX, ConfigChecker.config_file)
+
+        # return config checker list
+        return config_checker_list
 
     # Description:
     # This method checks correctness of header in the configuration file.
