@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           22 APR 2022
+#   DATE:           2 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -208,8 +208,6 @@ class ConfigChecker(object):
 
         # when config end marker is found
         elif "MCG CGC CONFIG END" in ConfigChecker.config_file[ConfigChecker.file_index]:
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
             # start footer verification
             ConfigChecker.checker_state = ConfigChecker.CHECK_FOOTER
 
@@ -261,9 +259,9 @@ class ConfigChecker(object):
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
 
             # when component name is found
-            elif (ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") ==
+            elif (ConfigChecker.config_file[temporary_file_index].find("COMPONENT NAME ") ==
                   ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
-                    (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
+                    (len(ConfigChecker.config_file[temporary_file_index]) >=
                      ConfigChecker.MIN_COMPONENT_NAME_LINE_LENGTH_IN_CFG):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_NAME
@@ -327,9 +325,9 @@ class ConfigChecker(object):
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
 
             # when package name is found
-            elif (ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE NAME ") ==
+            elif (ConfigChecker.config_file[temporary_file_index].find("PACKAGE NAME ") ==
                   ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
-                    (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
+                    (len(ConfigChecker.config_file[temporary_file_index]) >=
                      ConfigChecker.MIN_PACKAGE_NAME_LINE_LENGTH_IN_CFG):
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
@@ -380,9 +378,7 @@ class ConfigChecker(object):
                 ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_END
 
             # when config end marker is found
-            elif "MCG CGC CONFIG END" in ConfigChecker.config_file[ConfigChecker.file_index]:
-                # increment file index
-                ConfigChecker.file_index = ConfigChecker.file_index + 1
+            elif "MCG CGC CONFIG END" in ConfigChecker.config_file[temporary_file_index]:
                 # move to expected state
                 ConfigChecker.checker_state = ConfigChecker.CHECK_FOOTER
 
@@ -672,12 +668,283 @@ class ConfigChecker(object):
     # This method checks correctness of package section in the configuration file.
     @staticmethod
     def check_package():
-        ConfigChecker.checker_state = ConfigChecker.END_CHECKING
+
+        # for package source check
+        if ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_SOURCE:
+
+            # if package source is found
+            if ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE SOURCE") == \
+                    ConfigChecker.MODULE_SOURCE_MARKER_POSITION_IN_CFG:
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_SOURCE, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+
+        # for package name check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_NAME:
+
+            # if package name is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE NAME ") ==
+                ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
+                    (len(ConfigChecker.config_file[ConfigChecker.file_index]) >=
+                     ConfigChecker.MIN_PACKAGE_NAME_LINE_LENGTH_IN_CFG):
+                # get configuration file line
+                line = ConfigChecker.config_file[ConfigChecker.file_index]
+                # get module name
+                module_name = line[ConfigChecker.PACKAGE_NAME_POSITION_IN_CFG:len(line)]
+                # check if same module name was already declared in the configuration file
+                ConfigChecker.check_if_same_module_name(module_name)
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE_START
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_NAME, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+
+        # for package input interface start check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE_START:
+
+            # if package input interface start is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE INPUT INTERFACE START":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+
+        # for package input interface check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE:
+
+            # if type and name in input interface is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+            # of if package input interface end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE INPUT INTERFACE END":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE_START
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE, ConfigChecker.file_index + 1, "")
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # for package output interface start check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE_START:
+
+            # if package output interface start is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE OUTPUT INTERFACE START":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE, ConfigChecker.file_index + 1,
+                                          "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+
+        # for package output interface check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE:
+
+            # if type and name in output interface is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+            # or if package output interface end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE OUTPUT INTERFACE END":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_LOCAL_DATA_START
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE, ConfigChecker.file_index + 1,
+                                          "")
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # for package local data start check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_LOCAL_DATA_START:
+
+            # if package local data start is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE LOCAL DATA START":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_LOCAL_DATA
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+
+        # for package local data check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_LOCAL_DATA:
+
+            # if type and name in local data is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+            # or if package local data end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE LOCAL DATA END":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_BODY_START
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE, ConfigChecker.file_index + 1, "")
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # for package body start check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_BODY_START:
+
+            # if package body start is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE BODY START":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_BODY
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+
+        # for package body check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_BODY:
+
+            # if instruction or comment is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("INV ") ==
+                ConfigChecker.BODY_DEFINITION_MARKER_POSITION_IN_CFG) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("ASI ") ==
+                     ConfigChecker.BODY_DEFINITION_MARKER_POSITION_IN_CFG) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("COM ") ==
+                     ConfigChecker.BODY_DEFINITION_MARKER_POSITION_IN_CFG):
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+            # or if package body end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE BODY END":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
+                # move to next state
+                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_END
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, ConfigChecker.file_index + 1, "")
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+        # for package end check
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_PACKAGE_END:
+
+            # if package end is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE END":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # find beginning of next module section
+                ConfigChecker.checker_state = ConfigChecker.FIND_NEW_MODULE
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_END, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
 
     # Description:
     # This method checks correctness of footer in the configuration file.
     @staticmethod
     def check_footer():
+
+        # increment file index once config file end marker was found
+        ConfigChecker.file_index = ConfigChecker.file_index + 1
 
         # start searching for end of configuration file
         continue_searching = True
