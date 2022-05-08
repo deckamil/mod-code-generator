@@ -123,8 +123,13 @@ class Module(object):
         module = module + self.indent + self.filename + "_output_type " + self.filename + "_output;\n"
         module = module + "\n"
 
+        # ********** FUNCTION BODY ********** #
 
+        # set function body
+        for module_body in self.module_body_list:
+            module = module + self.indent + module_body + ";\n"
 
+        module = module + "\n"
 
         # ********** COLLECT OUTPUT DATA ********** #
 
