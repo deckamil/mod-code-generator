@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           2 MAY 2022
+#   DATE:           8 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,6 +33,7 @@ from sys import argv
 from mcg_cgc_logger import Logger
 from mcg_cgc_error_handler import ErrorHandler
 from mcg_cgc_config_checker import ConfigChecker
+from mcg_cgc_config_converter import ConfigConverter
 
 
 # Description:
@@ -106,7 +107,12 @@ class Main(object):
         ErrorHandler.check_errors()
 
         # check content of the configuration file
-        config_checker_list = ConfigChecker.check_config_file()
+        config_file = ConfigChecker.check_config_file()
+        # check errors
+        ErrorHandler.check_errors()
+
+        # generate code from the configuration file
+        ConfigConverter.generate_code_from_config_file(config_file)
         # check errors
         ErrorHandler.check_errors()
 
