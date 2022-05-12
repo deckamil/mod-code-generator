@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           8 MAY 2022
+#   DATE:           12 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -99,14 +99,8 @@ class ConfigConverter(object):
                 while "COMPONENT INPUT INTERFACE END" not in config_file[file_index]:
                     # get line
                     line = config_file[file_index]
-                    # get name position within line
-                    name_position = line.find(" name ")
-                    # get interface element type
-                    interface_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
-                    # get interface element name
-                    interface_element_name = line[name_position+ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:len(line)]
-                    # set interface element
-                    interface_element = [interface_element_type, interface_element_name]
+                    # extract interface element type and name from line of the configuration file
+                    interface_element = ConfigConverter.extract_interface_element(line)
                     # append interface element
                     module.input_interface_list.append(interface_element)
                     # increment file index
@@ -122,14 +116,8 @@ class ConfigConverter(object):
                 while "COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]:
                     # get line
                     line = config_file[file_index]
-                    # get name position within line
-                    name_position = line.find(" name ")
-                    # get interface element type
-                    interface_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
-                    # get interface element name
-                    interface_element_name = line[name_position+ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:len(line)]
-                    # set interface element
-                    interface_element = [interface_element_type, interface_element_name]
+                    # extract interface element type and name from line of the configuration file
+                    interface_element = ConfigConverter.extract_interface_element(line)
                     # append interface element
                     module.output_interface_list.append(interface_element)
                     # increment file index
@@ -145,14 +133,8 @@ class ConfigConverter(object):
                 while "COMPONENT LOCAL DATA END" not in config_file[file_index]:
                     # get line
                     line = config_file[file_index]
-                    # get name position within line
-                    name_position = line.find(" name ")
-                    # get interface element type
-                    interface_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
-                    # get interface element name
-                    interface_element_name = line[name_position+ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:len(line)]
-                    # set interface element
-                    interface_element = [interface_element_type, interface_element_name]
+                    # extract interface element type and name from line of the configuration file
+                    interface_element = ConfigConverter.extract_interface_element(line)
                     # append interface element
                     module.local_data_list.append(interface_element)
                     # increment file index
@@ -164,3 +146,20 @@ class ConfigConverter(object):
             file_index = file_index + 1
 
         print(module.generate_module_source())
+
+    # Description:
+    # This method extracts interface element type and interface element name from line of the configuration file .
+    @staticmethod
+    def extract_interface_element(line):
+
+        # get name position within line
+        name_position = line.find(" name ")
+        # get interface element type
+        interface_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
+        # get interface element name
+        interface_element_name = line[name_position + ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:len(line)]
+        # set interface element
+        interface_element = [interface_element_type, interface_element_name]
+
+        # return interface element
+        return interface_element
