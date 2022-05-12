@@ -41,6 +41,7 @@ class ConfigConverter(object):
     COMPONENT_SOURCE_POSITION_IN_CFG = 17
     INTERFACE_TYPE_POSITION_IN_CFG = 5
     INTERFACE_NAME_POSITION_IN_CFG = 6
+    BODY_DATA_POSITION_IN_CFG = 4
 
     # Description:
     # This method generates source code modules from the configuration file.
@@ -140,12 +141,37 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-                break
+            # when component body is found
+            elif "COMPONENT BODY START" in config_file[file_index]:
+
+                # increment file index to definition of first body element
+                file_index = file_index + 1
+
+                # continue reading of body elements until end of body section is reached
+                while "COMPONENT BODY END" not in config_file[file_index]:
+                    # get line
+                    line = config_file[file_index]
+
+                    # if body line contains module comment
+                    if "COM " in line:
+                        # get comment
+                        comment = "// " + line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # append comment
+                        module.module_body_list.append(comment)
+                    # otherwise when line contains module instruction
+                    else:
+                        # get instruction
+                        instruction = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # append instruction
+                        module.module_body_list.append(instruction)
+
+                    # increment file index
+                    file_index = file_index + 1
+
+                print(module.generate_module_source())
 
             # increment file index
             file_index = file_index + 1
-
-        print(module.generate_module_source())
 
     # Description:
     # This method extracts interface element type and interface element name from line of the configuration file .
