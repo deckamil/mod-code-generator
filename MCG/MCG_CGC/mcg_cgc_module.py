@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           8 MAY 2022
+#   DATE:           17 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,7 +57,7 @@ class Module(object):
     # This method returns string representation of module source file.
     def generate_module_source(self):
 
-        # ********** HEADER ********** #
+        # ********** MODULE HEADER ********** #
 
         # set module header
         module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
@@ -67,20 +67,26 @@ class Module(object):
         # set module comment
         module = module + " *\n"
 
-        # append comments to module body
+        # set generic comment
+        module = module + " *   " + "This is source file of " + self.filename + " module.\n"
+
+        # append header comments
         for header_comment in self.header_comment_list:
             module = module + " *   " + header_comment + "\n"
 
         # set end of module header
         module = module + " */\n\n"
 
-        # ********** INCLUDES ********** #
+        # ********** MODULE INCLUDES ********** #
 
         # set includes
         module = module + "#include \"" + self.filename + ".h\"\n"
         module = module + "#include \"basic_data_types.h\"\n\n"
 
-        # ********** FUNCTION BEGINNING ********** #
+        # ********** FUNCTION HEADER ********** #
+
+        # set function comment
+        module = module + "// This is definition of module function\n"
 
         # set return type
         module = module + self.filename + "_output_type "
@@ -94,7 +100,7 @@ class Module(object):
         # set input interface comment
         module = module + self.indent + "// Input Interface\n"
 
-        # set input interface
+        # append input interface
         for input_interface in self.input_interface_list:
             module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
@@ -105,7 +111,7 @@ class Module(object):
         # set local data comment
         module = module + self.indent + "// Local Data\n"
 
-        # set local data
+        # append local data
         for local_data in self.local_data_list:
             module = module + self.indent + local_data[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + local_data[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
@@ -115,7 +121,7 @@ class Module(object):
         # set output interface comment
         module = module + self.indent + "// Output Interface\n"
 
-        # set output interface
+        # append output interface
         for output_interface in self.output_interface_list:
             module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
@@ -125,7 +131,7 @@ class Module(object):
 
         # ********** FUNCTION BODY ********** #
 
-        # set function body
+        # append function body
         for module_body in self.module_body_list:
             module = module + self.indent + module_body + ";\n"
 
@@ -148,7 +154,7 @@ class Module(object):
 
         module = module + "}\n\n"
 
-        # ********** FOOTER ********** #
+        # ********** MODULE END ********** #
 
         # set module footer
         module = module + "/*\n" + " * END OF MODULE\n" + " */\n"
@@ -160,7 +166,58 @@ class Module(object):
     # This method returns string representation of module header file
     def generate_module_header(self):
 
+        # ********** MODULE HEADER ********** #
+
         # set module header
         module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
         # set module date
         module = module + self.generation_date + "\n"
+
+        # set module comment
+        module = module + " *\n"
+
+        # set generic comment
+        module = module + " *   " + "This is header file of " + self.filename + " module.\n"
+
+        # append header comments
+        for header_comment in self.header_comment_list:
+            module = module + " *   " + header_comment + "\n"
+
+        # set end of module header
+        module = module + " */\n\n"
+
+        # ********** HEADER GUARD ********** #
+
+        # set header guard
+        module = module + "#ifndef " + self.filename + "_H_\n"
+        module = module + "#define " + self.filename + "_H_\n\n"
+
+        # ********** MODULE INCLUDES ********** #
+
+        # set includes
+        module = module + "#include \"basic_data_types.h\"\n\n"
+
+        # ********** FUNCTION PROTOTYPE ********** #
+
+        # set function comment
+        module = module + "// This is prototype of module function\n"
+
+        # set return type
+        module = module + self.filename + "_output_type "
+        # set function name
+        module = module + self.filename
+        # set function argument
+        module = module + "(" + self.filename + "_input_type *" + self.filename + "_input);\n\n"
+
+        # ********** HEADER GUARD END ********** #
+
+        # set header guard end
+        module = module + "#endif " + "// " + self.filename + "_H_\n\n"
+
+        # ********** MODULE END ********** #
+
+        # set module footer
+        module = module + "/*\n" + " * END OF MODULE\n" + " */\n"
+
+        # return string representation
+        return module

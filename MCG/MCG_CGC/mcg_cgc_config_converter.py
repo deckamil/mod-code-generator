@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           12 MAY 2022
+#   DATE:           17 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -85,7 +85,7 @@ class ConfigConverter(object):
                 # get line
                 line = config_file[file_index]
                 # get comment
-                comment = "This module was generated from file " + \
+                comment = "The module was generated from file " + \
                           line[ConfigConverter.COMPONENT_SOURCE_POSITION_IN_CFG:len(line)]
                 # append comment
                 module.header_comment_list.append(comment)
@@ -168,13 +168,20 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
+            # when component end is found
+            elif "COMPONENT END" in config_file[file_index]:
+
                 print(module.generate_module_source())
+                print("")
+                print(module.generate_module_header())
+                print("")
+                print("")
 
             # increment file index
             file_index = file_index + 1
 
     # Description:
-    # This method extracts interface element type and interface element name from line of the configuration file .
+    # This method extracts interface element type and interface element name from line of the configuration file.
     @staticmethod
     def extract_interface_element(line):
 
@@ -184,8 +191,11 @@ class ConfigConverter(object):
         interface_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
         # get interface element name
         interface_element_name = line[name_position + ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:len(line)]
-        # set interface element
-        interface_element = [interface_element_type, interface_element_name]
+
+        # append collected data to interface element
+        interface_element = []
+        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
+        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
 
         # return interface element
         return interface_element
