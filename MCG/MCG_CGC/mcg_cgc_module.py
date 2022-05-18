@@ -150,6 +150,12 @@ class Module(object):
 
         module = module + "\n"
 
+        # set comment
+        module = module + self.indent + "// Return output data\n"
+
+        # set return
+        module = module + self.indent + "return " + self.filename + "_output;\n"
+
         # ********** FUNCTION END ********** #
 
         module = module + "}\n\n"
