@@ -215,6 +215,20 @@ class Module(object):
 
         # ********** OUTPUT INTERFACE TYPE ********** #
 
+        # set output interface type comment
+        module = module + "// This is output interface type of module function\n"
+
+        # set output interface struct definition
+        module = module + "typedef struct{\n"
+
+        # append output interface
+        for output_interface in self.output_interface_list:
+            module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
+                     + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+
+        # set output interface type name
+        module = module + "} " + self.filename + "_output_type;\n\n"
+
         # ********** FUNCTION PROTOTYPE ********** #
 
         # set function comment
