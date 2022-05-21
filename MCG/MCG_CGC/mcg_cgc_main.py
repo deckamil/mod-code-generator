@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           8 MAY 2022
+#   DATE:           21 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -76,6 +76,8 @@ class Main(object):
 
             # set path to configuration file
             ConfigChecker.set_config_file_path(config_file_path)
+            # set path to code directory
+            ConfigConverter.set_code_dir_path(output_dir_path)
             # set path to log file
             Logger.set_log_file_path(output_dir_path)
 

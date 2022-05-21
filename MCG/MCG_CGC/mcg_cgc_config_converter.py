@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           17 MAY 2022
+#   DATE:           21 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -43,6 +43,32 @@ class ConfigConverter(object):
     INTERFACE_NAME_POSITION_IN_CFG = 6
     BODY_DATA_POSITION_IN_CFG = 4
 
+    # path to source code directory
+    code_dir_path = ""
+
+    # Description:
+    # This method sets path to output directory where source code will be generated.
+    @staticmethod
+    def set_code_dir_path(output_dir_path):
+
+        # set code directory path
+        ConfigConverter.code_dir_path = output_dir_path
+
+    # Description:
+    # This method saves module file on hard disk.
+    @staticmethod
+    def save_module_file(module_name, module_file):
+
+        # set module file path
+        module_file_path = ConfigConverter.code_dir_path + "\\" + module_name
+
+        # open file in write mode
+        module_file_disk = open(module_file_path, "w")
+        # write module to file on hard disk
+        module_file_disk.write(module_file)
+        # close file
+        module_file_disk.close()
+
     # Description:
     # This method generates source code modules from the configuration file.
     @staticmethod
@@ -55,6 +81,8 @@ class ConfigConverter(object):
 
         # get new module
         module = Module()
+        # module name
+        module_name = ""
 
         # set file index
         file_index = 0
@@ -75,10 +103,10 @@ class ConfigConverter(object):
             elif "COMPONENT NAME" in config_file[file_index]:
                 # get line
                 line = config_file[file_index]
-                # get filename
-                filename = line[ConfigConverter.COMPONENT_NAME_POSITION_IN_CFG:len(line)]
-                # set filename
-                module.filename = filename
+                # get module name
+                module_name = line[ConfigConverter.COMPONENT_NAME_POSITION_IN_CFG:len(line)]
+                # set module name
+                module.module_name = module_name
 
             # when component comment is found
             elif "COMPONENT SOURCE" in config_file[file_index]:
@@ -171,11 +199,19 @@ class ConfigConverter(object):
             # when component end is found
             elif "COMPONENT END" in config_file[file_index]:
 
-                print(module.generate_module_source())
-                print("")
-                print(module.generate_module_header())
-                print("")
-                print("")
+                # generate source file code
+                module_source = module.generate_module_source()
+                # set module source name
+                module_source_name = module_name + ".c"
+                # save module source to file
+                ConfigConverter.save_module_file(module_source_name, module_source)
+
+                # generate header file code
+                module_header = module.generate_module_header()
+                # set module header name
+                module_header_name = module_name + '.h'
+                # save module header to file
+                ConfigConverter.save_module_file(module_header_name, module_header)
 
             # increment file index
             file_index = file_index + 1

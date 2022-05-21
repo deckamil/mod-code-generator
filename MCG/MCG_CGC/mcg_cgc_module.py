@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           18 MAY 2022
+#   DATE:           21 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -45,7 +45,7 @@ class Module(object):
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        self.filename = ""
+        self.module_name = ""
         self.generation_date = ""
         self.header_comment_list = []
         self.input_interface_list = []
@@ -68,7 +68,7 @@ class Module(object):
         module = module + " *\n"
 
         # set generic comment
-        module = module + " *   " + "This is source file of " + self.filename + " module.\n"
+        module = module + " *   " + "This is source file of " + self.module_name + " module.\n"
 
         # append header comments
         for header_comment in self.header_comment_list:
@@ -80,7 +80,7 @@ class Module(object):
         # ********** MODULE INCLUDES ********** #
 
         # set includes
-        module = module + "#include \"" + self.filename + ".h\"\n"
+        module = module + "#include \"" + self.module_name + ".h\"\n"
         module = module + "#include \"basic_data_types.h\"\n\n"
 
         # ********** FUNCTION HEADER ********** #
@@ -89,11 +89,11 @@ class Module(object):
         module = module + "// This is definition of module function\n"
 
         # set return type
-        module = module + self.filename + "_output_type "
+        module = module + self.module_name + "_output_type "
         # set function name
-        module = module + self.filename
+        module = module + self.module_name
         # set function argument
-        module = module + "(" + self.filename + "_input_type *" + self.filename + "_input){\n\n"
+        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input){\n\n"
 
         # ********** FUNCTION INTERFACE ********** #
 
@@ -104,7 +104,7 @@ class Module(object):
         for input_interface in self.input_interface_list:
             module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
-                     + self.filename + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+                     + self.module_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -126,7 +126,7 @@ class Module(object):
             module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
-        module = module + self.indent + self.filename + "_output_type " + self.filename + "_output;\n"
+        module = module + self.indent + self.module_name + "_output_type " + self.module_name + "_output;\n"
         module = module + "\n"
 
         # ********** FUNCTION BODY ********** #
@@ -144,7 +144,7 @@ class Module(object):
 
         # collect output data into output data structure
         for output_interface in self.output_interface_list:
-            module = module + self.indent + self.filename + "_output->" + \
+            module = module + self.indent + self.module_name + "_output->" + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
@@ -154,7 +154,7 @@ class Module(object):
         module = module + self.indent + "// Return output data\n"
 
         # set return
-        module = module + self.indent + "return " + self.filename + "_output;\n"
+        module = module + self.indent + "return " + self.module_name + "_output;\n"
 
         # ********** FUNCTION END ********** #
 
@@ -183,7 +183,7 @@ class Module(object):
         module = module + " *\n"
 
         # set generic comment
-        module = module + " *   " + "This is header file of " + self.filename + " module.\n"
+        module = module + " *   " + "This is header file of " + self.module_name + " module.\n"
 
         # append header comments
         for header_comment in self.header_comment_list:
@@ -195,8 +195,8 @@ class Module(object):
         # ********** HEADER GUARD ********** #
 
         # set header guard
-        module = module + "#ifndef " + self.filename + "_H_\n"
-        module = module + "#define " + self.filename + "_H_\n\n"
+        module = module + "#ifndef " + self.module_name + "_H_\n"
+        module = module + "#define " + self.module_name + "_H_\n\n"
 
         # ********** MODULE INCLUDES ********** #
 
@@ -217,7 +217,7 @@ class Module(object):
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         # set input interface type name
-        module = module + "} " + self.filename + "_input_type;\n\n"
+        module = module + "} " + self.module_name + "_input_type;\n\n"
 
         # ********** OUTPUT INTERFACE TYPE ********** #
 
@@ -233,7 +233,7 @@ class Module(object):
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         # set output interface type name
-        module = module + "} " + self.filename + "_output_type;\n\n"
+        module = module + "} " + self.module_name + "_output_type;\n\n"
 
         # ********** FUNCTION PROTOTYPE ********** #
 
@@ -241,16 +241,16 @@ class Module(object):
         module = module + "// This is prototype of module function\n"
 
         # set return type
-        module = module + self.filename + "_output_type "
+        module = module + self.module_name + "_output_type "
         # set function name
-        module = module + self.filename
+        module = module + self.module_name
         # set function argument
-        module = module + "(" + self.filename + "_input_type *" + self.filename + "_input);\n\n"
+        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input);\n\n"
 
         # ********** HEADER GUARD END ********** #
 
         # set header guard end
-        module = module + "#endif " + "// " + self.filename + "_H_\n\n"
+        module = module + "#endif " + "// " + self.module_name + "_H_\n\n"
 
         # ********** MODULE END ********** #
 
