@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           8 MAY 2022
+#   DATE:           21 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -101,9 +101,9 @@ class ConfigChecker(object):
         ConfigChecker.config_file_path = config_file_path
 
     # Description:
-    # This method reads content of the configuration file.
+    # This method loads content of the configuration file from hard disk.
     @staticmethod
-    def read_config_file():
+    def load_config_file():
 
         # open file and read content, then close file
         config_file_disk = open(ConfigChecker.config_file_path, "r")
@@ -117,7 +117,7 @@ class ConfigChecker(object):
         ConfigChecker.number_of_config_file_lines = len(config_file)
 
     # Description:
-    # This is main method of the class, which checks if content of the configuration file is correct.
+    # This method checks content of the configuration file.
     @staticmethod
     def check_config_file():
 
@@ -164,6 +164,11 @@ class ConfigChecker(object):
             # check footer
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_FOOTER:
                 ConfigChecker.check_footer()
+
+    # Description:
+    # This method returns content of the configuration file.
+    @staticmethod
+    def get_config_file():
 
         # return config file
         return ConfigChecker.config_file

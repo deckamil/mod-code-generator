@@ -103,16 +103,18 @@ class Main(object):
         # saves log file header
         Logger.save_log_file_header()
 
-        # read the configuration file
-        ConfigChecker.read_config_file()
+        # load content of the configuration file
+        ConfigChecker.load_config_file()
         # check errors
         ErrorHandler.check_errors()
 
         # check content of the configuration file
-        config_file = ConfigChecker.check_config_file()
+        ConfigChecker.check_config_file()
         # check errors
         ErrorHandler.check_errors()
 
+        # get content of the configuration file
+        config_file = ConfigChecker.get_config_file()
         # generate code from the configuration file
         ConfigConverter.generate_code_from_config_file(config_file)
         # check errors
