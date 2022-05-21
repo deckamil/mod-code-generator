@@ -38,7 +38,9 @@ class ConfigConverter(object):
 
     # expected data/marker positions or properties of configuration file
     COMPONENT_NAME_POSITION_IN_CFG = 15
+    PACKAGE_NAME_POSITION_IN_CFG = 13
     COMPONENT_SOURCE_POSITION_IN_CFG = 17
+    PACKAGE_SOURCE_POSITION_IN_CFG = 15
     INTERFACE_TYPE_POSITION_IN_CFG = 5
     INTERFACE_NAME_POSITION_IN_CFG = 6
     BODY_DATA_POSITION_IN_CFG = 4
@@ -92,8 +94,8 @@ class ConfigConverter(object):
         # continue conversion until end of the configuration file is reached
         while file_index < number_of_config_file_lines:
 
-            # when new component definition is found
-            if "COMPONENT START" in config_file[file_index]:
+            # when new module definition is found
+            if ("COMPONENT START" in config_file[file_index]) or ("PACKAGE START" in config_file[file_index]):
                 # get new module
                 module = Module()
                 # set date
@@ -108,6 +110,15 @@ class ConfigConverter(object):
                 # set module name
                 module.module_name = module_name
 
+            # when package name is found
+            elif "PACKAGE NAME" in config_file[file_index]:
+                # get line
+                line = config_file[file_index]
+                # get module name
+                module_name = line[ConfigConverter.PACKAGE_NAME_POSITION_IN_CFG:len(line)]
+                # set module name
+                module.module_name = module_name
+
             # when component comment is found
             elif "COMPONENT SOURCE" in config_file[file_index]:
                 # get line
@@ -118,14 +129,26 @@ class ConfigConverter(object):
                 # append comment
                 module.header_comment_list.append(comment)
 
-            # when component input interface is found
-            elif "COMPONENT INPUT INTERFACE START" in config_file[file_index]:
+            # when package comment is found
+            elif "PACKAGE SOURCE" in config_file[file_index]:
+                # get line
+                line = config_file[file_index]
+                # get comment
+                comment = "The module was generated from file " + \
+                          line[ConfigConverter.PACKAGE_SOURCE_POSITION_IN_CFG:len(line)]
+                # append comment
+                module.header_comment_list.append(comment)
+
+            # when module input interface is found
+            elif ("COMPONENT INPUT INTERFACE START" in config_file[file_index]) or \
+                    ("PACKAGE INPUT INTERFACE START" in config_file[file_index]):
 
                 # increment file index to definition of first input interface element
                 file_index = file_index + 1
 
                 # continue reading of input interface definition until end of input interface section is reached
-                while "COMPONENT INPUT INTERFACE END" not in config_file[file_index]:
+                while ("COMPONENT INPUT INTERFACE END" not in config_file[file_index]) and \
+                        ("PACKAGE INPUT INTERFACE END" not in config_file[file_index]):
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
@@ -135,14 +158,16 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when component output interface is found
-            elif "COMPONENT OUTPUT INTERFACE START" in config_file[file_index]:
+            # when module output interface is found
+            elif ("COMPONENT OUTPUT INTERFACE START" in config_file[file_index]) or \
+                    ("PACKAGE OUTPUT INTERFACE START" in config_file[file_index]):
 
                 # increment file index to definition of first output interface element
                 file_index = file_index + 1
 
                 # continue reading of output interface definition until end of output interface section is reached
-                while "COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]:
+                while ("COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]) and \
+                        ("PACKAGE OUTPUT INTERFACE END" not in config_file[file_index]):
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
@@ -152,14 +177,16 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when component local data is found
-            elif "COMPONENT LOCAL DATA START" in config_file[file_index]:
+            # when module local data is found
+            elif ("COMPONENT LOCAL DATA START" in config_file[file_index]) or \
+                    ("PACKAGE LOCAL DATA START" in config_file[file_index]):
 
                 # increment file index to definition of first local data element
                 file_index = file_index + 1
 
                 # continue reading of local data definition until end of local data section is reached
-                while "COMPONENT LOCAL DATA END" not in config_file[file_index]:
+                while ("COMPONENT LOCAL DATA END" not in config_file[file_index]) and \
+                        ("PACKAGE LOCAL DATA END" not in config_file[file_index]):
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
@@ -196,8 +223,22 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when component end is found
-            elif "COMPONENT END" in config_file[file_index]:
+            # when package body is found
+            elif "PACKAGE BODY START" in config_file[file_index]:
+
+                # increment file index to definition of first body element
+                file_index = file_index + 1
+
+                # continue reading of body elements until end of body section is reached
+                while "PACKAGE BODY END" not in config_file[file_index]:
+
+                    # TBD
+
+                    # increment file index
+                    file_index = file_index + 1
+
+            # when module end is found
+            elif ("COMPONENT END" in config_file[file_index]) or ("PACKAGE END" in config_file[file_index]):
 
                 # generate source file code
                 module_source = module.generate_module_source()
