@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           22 APR 2022
+#   DATE:           28 APR 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -164,14 +164,11 @@ class ErrorHandler(object):
         # if any error was recorded
         if len(ErrorHandler.error_list) > 0:
             # error handler
-            Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-            Logger.save_in_log_file("*** ERRORS FOUND, Mod Code Generator (MCG) Code Generator Component (CGC) WILL EXIT")
+            Logger.save_in_log_file("ErrorHandler",
+                                    "ERRORS FOUND, Mod Code Generator (MCG) Code Generator Component (CGC) WILL EXIT")
             # display errors
             for error in ErrorHandler.error_list:
-                Logger.save_in_log_file(error)
-
-            # end of error handler
-            Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+                Logger.save_in_log_file("ErrorHandler", error)
 
             # exit MCG CGC.
             exit()
