@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           21 MAY 2022
+#   DATE:           28 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,6 +30,7 @@
 
 from datetime import datetime
 from mcg_cgc_module import Module
+from mcg_cgc_logger import Logger
 
 
 # Description:
@@ -76,6 +77,10 @@ class ConfigConverter(object):
     @staticmethod
     def generate_code_from_config_file(config_file):
 
+        # record info
+        Logger.save_in_log_file("ConfigConverter",
+                                "Starting conversion of the configuration file into source code", True)
+
         # get date
         date = datetime.now()
         # format date
@@ -103,6 +108,10 @@ class ConfigConverter(object):
 
             # when component name is found
             elif "COMPONENT NAME" in config_file[file_index]:
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Reading component name from line " + str(file_index + 1),
+                                        False)
                 # get line
                 line = config_file[file_index]
                 # get module name
@@ -112,6 +121,10 @@ class ConfigConverter(object):
 
             # when package name is found
             elif "PACKAGE NAME" in config_file[file_index]:
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Reading package name from line " + str(file_index + 1),
+                                        False)
                 # get line
                 line = config_file[file_index]
                 # get module name
@@ -121,6 +134,10 @@ class ConfigConverter(object):
 
             # when component comment is found
             elif "COMPONENT SOURCE" in config_file[file_index]:
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Reading component source from line " + str(file_index + 1),
+                                        False)
                 # get line
                 line = config_file[file_index]
                 # get comment
@@ -131,6 +148,10 @@ class ConfigConverter(object):
 
             # when package comment is found
             elif "PACKAGE SOURCE" in config_file[file_index]:
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Reading package source from line " + str(file_index + 1),
+                                        False)
                 # get line
                 line = config_file[file_index]
                 # get comment
@@ -149,6 +170,10 @@ class ConfigConverter(object):
                 # continue reading of input interface definition until end of input interface section is reached
                 while ("COMPONENT INPUT INTERFACE END" not in config_file[file_index]) and \
                         ("PACKAGE INPUT INTERFACE END" not in config_file[file_index]):
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module input interface from line " + str(file_index + 1),
+                                            False)
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
@@ -168,6 +193,10 @@ class ConfigConverter(object):
                 # continue reading of output interface definition until end of output interface section is reached
                 while ("COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]) and \
                         ("PACKAGE OUTPUT INTERFACE END" not in config_file[file_index]):
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module output interface from line " + str(file_index + 1),
+                                            False)
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
@@ -187,6 +216,10 @@ class ConfigConverter(object):
                 # continue reading of local data definition until end of local data section is reached
                 while ("COMPONENT LOCAL DATA END" not in config_file[file_index]) and \
                         ("PACKAGE LOCAL DATA END" not in config_file[file_index]):
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module local data from line " + str(file_index + 1),
+                                            False)
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
@@ -204,6 +237,12 @@ class ConfigConverter(object):
 
                 # continue reading of body elements until end of body section is reached
                 while "COMPONENT BODY END" not in config_file[file_index]:
+
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module body from line " + str(file_index + 1),
+                                            False)
+
                     # get line
                     line = config_file[file_index]
 
@@ -232,6 +271,11 @@ class ConfigConverter(object):
                 # continue reading of body elements until end of body section is reached
                 while "PACKAGE BODY END" not in config_file[file_index]:
 
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module body from line " + str(file_index + 1),
+                                            False)
+
                     # TBD
 
                     # increment file index
@@ -240,6 +284,10 @@ class ConfigConverter(object):
             # when module end is found
             elif ("COMPONENT END" in config_file[file_index]) or ("PACKAGE END" in config_file[file_index]):
 
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Generating source code file for " + module_name + " module",
+                                        False)
                 # generate source file code
                 module_source = module.generate_module_source()
                 # set module source name
@@ -247,6 +295,10 @@ class ConfigConverter(object):
                 # save module source to file
                 ConfigConverter.save_module_file(module_source_name, module_source)
 
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Generating header code file for " + module_name + " module",
+                                        False)
                 # generate header file code
                 module_header = module.generate_module_header()
                 # set module header name
