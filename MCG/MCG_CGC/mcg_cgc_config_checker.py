@@ -107,7 +107,9 @@ class ConfigChecker(object):
     def load_config_file():
 
         # record info
-        Logger.save_in_log_file("ConfigChecker", "Loading of the configuration file")
+        Logger.save_in_log_file("ConfigChecker",
+                                "Loading of the configuration file",
+                                True)
 
         # open file and read content, then close file
         config_file_disk = open(ConfigChecker.config_file_path, "r")
@@ -185,7 +187,8 @@ class ConfigChecker(object):
         # record info
         Logger.save_in_log_file("ConfigChecker",
                                 "Checking header of the configuration file at line "
-                                + str(ConfigChecker.file_index + 1))
+                                + str(ConfigChecker.file_index + 1),
+                                False)
 
         # when config start marker is NOT found
         if "MCG CGC CONFIG START" not in ConfigChecker.config_file[ConfigChecker.file_index]:
@@ -204,7 +207,8 @@ class ConfigChecker(object):
 
         # record info
         Logger.save_in_log_file("ConfigChecker",
-                                "Looking for next section of the configuration file")
+                                "Looking for next section of the configuration file",
+                                False)
 
         # clear counter of subsection errors
         ConfigChecker.number_of_subsection_errors = 0
@@ -214,7 +218,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Have found new component section in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # start component verification
@@ -225,7 +230,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Have found new package section in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
             # start package verification
@@ -236,7 +242,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Have found footer of the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
             # start footer verification
             ConfigChecker.checker_state = ConfigChecker.CHECK_FOOTER
 
@@ -255,7 +262,8 @@ class ConfigChecker(object):
 
         # record info
         Logger.save_in_log_file("ConfigChecker",
-                                "Skipping current section of the configuration file and looking for next one")
+                                "Skipping current section of the configuration file and looking for next one",
+                                False)
 
         # clear counter of subsection errors
         ConfigChecker.number_of_subsection_errors = 0
@@ -438,7 +446,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component source in the configuration file at line "
-                                    + str(ConfigChecker.file_index + 1))
+                                    + str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component source is found
             if ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT SOURCE") == \
@@ -461,7 +470,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component name in the configuration file at line "
-                                    + str(ConfigChecker.file_index + 1))
+                                    + str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component name is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("COMPONENT NAME ") ==
@@ -492,7 +502,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component input interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component input interface start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT INPUT INTERFACE START":
@@ -514,7 +525,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component input interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if type and name in input interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
@@ -553,7 +565,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component output interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component output interface start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT OUTPUT INTERFACE START":
@@ -575,7 +588,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component output interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if type and name in output interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
@@ -614,7 +628,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component local data in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component local data start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT LOCAL DATA START":
@@ -636,7 +651,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component local data in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if type and name in local data is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
@@ -675,7 +691,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component body in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component body start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT BODY START":
@@ -697,7 +714,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component body in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if instruction or comment is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("INS ") ==
@@ -736,7 +754,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking component end in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if component end is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT END":
@@ -763,7 +782,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package source in the configuration file at line "
-                                    + str(ConfigChecker.file_index + 1))
+                                    + str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package source is found
             if ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE SOURCE") == \
@@ -786,7 +806,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package name in the configuration file at line "
-                                    + str(ConfigChecker.file_index + 1))
+                                    + str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package name is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("PACKAGE NAME ") ==
@@ -817,7 +838,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package input interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package input interface start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE INPUT INTERFACE START":
@@ -839,7 +861,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package input interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if type and name in input interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
@@ -878,7 +901,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package output interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package output interface start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE OUTPUT INTERFACE START":
@@ -901,7 +925,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package output interface in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if type and name in output interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
@@ -941,7 +966,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package local data in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package local data start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE LOCAL DATA START":
@@ -963,7 +989,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package local data in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if type and name in local data is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
@@ -1002,7 +1029,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package body in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package body start is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE BODY START":
@@ -1024,7 +1052,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package body in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if instruction or comment is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("INV ") ==
@@ -1065,7 +1094,8 @@ class ConfigChecker(object):
             # record info
             Logger.save_in_log_file("ConfigChecker",
                                     "Checking package end in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1))
+                                    str(ConfigChecker.file_index + 1),
+                                    False)
 
             # if package end is found
             if ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE END":
@@ -1089,7 +1119,8 @@ class ConfigChecker(object):
         # record info
         Logger.save_in_log_file("ConfigChecker",
                                 "Checking footer of the configuration file at line "
-                                + str(ConfigChecker.file_index + 1))
+                                + str(ConfigChecker.file_index + 1),
+                                False)
 
         # increment file index once config file end marker was found
         ConfigChecker.file_index = ConfigChecker.file_index + 1

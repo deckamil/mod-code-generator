@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           21 MAY 2022
+#   DATE:           28 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -100,7 +100,7 @@ class Main(object):
     @staticmethod
     def generate_code():
 
-        # saves log file header
+        # save log file header
         Logger.save_log_file_header()
 
         # load content of the configuration file
@@ -120,7 +120,7 @@ class Main(object):
         # check errors
         ErrorHandler.check_errors()
 
-        # saves log file footer
+        # save log file footer
         Logger.save_log_file_footer()
 
 

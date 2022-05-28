@@ -57,7 +57,7 @@ class Logger(object):
     def save_log_file_header():
 
         # write header info in log file
-        Logger.save_in_log_file("Logger", "Start of MCG CGC log")
+        Logger.save_in_log_file("Logger", "Start of MCG CGC log", False)
 
     # Description:
     # This method saves footer info in log file.
@@ -65,12 +65,12 @@ class Logger(object):
     def save_log_file_footer():
 
         # write footer info in log
-        Logger.save_in_log_file("Logger", "End of MCG CGC log")
+        Logger.save_in_log_file("Logger", "End of MCG CGC log", True)
 
     # Description:
     # This method prints and saves info in log file.
     @staticmethod
-    def save_in_log_file(info_source, info):
+    def save_in_log_file(info_source, info, empty_line):
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")
@@ -80,8 +80,15 @@ class Logger(object):
         # format date
         date = date.strftime("%d %b %Y, %H:%M:%S")
 
+        # merged info to be recorded in log file
+        merged_info = ""
+
+        # if empty line before new record in log is demanded
+        if empty_line:
+            merged_info = merged_info + "\n"
+
         # merge date, source and info
-        merged_info = date + " - " + info_source + " - " + info
+        merged_info = merged_info + date + " - " + info_source + " - " + info
 
         # print info
         print(merged_info)

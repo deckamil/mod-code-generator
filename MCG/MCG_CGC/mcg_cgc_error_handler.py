@@ -165,10 +165,14 @@ class ErrorHandler(object):
         if len(ErrorHandler.error_list) > 0:
             # error handler
             Logger.save_in_log_file("ErrorHandler",
-                                    "ERRORS FOUND, Mod Code Generator (MCG) Code Generator Component (CGC) WILL EXIT")
+                                    "ERRORS FOUND, Mod Code Generator (MCG) Code Generator Component (CGC) WILL EXIT",
+                                    True)
             # display errors
             for error in ErrorHandler.error_list:
-                Logger.save_in_log_file("ErrorHandler", error)
+                Logger.save_in_log_file("ErrorHandler", error, False)
+
+            # save log file footer
+            Logger.save_log_file_footer()
 
             # exit MCG CGC.
             exit()
