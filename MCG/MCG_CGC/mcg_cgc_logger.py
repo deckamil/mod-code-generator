@@ -70,7 +70,7 @@ class Logger(object):
     # Description:
     # This method prints and saves info in log file.
     @staticmethod
-    def save_in_log_file(info_source, info, empty_line):
+    def save_in_log_file(info_source, info, add_empty_line):
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")
@@ -84,7 +84,7 @@ class Logger(object):
         merged_info = ""
 
         # if empty line before new record in log is demanded
-        if empty_line:
+        if add_empty_line:
             merged_info = merged_info + "\n"
 
         # merge date, source and info
