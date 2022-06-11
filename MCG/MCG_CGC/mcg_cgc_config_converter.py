@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           28 MAY 2022
+#   DATE:           11 JUN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -276,7 +276,89 @@ class ConfigConverter(object):
                                             "Reading module body from line " + str(file_index + 1),
                                             False)
 
-                    # TBD
+                    # get line
+                    line = config_file[file_index]
+
+                    # if body line contains module comment
+                    if "COM " in line:
+                        # get comment
+                        comment = "// " + line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # append comment
+                        module.module_body_list.append(comment)
+
+                    # otherwise when line contains call of another module
+                    elif "INV " in line:
+
+                        # get invoked module output data name
+                        invoked_module_output_data_name = line[line.find("INV ")+4:line.find(" = ")]
+                        # get invoked module name
+                        invoked_module_name = line[line.find(" = ")+3:line.find(" (")]
+                        # get invoked module arguments
+                        invoked_module_arguments = line[line.find("(")+1:line.find(")")]
+                        # split string representation of invoked module arguments into list form
+                        invoked_module_argument_list = invoked_module_arguments.split(", ")
+
+                        # find invoked module input interface list
+                        invoked_module_input_interface_list = \
+                            ConfigConverter.find_module_input_interface(invoked_module_name, config_file)
+                        # find structure of each input data elements, i.e. output interface definition of other modules
+                        # which generate input data to above module
+                        input_data_structure_list = \
+                            ConfigConverter.find_input_data_structure(invoked_module_argument_list, config_file)
+
+                        # set instance of module input data
+                        module.module_body_list.append(invoked_module_name + "_input_type *" +
+                                                       invoked_module_name + "_input")
+                        # set module inputs
+                        for invoked_module_input_interface in invoked_module_input_interface_list:
+
+                            # get input interface type
+                            input_interface_type = invoked_module_input_interface[0]
+                            # get input interface name
+                            input_interface_name = invoked_module_input_interface[1]
+
+                            # check input data list for matching input interface element
+                            for input_data_structure in input_data_structure_list:
+
+                                # get input data name
+                                input_data_name = input_data_structure[0]
+                                # get input data interface
+                                input_data_interface = input_data_structure[1]
+
+                                # if input data comes from main Input Interface
+                                if input_data_name == "Input Interface":
+                                    # replace Input Interface with name of input data structure
+                                    input_data_name = module_name + "_input"
+
+                                # search for match between required input data and potential input data
+                                for input_data in input_data_interface:
+
+                                    # get potential type match
+                                    potential_input_interface_type_match = input_data[0]
+                                    # get potential name match
+                                    potential_input_interface_name_match = input_data[1]
+
+                                    # check match
+                                    if ((input_interface_type == potential_input_interface_type_match) and
+                                            (input_interface_name == potential_input_interface_name_match)):
+
+                                        # set module input
+                                        module.module_body_list.append(invoked_module_name + "_input->" +
+                                                                       input_interface_name + " = " +
+                                                                       input_data_name + "->" +
+                                                                       potential_input_interface_name_match)
+
+                                        # break "for input_data in" loop
+                                        break
+
+                        # set module invocation
+                        module.module_body_list.append(invoked_module_output_data_name + " = " + invoked_module_name +
+                                                       "(" + invoked_module_name + "_input)")
+
+                    # otherwise when line contains collection of output data
+                    else:
+
+                        TBD = ""
 
                     # increment file index
                     file_index = file_index + 1
@@ -328,3 +410,162 @@ class ConfigConverter(object):
 
         # return interface element
         return interface_element
+
+    # Description
+    # This method looks for definition of module input interface in the configuration file.
+    @staticmethod
+    def find_module_input_interface(module_name, config_file):
+
+        # module input interface list
+        module_input_interface_list = []
+        # module definition found in the configuration file
+        found_module_definition = False
+
+        # search for input interface definition of given module in the configuration file
+        for file_index in range(0, len(config_file)):
+
+            # if given module was found
+            if (("COMPONENT NAME " in config_file[file_index]) or
+                ("PACKAGE NAME " in config_file[file_index])) and \
+                    (module_name in config_file[file_index]):
+                # change flag
+                found_module_definition = True
+
+            # if input interface definition of given module was found
+            elif (("COMPONENT INPUT INTERFACE START" in config_file[file_index]) or
+                  ("PACKAGE INPUT INTERFACE START" in config_file[file_index])) and \
+                    found_module_definition:
+
+                # increment file index to definition of first input interface element
+                file_index = file_index + 1
+
+                # continue reading of input interface definition until end of input interface section is reached
+                while ("COMPONENT INPUT INTERFACE END" not in config_file[file_index]) and \
+                        ("PACKAGE INPUT INTERFACE END" not in config_file[file_index]):
+
+                    # get line
+                    line = config_file[file_index]
+                    # extract interface element type and name from line of the configuration file
+                    interface_element = ConfigConverter.extract_interface_element(line)
+                    # append interface element
+                    module_input_interface_list.append(interface_element)
+                    # increment file index
+                    file_index = file_index + 1
+
+                # break "for file_index in" loop
+                break
+
+        # return module input interface list
+        return module_input_interface_list
+
+    # Description
+    # This method looks for definition of module output interface in the configuration file.
+    @staticmethod
+    def find_module_output_interface(module_name, config_file):
+
+        # module output interface list
+        module_output_interface_list = []
+        # module definition found in the configuration file
+        found_module_definition = False
+
+        # search for output interface definition of given module in the configuration file
+        for file_index in range(0, len(config_file)):
+
+            # if given module was found
+            if (("COMPONENT NAME " in config_file[file_index]) or
+                ("PACKAGE NAME " in config_file[file_index])) and \
+                    (module_name in config_file[file_index]):
+                # change flag
+                found_module_definition = True
+
+            # if output interface definition of given module was found
+            elif (("COMPONENT OUTPUT INTERFACE START" in config_file[file_index]) or
+                  ("PACKAGE OUTPUT INTERFACE START" in config_file[file_index])) and \
+                    found_module_definition:
+
+                # increment file index to definition of first output interface element
+                file_index = file_index + 1
+
+                # continue reading of output interface definition until end of output interface section is reached
+                while ("COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]) and \
+                        ("PACKAGE OUTPUT INTERFACE END" not in config_file[file_index]):
+                    # get line
+                    line = config_file[file_index]
+                    # extract interface element type and name from line of the configuration file
+                    interface_element = ConfigConverter.extract_interface_element(line)
+                    # append interface element
+                    module_output_interface_list.append(interface_element)
+                    # increment file index
+                    file_index = file_index + 1
+
+                # break "for file_index in" loop
+                break
+
+        # return module output interface list
+        return module_output_interface_list
+
+    # Description
+    # This method looks for structure of each input data element passed to module during module call in
+    # the configuration file.
+    @staticmethod
+    def find_input_data_structure(input_data_name_list, config_file):
+
+        # input data structure list
+        input_data_structure_list = []
+
+        # for given input data element
+        for input_data_name in input_data_name_list:
+
+            # in main Input Interface is input element
+            if input_data_name == "Input Interface":
+
+                # check the configuration file for package name
+                for file_index in range(0, len(config_file)):
+
+                    # when package name is found
+                    if "PACKAGE NAME " in config_file[file_index]:
+
+                        # get line
+                        line = config_file[file_index]
+                        # get module name
+                        module_name = line[ConfigConverter.PACKAGE_NAME_POSITION_IN_CFG:len(line)]
+                        # find module input interface list
+                        module_input_interface_list = ConfigConverter.find_module_input_interface(module_name,
+                                                                                                  config_file)
+                        # input data structure
+                        input_data_structure = [input_data_name, module_input_interface_list]
+                        # append input data structure
+                        input_data_structure_list.append(input_data_structure)
+
+                        # break "for file_index in" loop
+                        break
+
+            # otherwise look for data generated by other modules
+            else:
+
+                # look for specific string where input data element in output of another module
+                keyword = "INV " + input_data_name + " = "
+
+                # check the configuration file for above keyword
+                for file_index in range(0, len(config_file)):
+
+                    # if given keyword is found in the configuration file
+                    if keyword in config_file[file_index]:
+
+                        # get line
+                        line = config_file[file_index]
+                        # get module name
+                        module_name = line[line.find(" = ") + 3:line.find(" (")]
+                        #  find module output interface list
+                        module_output_interface_list = ConfigConverter.find_module_output_interface(module_name,
+                                                                                                    config_file)
+                        # input data structure
+                        input_data_structure = [input_data_name, module_output_interface_list]
+                        # append input data structure
+                        input_data_structure_list.append(input_data_structure)
+
+                        # break "for file_index in" loop
+                        break
+
+        # return input data structure list
+        return input_data_structure_list
