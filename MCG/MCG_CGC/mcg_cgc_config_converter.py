@@ -268,6 +268,11 @@ class ConfigConverter(object):
                 # increment file index to definition of first body element
                 file_index = file_index + 1
 
+                # append instance of module input data
+                module.module_body_list.append("// Input data")
+                module.module_body_list.append(module_name + "_input_type " + module_name + "_input" +
+                                               " = *" + module_name + "_input")
+
                 # continue reading of body elements until end of body section is reached
                 while "PACKAGE BODY END" not in config_file[file_index]:
 
@@ -307,20 +312,17 @@ class ConfigConverter(object):
                             ConfigConverter.find_argument_interface(invoked_module_argument_list, config_file)
 
                         # TO DO:
-                        # 1. get instance of input data from input data pointer
-                        # 2. remove input interface, local interface, output interface and
-                        # collection of output interface section from package source code item
-                        # 3. add setup of output data structure
+                        # 1. add setup of output data structure
 
-                        # set instance of module input data
+                        # append instance of invoked module input data
                         module.module_body_list.append(invoked_module_name + "_input_type " +
                                                        invoked_module_name + "_input")
 
-                        # set instance of module output data
+                        # append instance of invoked module output data
                         module.module_body_list.append(invoked_module_name + "_output_type " +
                                                        invoked_module_output_data_name)
 
-                        # set module inputs
+                        # set inputs of invoked module
                         for invoked_module_input_interface in invoked_module_input_interface_list:
 
                             # get input interface type
@@ -357,7 +359,7 @@ class ConfigConverter(object):
                                             # replace Input Interface with name of input data structure
                                             invoked_module_argument = module_name + "_input"
 
-                                        # set module input
+                                        # append invoked module input
                                         module.module_body_list.append(invoked_module_name + "_input." +
                                                                        input_interface_name + " = " +
                                                                        invoked_module_argument + "." +
@@ -366,7 +368,7 @@ class ConfigConverter(object):
                                         # break "for invoked_module_argument_element in" loop
                                         break
 
-                        # set module invocation
+                        # append module invocation
                         module.module_body_list.append(invoked_module_output_data_name + " = " + invoked_module_name +
                                                        "(&" + invoked_module_name + "_input)")
 
@@ -379,7 +381,7 @@ class ConfigConverter(object):
                     file_index = file_index + 1
 
             # when module end is found
-            elif ("COMPONENT END" in config_file[file_index]) or ("PACKAGE END" in config_file[file_index]):
+            elif "COMPONENT END" in config_file[file_index]:
 
                 # record info
                 Logger.save_in_log_file("ConfigConverter",
@@ -402,6 +404,37 @@ class ConfigConverter(object):
                 module_header_name = module_name + '.h'
                 # save module header to file
                 ConfigConverter.save_module_file(module_header_name, module_header)
+
+            # when module end is found
+            elif "PACKAGE END" in config_file[file_index]:
+
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Generating header code file for " + module_name + " module",
+                                        False)
+                # generate header file code
+                module_header = module.generate_module_header()
+                # set module header name
+                module_header_name = module_name + '.h'
+                # save module header to file
+                ConfigConverter.save_module_file(module_header_name, module_header)
+
+                # record info
+                Logger.save_in_log_file("ConfigConverter",
+                                        "Generating source code file for " + module_name + " module",
+                                        False)
+
+                # clear interface details
+                module.input_interface_list = []
+                module.output_interface_list = []
+                module.local_data_list = []
+
+                # generate source file code
+                module_source = module.generate_module_source()
+                # set module source name
+                module_source_name = module_name + ".c"
+                # save module source to file
+                ConfigConverter.save_module_file(module_source_name, module_source)
 
             # increment file index
             file_index = file_index + 1
