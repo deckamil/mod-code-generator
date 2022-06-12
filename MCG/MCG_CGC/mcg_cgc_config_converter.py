@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           11 JUN 2022
+#   DATE:           12 JUN 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -298,57 +298,62 @@ class ConfigConverter(object):
                         # split string representation of invoked module arguments into list form
                         invoked_module_argument_list = invoked_module_arguments.split(", ")
 
-                        # find invoked module input interface list
+                        # find input interface of invoked module
                         invoked_module_input_interface_list = \
                             ConfigConverter.find_module_input_interface(invoked_module_name, config_file)
-                        # find structure of each input data elements, i.e. output interface definition of other modules
-                        # which generate input data to above module
-                        input_data_structure_list = \
-                            ConfigConverter.find_input_data_structure(invoked_module_argument_list, config_file)
+                        # find structure of each argument, i.e. output interface definition of other modules
+                        # which generate input data passed to invoked module
+                        invoked_module_argument_interface_list = \
+                            ConfigConverter.find_argument_interface(invoked_module_argument_list, config_file)
 
                         # set instance of module input data
                         module.module_body_list.append(invoked_module_name + "_input_type *" +
                                                        invoked_module_name + "_input")
+
                         # set module inputs
                         for invoked_module_input_interface in invoked_module_input_interface_list:
 
                             # get input interface type
-                            input_interface_type = invoked_module_input_interface[0]
+                            input_interface_type = invoked_module_input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX]
                             # get input interface name
-                            input_interface_name = invoked_module_input_interface[1]
+                            input_interface_name = invoked_module_input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX]
 
-                            # check input data list for matching input interface element
-                            for input_data_structure in input_data_structure_list:
+                            # check interface of each argument
+                            for common_index in range(0, len(invoked_module_argument_interface_list)):
 
-                                # get input data name
-                                input_data_name = input_data_structure[0]
-                                # get input data interface
-                                input_data_interface = input_data_structure[1]
+                                # get interface of specific argument
+                                invoked_module_argument_interface = invoked_module_argument_interface_list[common_index]
 
-                                # if input data comes from main Input Interface
-                                if input_data_name == "Input Interface":
-                                    # replace Input Interface with name of input data structure
-                                    input_data_name = module_name + "_input"
-
-                                # search for match between required input data and potential input data
-                                for input_data in input_data_interface:
+                                # check each interface element of given argument
+                                for invoked_module_argument_element in invoked_module_argument_interface:
 
                                     # get potential type match
-                                    potential_input_interface_type_match = input_data[0]
+                                    potential_interface_type_match = \
+                                        invoked_module_argument_element[Module.INTERFACE_ELEMENT_TYPE_INDEX]
                                     # get potential name match
-                                    potential_input_interface_name_match = input_data[1]
+                                    potential_interface_name_match = \
+                                        invoked_module_argument_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
 
-                                    # check match
-                                    if ((input_interface_type == potential_input_interface_type_match) and
-                                            (input_interface_name == potential_input_interface_name_match)):
+                                    # check if there is a match between required input data to invoked module
+                                    # and data generated by another module
+                                    if ((input_interface_type == potential_interface_type_match) and
+                                            (input_interface_name == potential_interface_name_match)):
+
+                                        # get argument passed to invoked module
+                                        invoked_module_argument = invoked_module_argument_list[common_index]
+
+                                        # if input data comes from main Input Interface
+                                        if invoked_module_argument == "Input Interface":
+                                            # replace Input Interface with name of input data structure
+                                            invoked_module_argument = module_name + "_input"
 
                                         # set module input
                                         module.module_body_list.append(invoked_module_name + "_input->" +
                                                                        input_interface_name + " = " +
-                                                                       input_data_name + "->" +
-                                                                       potential_input_interface_name_match)
+                                                                       invoked_module_argument + "->" +
+                                                                       potential_interface_name_match)
 
-                                        # break "for input_data in" loop
+                                        # break "for invoked_module_argument_element in" loop
                                         break
 
                         # set module invocation
@@ -505,19 +510,18 @@ class ConfigConverter(object):
         return module_output_interface_list
 
     # Description
-    # This method looks for structure of each input data element passed to module during module call in
-    # the configuration file.
+    # This method looks for interface details of each argument element from the given list.
     @staticmethod
-    def find_input_data_structure(input_data_name_list, config_file):
+    def find_argument_interface(argument_list, config_file):
 
-        # input data structure list
-        input_data_structure_list = []
+        # argument interface list
+        argument_interface_list = []
 
-        # for given input data element
-        for input_data_name in input_data_name_list:
+        # for given argument element find its interface details
+        for argument in argument_list:
 
-            # in main Input Interface is input element
-            if input_data_name == "Input Interface":
+            # if Input Interface is argument
+            if argument == "Input Interface":
 
                 # check the configuration file for package name
                 for file_index in range(0, len(config_file)):
@@ -529,22 +533,18 @@ class ConfigConverter(object):
                         line = config_file[file_index]
                         # get module name
                         module_name = line[ConfigConverter.PACKAGE_NAME_POSITION_IN_CFG:len(line)]
-                        # find module input interface list
-                        module_input_interface_list = ConfigConverter.find_module_input_interface(module_name,
-                                                                                                  config_file)
-                        # input data structure
-                        input_data_structure = [input_data_name, module_input_interface_list]
-                        # append input data structure
-                        input_data_structure_list.append(input_data_structure)
-
+                        # find interface details
+                        module_interface_list = ConfigConverter.find_module_input_interface(module_name, config_file)
+                        # append interface to argument interface list
+                        argument_interface_list.append(module_interface_list)
                         # break "for file_index in" loop
                         break
 
             # otherwise look for data generated by other modules
             else:
 
-                # look for specific string where input data element in output of another module
-                keyword = "INV " + input_data_name + " = "
+                # look for specific string where argument is output of another module
+                keyword = "INV " + argument + " = "
 
                 # check the configuration file for above keyword
                 for file_index in range(0, len(config_file)):
@@ -556,16 +556,12 @@ class ConfigConverter(object):
                         line = config_file[file_index]
                         # get module name
                         module_name = line[line.find(" = ") + 3:line.find(" (")]
-                        #  find module output interface list
-                        module_output_interface_list = ConfigConverter.find_module_output_interface(module_name,
-                                                                                                    config_file)
-                        # input data structure
-                        input_data_structure = [input_data_name, module_output_interface_list]
-                        # append input data structure
-                        input_data_structure_list.append(input_data_structure)
-
+                        # find interface details
+                        module_interface_list = ConfigConverter.find_module_output_interface(module_name, config_file)
+                        # append interface to argument interface list
+                        argument_interface_list.append(module_interface_list)
                         # break "for file_index in" loop
                         break
 
-        # return input data structure list
-        return input_data_structure_list
+        # return argument interface list
+        return argument_interface_list
