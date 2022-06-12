@@ -306,9 +306,19 @@ class ConfigConverter(object):
                         invoked_module_argument_interface_list = \
                             ConfigConverter.find_argument_interface(invoked_module_argument_list, config_file)
 
+                        # TO DO:
+                        # 1. get instance of input data from input data pointer
+                        # 2. remove input interface, local interface, output interface and
+                        # collection of output interface section from package source code item
+                        # 3. add setup of output data structure
+
                         # set instance of module input data
-                        module.module_body_list.append(invoked_module_name + "_input_type *" +
+                        module.module_body_list.append(invoked_module_name + "_input_type " +
                                                        invoked_module_name + "_input")
+
+                        # set instance of module output data
+                        module.module_body_list.append(invoked_module_name + "_output_type " +
+                                                       invoked_module_output_data_name)
 
                         # set module inputs
                         for invoked_module_input_interface in invoked_module_input_interface_list:
@@ -348,9 +358,9 @@ class ConfigConverter(object):
                                             invoked_module_argument = module_name + "_input"
 
                                         # set module input
-                                        module.module_body_list.append(invoked_module_name + "_input->" +
+                                        module.module_body_list.append(invoked_module_name + "_input." +
                                                                        input_interface_name + " = " +
-                                                                       invoked_module_argument + "->" +
+                                                                       invoked_module_argument + "." +
                                                                        potential_interface_name_match)
 
                                         # break "for invoked_module_argument_element in" loop
@@ -358,7 +368,7 @@ class ConfigConverter(object):
 
                         # set module invocation
                         module.module_body_list.append(invoked_module_output_data_name + " = " + invoked_module_name +
-                                                       "(" + invoked_module_name + "_input)")
+                                                       "(&" + invoked_module_name + "_input)")
 
                     # otherwise when line contains collection of output data
                     else:
