@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of Sorter class, which is responsible
-#       for sorting of model element content, i.e. nodes of activity diagram.
+#       for sorting of model module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2021
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,24 +33,15 @@ from mcg_cc_logger import Logger
 from mcg_cc_node import Node
 
 
-# Class:
-# Sorter()
-#
 # Description:
-# This is base class responsible for sorting of model element content, i.e. nodes of activity diagram.
+# This class allows to sort model module nodes.
 class Sorter(object):
 
     # indexes of sorter list
     SORTED_NODE_LIST_INDEX = 0
 
-    # Method:
-    # __init__()
-    #
     # Description:
     # This is class constructor.
-    #
-    # Returns:
-    # This method does not return anything.
     def __init__(self, reader_list):
 
         # initialize object data
@@ -61,14 +52,8 @@ class Sorter(object):
         self.dependency_list = []
         self.sorted_node_list = []
 
-    # Method:
-    # sort_connections()
-    #
     # Description:
     # This method sorts connections with same interaction in one place within connection list.
-    #
-    # Returns:
-    # This method does not return anything.
     def sort_connections(self):
 
         # sort interactions
@@ -120,15 +105,9 @@ class Sorter(object):
                 index = index - 1
             index = index + 1
 
-    # Method:
-    # find_nodes()
-    #
     # Description:
     # This method gathers details of connections from activity diagram and base on them create nodes, where each
     # node describes inputs and output from one unique interaction.
-    #
-    # Returns:
-    # This method does not return anything.
     def find_nodes(self):
 
         # find nodes
@@ -193,15 +172,9 @@ class Sorter(object):
                 # append node to node list
                 self.node_list.append(node)
 
-    # Method:
-    # find_dependencies()
-    #
     # Description:
     # This method finds dependencies of each node, i.e. list of local data elements, which are inputs to node
     # interaction and are required to compute node output.
-    #
-    # Returns:
-    # This method does not return anything.
     def find_dependencies(self):
 
         # find dependencies
@@ -232,14 +205,8 @@ class Sorter(object):
             # append dependency to dependency list
             self.dependency_list.append(dependency)
 
-    # Method:
-    # sort_nodes()
-    #
     # Description:
-    # This method sort nodes basing on their dependencies from sublist under dependency list.
-    #
-    # Returns:
-    # This method does not return anything.
+    # This method sorts nodes basing on their dependencies from sublist under dependency list.
     def sort_nodes(self):
 
         # sort nodes

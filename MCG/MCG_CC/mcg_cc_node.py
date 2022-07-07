@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_node.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Node class, which holds together all
-#       details of model node form activity diagram, i.e. node inputs,
-#       node interaction and node output.
+#       This module contains definition of Node class, which stores together all
+#       details of model node form activity diagram, i.e. node inputs, node
+#       interaction and node output.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2021
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,35 +29,20 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-# Class:
-# Node()
-#
 # Description:
-# This is base class responsible for storing details of model node from activity diagram.
+# This class represents model module node.
 class Node(object):
 
-    # Method:
-    # __init__()
-    #
     # Description:
     # This is class constructor.
-    #
-    # Returns:
-    # This method does not return anything.
     def __init__(self):
         # initialize object data
         self.node_input_list = []
         self.node_interaction = ""
         self.node_output = ""
 
-    # Method:
-    # __str__()
-    #
     # Description:
-    # This is string representation of object data.
-    #
-    # Returns:
-    # This method return string representation of object data.
+    # This method returns string representation of model module node.
     def __str__(self):
         # append input marker
         line = "$INPUTS$: "

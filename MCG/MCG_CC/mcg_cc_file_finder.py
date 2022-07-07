@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_file_finder.py
 #
 #   DESCRIPTION:
-#       This module contains definition of FileFinder class, which is child
-#       class or Reader class and is responsible for finding .exml files, which
-#       describe model content.
+#       This module contains definition of FileFinder class, which is
+#       responsible for finding .exml files, which describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,11 +34,8 @@ from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
 
 
-# Class:
-# FileFinder()
-#
 # Description:
-# This is child class responsible for finding .exml files, which describe model content.
+# This class allows to find .exml files, which describe model content.
 class FileFinder(Reader):
 
     # initialize class data
@@ -74,14 +70,8 @@ class FileFinder(Reader):
     LOCAL_DATA_SOURCE_INDEX = 8
     LOCAL_DATA_FILE_INDEX = 9
 
-    # Method:
-    # set_model_dir_path()
-    #
     # Description:
     # This method sets path to model directory with .exml files, which describe model content.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def set_model_dir_path(model_dir_path):
 
@@ -98,14 +88,8 @@ class FileFinder(Reader):
         # get number of activity .exml files
         FileFinder.number_of_activity_sources = len(FileFinder.activity_source_list)
 
-    # Method:
-    # clear_collected_data()
-    #
     # Description:
     # This method clears collected data, which represents either component or package element.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def clear_collected_data():
 
@@ -120,14 +104,8 @@ class FileFinder(Reader):
         FileFinder.local_data_source = ""
         FileFinder.local_data_file = []
 
-    # Method:
-    # check_interface_file()
-    #
     # Description:
     # This method checks if content of given interface file represents desired interface element.
-    #
-    # Method:
-    # This method returns interface marker.
     @staticmethod
     def check_interface_file(model_element_type, interface_type, interface_file):
 
@@ -150,15 +128,9 @@ class FileFinder(Reader):
         # return interface marker
         return interface_found
 
-    # Method:
-    # find_interface_files()
-    #
     # Description:
-    # This function looks for content of .exml files, which represent interface elements of either
+    # This method looks for content of .exml files, which represent interface elements of either
     # component or package element.
-    #
-    # Returns:
-    # This method returns interface marker.
     @staticmethod
     def find_interface_files(model_element_type):
 
@@ -282,14 +254,8 @@ class FileFinder(Reader):
         # return interface marker
         return interface_found
 
-    # Method:
-    # check_activity_file()
-    #
     # Description:
     # This method checks if content of activity file represents desired activity element.
-    #
-    # Returns:
-    # This method returns activity marker and model element name.
     @staticmethod
     def check_activity_file(model_element_type, activity_file):
 
@@ -318,15 +284,9 @@ class FileFinder(Reader):
         # return activity marker and model element name
         return activity_found, model_element_name
 
-    # Method:
-    # find_activity_file()
-    #
     # Description:
-    # This function looks for content of .exml file, which represents activity element of either
+    # This method looks for content of .exml file, which represents activity element of either
     # component or package element.
-    #
-    # Returns:
-    # This method returns activity marker.
     @staticmethod
     def find_activity_file(model_element_type):
 
@@ -395,15 +355,9 @@ class FileFinder(Reader):
         # return activity marker
         return activity_found
 
-    # Method:
-    # find_files()
-    #
     # Description:
     # This method looks for set of .exml files, which describe entire content of one model element
     # (either component or package element), i.e. activity diagram and related interface elements.
-    #
-    # Returns:
-    # This method returns file finder list, which contains activity and interface files.
     @staticmethod
     def find_files(model_element_type):
 

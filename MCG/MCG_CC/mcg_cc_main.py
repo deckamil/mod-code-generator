@@ -3,12 +3,11 @@
 #   DESCRIPTION:
 #       This is main module of Mod Code Generator (MCG) Converter Component (CC)
 #       and it contains definition of Main class, which uses other MCG CC classes
-#       to convert component and package content from .exml file into configuration
-#       file. The configuration file will be used by Mod Code Generator (MCG) Code
-#       Generator Component (CGC) to generate C code from the model.
+#       to convert component and package content from .exml files into configuration
+#       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -44,11 +43,8 @@ from mcg_cc_package_sorter import PackageSorter
 from mcg_cc_package_converter import PackageConverter
 
 
-# Class:
-# Main()
-#
 # Description:
-# This is base class, which uses other MCG CC classes to generate configuration file.
+# This is main class, which controls conversion process of model content into configuration file.
 class Main(object):
 
     # This parameter defines expected number of command line arguments passed to MCG CC,
@@ -61,14 +57,8 @@ class Main(object):
     MODEL_DIR_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
 
-    # Method:
-    # main()
-    #
     # Description:
-    # This is main method of MCGCCMain class.
-    #
-    # Returns:
-    # This method does not return anything.
+    # This is main method, which display short notice and start conversion process.
     @staticmethod
     def main():
 
@@ -112,14 +102,8 @@ class Main(object):
             print("Keep specific order of arguments, as pointed in usage above.")
             print("See Mod Code Generator Manual for further information.")
 
-    # Method:
-    # convert_model()
-    #
     # Description:
     # This method invokes conversion of model content in form of .exml files into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def convert_model():
 
@@ -138,15 +122,9 @@ class Main(object):
         # saves log file footer
         Logger.save_log_file_footer()
 
-    # Method:
-    # run_component_conversion()
-    #
     # Description:
     # This method is responsible for processing of component content from .exml file
     # into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def run_component_conversion():
 
@@ -197,15 +175,9 @@ class Main(object):
                 # convert component content
                 component_converter.convert_component()
 
-    # Method:
-    # run_package_conversion()
-    #
     # Description:
     # This method is responsible for processing of package content from .exml file
     # into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def run_package_conversion():
 

@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of Converter class, which is responsible
-#       for conversion of model element content into configuration file.
+#       for conversion of model module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           25 MAR 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,25 +35,16 @@ from mcg_cc_sorter import Sorter
 from mcg_cc_logger import Logger
 
 
-# Class:
-# Converter()
-#
 # Description:
-# This is base class responsible for conversion of model element content into configuration file.
+# This allows to convert model module content into configuration file format.
 class Converter(object):
 
     # initialize class data
     configuration_file_disk = ""
     configuration_file_path = ""
 
-    # Method:
-    # __init__()
-    #
     # Description:
     # This is class constructor.
-    #
-    # Returns:
-    # This method does not return anything.
     def __init__(self, file_finder_list, reader_list, sorter_list):
 
         # initialize object data
@@ -66,14 +57,8 @@ class Converter(object):
         self.sorted_node_list = sorter_list[Sorter.SORTED_NODE_LIST_INDEX]
         self.configuration_file = []
 
-    # Method:
-    # set_configuration_file_path()
-    #
     # Description:
     # This method sets path to configuration file, which will contain input configuration to MCG CGC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def set_configuration_file_path(output_dir_path):
 
@@ -84,14 +69,8 @@ class Converter(object):
         Converter.configuration_file_disk = open(Converter.configuration_file_path, "w")
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # save_configuration_file_header()
-    #
     # Description:
     # This method saves header info in configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_configuration_file_header():
 
@@ -107,14 +86,8 @@ class Converter(object):
         # close file
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # save_configuration_file_footer()
-    #
     # Description:
     # This method saves footer info in configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_configuration_file_footer():
 
@@ -130,14 +103,8 @@ class Converter(object):
         # close file
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # save_in_configuration_file()
-    #
     # Description:
     # This method saves configuration in configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def save_in_configuration_file(self):
 
         # open file in append mode, ready to save fresh configuration file content
@@ -154,14 +121,8 @@ class Converter(object):
         # close file
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # convert_specific_interface()
-    #
     # Description:
     # This method converts specific interface type into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_specific_interface(self, interface_element_list):
 
         # append interface details to configuration file
@@ -175,14 +136,8 @@ class Converter(object):
             # append configuration file line to configuration file
             self.configuration_file.append(configuration_file_line)
 
-    # Method:
-    # convert_interfaces()
-    #
     # Description:
     # This method converts input interface, output interface and local data elements into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_interfaces(self, model_element_type):
 
         # convert interfaces

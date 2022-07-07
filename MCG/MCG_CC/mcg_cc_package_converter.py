@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_package_converter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of PackageConverter class, which is child
-#       class of Converter class and is responsible for conversion of package content
-#       into configuration file.
+#       This module contains definition of PackageConverter class, which is
+#       responsible for conversion of package content into configuration file
+#       format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           25 MAR 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,21 +34,12 @@ from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 
 
-# Class:
-# PackageConverter()
-#
 # Description:
-# This is child class responsible for converting of package content into configuration file.
+# This class allows to convert package content into configuration file format.
 class PackageConverter(Converter):
 
-    # Method:
-    # convert_component_interaction()
-    #
     # Description:
     # This method is responsible for conversion of component interaction into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_component_interaction(self, sorted_node):
 
         # find component name
@@ -75,14 +66,8 @@ class PackageConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Method:
-    # convert_structure_assignment()
-    #
     # Description:
     # This method is responsible for conversion of structure assignment into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_structure_assignment(self, sorted_node):
 
         # append Output Interface structure to conversion line
@@ -105,14 +90,8 @@ class PackageConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Method:
-    # convert_package()
-    #
     # Description:
     # This method is responsible for converting of package content into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_package(self):
 
         # package converter

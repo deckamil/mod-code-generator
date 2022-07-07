@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           28 APR 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,7 +32,7 @@ from mcg_cgc_logger import Logger
 
 
 # Description:
-# This class is responsible for error recording, which may occur during run of MCG CC.
+# This class is responsible for error recording, which may occur during run of MCG CGC.
 class ErrorHandler(object):
 
     # error list

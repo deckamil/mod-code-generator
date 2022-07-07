@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_component_sorter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of ComponentSorter class, which is child
-#       class of Sorter class and is responsible for sorting of component content,
-#       i.e. nodes of activity diagram.
+#       This module contains definition of ComponentSorter class, which is
+#       responsible for sorting of component nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,22 +33,13 @@ from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 
 
-# Class:
-# ComponentSorter()
-#
 # Description:
-# This is child class responsible for sorting of component content, i.e. nodes of activity diagram.
+# This class allows to sort component nodes.
 class ComponentSorter(Sorter):
 
-    # Method:
-    # sort_first_input_signals()
-    #
     # Description:
     # This method moves first input signal, recognized by $FIRST$ marker, at beginning of node input list
     # and removes $FIRST$ marker.
-    #
-    # Returns:
-    # This method does not return anything.
     def sort_first_input_signals(self):
 
         # sort first input signals
@@ -74,14 +64,8 @@ class ComponentSorter(Sorter):
                     # append first input signal at beginning of node input list
                     node.node_input_list = [first_input_signal] + node.node_input_list
 
-    # Method:
-    # sort_component()
-    #
     # Description:
     # This method is responsible for sorting of component details.
-    #
-    # Returns:
-    # This method returns sorted node list.
     def sort_component(self):
 
         # component sorter

@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_component_converter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of ComponentConverter class, which is child
-#       class of Converter class and is responsible for conversion of component content
-#       into configuration file.
+#       This module contains definition of ComponentConverter class, which is
+#       responsible for conversion of component content into configuration file
+#       format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           25 MAR 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,21 +33,12 @@ from mcg_cc_converter import Converter
 from mcg_cc_logger import Logger
 
 
-# Class:
-# ComponentConverter()
-#
 # Description:
-# This is child class responsible for converting of component content into configuration file.
+# This class allows to convert component content into configuration file format.
 class ComponentConverter(Converter):
 
-    # Method:
-    # convert_action_interaction()
-    #
     # Description:
     # This method is responsible for conversion of action interaction into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_action_interaction(self, sorted_node, math_symbol):
 
         # append interaction comment to configuration file
@@ -69,14 +60,8 @@ class ComponentConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Method:
-    # convert_signal_assignment()
-    #
     # Description:
     # This method is responsible for conversion of signal assignment into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_signal_assignment(self, sorted_node):
 
         # find output signal name within sorted node
@@ -90,14 +75,8 @@ class ComponentConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Method:
-    # convert_component()
-    #
     # Description:
     # This method is responsible for converting of component content into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_component(self):
 
         # component converter
