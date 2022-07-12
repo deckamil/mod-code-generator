@@ -5,7 +5,7 @@
 #       for log recording during MCG CC run.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           12 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,7 +28,7 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-import datetime
+from datetime import datetime
 
 
 # Description:
@@ -56,50 +56,45 @@ class Logger(object):
     @staticmethod
     def save_log_file_header():
 
-        # open file in append mode, ready to save fresh info in log content
-        Logger.log_file_disk = open(Logger.log_file_path, "a")
-
-        # get date
-        date = datetime.datetime.now()
-
-        # write header info to log file on hard disk
-        Logger.log_file_disk.write(str("MCG CC LOG START\n"))
-        Logger.log_file_disk.write(str("MCG CC LOG DATE ") + str(date) + str("\n"))
-
-        # close file
-        Logger.log_file_disk.close()
+        # write header info in log file
+        Logger.save_in_log_file("Logger", "Start of MCG CC log", False)
 
     # Description:
     # This method saves footer info in log file.
     @staticmethod
     def save_log_file_footer():
 
-        # open file in append mode, ready to save fresh info in log content
-        Logger.log_file_disk = open(Logger.log_file_path, "a")
-
-        # get date
-        date = datetime.datetime.now()
-
-        # write footer info to log file on hard disk
-        Logger.log_file_disk.write(str("\nMCG CC LOG DATE ") + str(date))
-        Logger.log_file_disk.write(str("\nMCG CC LOG END"))
-
-        # close file
-        Logger.log_file_disk.close()
+        # write footer info in log
+        Logger.save_in_log_file("Logger", "End of MCG CGC log", True)
 
     # Description:
     # This method prints and saves info in log file.
     @staticmethod
-    def save_in_log_file(info):
+    def save_in_log_file(info_source, info, add_empty_line):
 
         # open file in append mode, ready to save fresh info in log content
         Logger.log_file_disk = open(Logger.log_file_path, "a")
 
+        # get date
+        date = datetime.now()
+        # format date
+        date = date.strftime("%d %b %Y, %H:%M:%S")
+
+        # merged info to be recorded in log file
+        merged_info = ""
+
+        # if empty line before new record in log is demanded
+        if add_empty_line:
+            merged_info = merged_info + "\n"
+
+        # merge date, source and info
+        merged_info = merged_info + date + " - " + info_source + " - " + info
+
         # print info
-        print(info)
+        print(merged_info)
 
         # write info to log file on hard disk
-        Logger.log_file_disk.write(info)
+        Logger.log_file_disk.write(merged_info)
         Logger.log_file_disk.write("\n")
 
         # close file

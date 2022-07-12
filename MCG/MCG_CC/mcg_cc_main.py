@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           12 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -134,9 +134,6 @@ class Main(object):
         # repeat until all components are converted into configuration file
         while files_found:
 
-            Logger.save_in_log_file("\n                         *** COMPONENT PROCESSING ***"
-                                    "                          \n")
-
             # find component files
             file_finder_list = FileFinder.find_files("Standard.Component")
             # get files marker
@@ -186,9 +183,6 @@ class Main(object):
 
         # repeat until all packages are converted into configuration file
         while files_found:
-
-            Logger.save_in_log_file("\n                          *** PACKAGE PROCESSING ***"
-                                    "                           \n")
 
             # find package files
             file_finder_list = FileFinder.find_files("Standard.Package")
