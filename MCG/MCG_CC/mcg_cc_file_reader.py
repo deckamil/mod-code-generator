@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           12 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -221,8 +221,8 @@ class FileReader(Reader):
     # This method looks for signals/structures of input interface, output interface and local data elements.
     def read_interface_elements(self):
 
-        # read interface elements
-        Logger.save_in_log_file("*** read interface elements")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for interface details in .exml files", False)
 
         # find input interface elements
         self.input_interface_list = FileReader.find_interface_elements(self.input_interface_file)

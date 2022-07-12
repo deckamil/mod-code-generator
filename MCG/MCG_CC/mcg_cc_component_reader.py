@@ -6,7 +6,7 @@
 #       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           12 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -50,8 +50,8 @@ class ComponentReader(FileReader):
     # This method checks correctness of component content.
     def check_correctness(self):
 
-        # check correctness
-        Logger.save_in_log_file("*** check correctness")
+        # record info
+        Logger.save_in_log_file("Reader", "Checking component correctness", False)
 
         # check signal-related errors
         self.check_signal_errors()
@@ -338,8 +338,8 @@ class ComponentReader(FileReader):
     # This method looks for data targets, i.e. component signals and their targets from activity diagram.
     def read_data_targets(self):
 
-        # read data targets
-        Logger.save_in_log_file("*** read data targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for component data targets in .exml file", False)
 
         # search for signals in activity file
         for i in range(0, len(self.activity_file)):
@@ -469,8 +469,8 @@ class ComponentReader(FileReader):
     # This method looks for interaction targets, i.e. component actions and their targets from activity diagram.
     def read_interaction_targets(self):
 
-        # read interaction targets
-        Logger.save_in_log_file("*** read interaction targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for component interaction targets in .exml file", False)
 
         # search for actions in activity file
         for i in range(0, len(self.activity_file)):
@@ -563,8 +563,8 @@ class ComponentReader(FileReader):
     # This method is responsible for reading of component details.
     def read_component(self):
 
-        # component reader
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        # record info
+        Logger.save_in_log_file("Reader", "Reading component details from .exml files", True)
 
         # search for signals target within activity file
         self.read_data_targets()
@@ -578,32 +578,19 @@ class ComponentReader(FileReader):
         # check component correctness
         self.check_correctness()
 
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
         # display additional details after component reading
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Connections:")
         for connection in self.connection_list:
-            Logger.save_in_log_file("          " + str(connection))
-        Logger.save_in_log_file("Actions:")
+            Logger.save_in_log_file("Reader", "Have found connection " + str(connection), False)
         for interaction in self.interaction_list:
-            Logger.save_in_log_file("          " + str(interaction))
-        Logger.save_in_log_file("Signals:")
+            Logger.save_in_log_file("Reader", "Have found interaction " + str(interaction), False)
         for data in self.data_list:
-            Logger.save_in_log_file("          " + str(data))
-        Logger.save_in_log_file("Input Interface:")
+            Logger.save_in_log_file("Reader", "Have found data " + str(data), False)
         for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("          " + str(input_interface))
-        Logger.save_in_log_file("Output Interface:")
+            Logger.save_in_log_file("Reader", "Have found input interface element " + str(input_interface), False)
         for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("          " + str(output_interface))
-        Logger.save_in_log_file("Local Data:")
+            Logger.save_in_log_file("Reader", "Have found output interface element " + str(output_interface), False)
         for local_data in self.local_data_list:
-            Logger.save_in_log_file("          " + str(local_data))
-
-        # end of component reader
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            Logger.save_in_log_file("Reader", "Have found local data element " + str(local_data), False)
 
         # append collected data to component reader list
         component_reader_list = []
