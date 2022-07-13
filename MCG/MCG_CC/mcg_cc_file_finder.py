@@ -5,7 +5,7 @@
 #       responsible for finding .exml files, which describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           12 JUL 2022
+#   DATE:           13 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -134,6 +134,9 @@ class FileFinder(Reader):
     @staticmethod
     def find_interface_files(model_element_type):
 
+        # record info
+        Logger.save_in_log_file("FileFinder", "Looking for module interface .exml files", False)
+
         # interface markers show whether interface was found or not
         interface_found = False
         input_interface_found = False
@@ -247,6 +250,16 @@ class FileFinder(Reader):
         if input_interface_found and output_interface_found and local_data_found:
             # change interface marker
             interface_found = True
+            # record info
+            Logger.save_in_log_file("FileFinder",
+                                    "Have found module input interface " + FileFinder.input_interface_source
+                                    + " file", False)
+            Logger.save_in_log_file("FileFinder",
+                                    "Have found module output interface " + FileFinder.output_interface_source
+                                    + " file", False)
+            Logger.save_in_log_file("FileFinder",
+                                    "Have found module local data " + FileFinder.local_data_source
+                                    + " file", False)
 
         # return interface marker
         return interface_found
@@ -286,6 +299,9 @@ class FileFinder(Reader):
     # component or package element.
     @staticmethod
     def find_activity_file(model_element_type):
+
+        # record info
+        Logger.save_in_log_file("FileFinder", "Looking for module activity diagram .exml files", False)
 
         # get source list index
         if "Standard.Component" in model_element_type:
@@ -332,6 +348,10 @@ class FileFinder(Reader):
                     FileFinder.activity_source = activity_source
                     # set activity file
                     FileFinder.activity_file = activity_file
+                    # record info
+                    Logger.save_in_log_file("FileFinder",
+                                            "Have found module " + FileFinder.model_element_name + " "
+                                            + FileFinder.activity_source + " file", False)
 
             # else if end of source list is reached
             else:
@@ -364,7 +384,7 @@ class FileFinder(Reader):
         FileFinder.clear_collected_data()
 
         # record info
-        Logger.save_in_log_file("FileFinder", "Looking for module and interface .exml files", True)
+        Logger.save_in_log_file("FileFinder", "Searching for set of .exml files that describe module details", True)
 
         # if model element type is correct
         if ("Standard.Component" in model_element_type) or ("Standard.Package" in model_element_type):
@@ -386,36 +406,6 @@ class FileFinder(Reader):
         if activity_found and interface_found:
             # change files marker
             files_found = True
-
-            # print details
-            if "Standard.Component" in model_element_type:
-                # record info
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found " + FileFinder.model_element_name + " component "
-                                        + FileFinder.activity_source + " file", False)
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found component input interface " + FileFinder.input_interface_source
-                                        + " file", False)
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found component output interface " + FileFinder.output_interface_source
-                                        + " file", False)
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found component local data " + FileFinder.local_data_source
-                                        + " file", False)
-            else:
-                # record info
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found " + FileFinder.model_element_name + " package "
-                                        + FileFinder.activity_source + " file", False)
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found package input interface " + FileFinder.input_interface_source
-                                        + " file", False)
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found package output interface " + FileFinder.output_interface_source
-                                        + " file", False)
-                Logger.save_in_log_file("FileFinder",
-                                        "Have found package local data " + FileFinder.local_data_source
-                                        + " file", False)
 
         else:
             # clear once again collected data before return
