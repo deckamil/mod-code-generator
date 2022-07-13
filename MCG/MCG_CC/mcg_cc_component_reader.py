@@ -6,7 +6,7 @@
 #       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           12 JUL 2022
+#   DATE:           13 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -51,7 +51,7 @@ class ComponentReader(FileReader):
     def check_correctness(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Checking component correctness", False)
+        Logger.save_in_log_file("Reader", "Checking module correctness", False)
 
         # check signal-related errors
         self.check_signal_errors()
@@ -339,7 +339,7 @@ class ComponentReader(FileReader):
     def read_data_targets(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Looking for component data targets in .exml file", False)
+        Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
 
         # search for signals in activity file
         for i in range(0, len(self.activity_file)):
@@ -377,6 +377,8 @@ class ComponentReader(FileReader):
                         connection.connection_target = "$EMPTY$"
                         # append connection to connection list
                         self.connection_list.append(connection)
+                        # record info
+                        Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
                         # exit "for j in range" loop
                         break
 
@@ -425,6 +427,8 @@ class ComponentReader(FileReader):
                             connection.connection_target = target_action
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                         # if signal is target of given signal
                         if ("<ID name=" in self.activity_file[j + 2]) and \
@@ -456,6 +460,8 @@ class ComponentReader(FileReader):
                             connection.connection_target = target_signal_name
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -465,12 +471,16 @@ class ComponentReader(FileReader):
         # remove duplicates from data list
         self.data_list = list(set(self.data_list))
 
+        # record info
+        for data in self.data_list:
+            Logger.save_in_log_file("Reader", "Have found data " + str(data) + " element", False)
+
     # Description:
     # This method looks for interaction targets, i.e. component actions and their targets from activity diagram.
     def read_interaction_targets(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Looking for component interaction targets in .exml file", False)
+        Logger.save_in_log_file("Reader", "Looking for module interaction targets in .exml file", False)
 
         # search for actions in activity file
         for i in range(0, len(self.activity_file)):
@@ -550,6 +560,8 @@ class ComponentReader(FileReader):
                             connection.connection_target = target_signal_name
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -559,12 +571,16 @@ class ComponentReader(FileReader):
         # remove duplicates from interaction list
         self.interaction_list = list(set(self.interaction_list))
 
+        # record info
+        for interaction in self.interaction_list:
+            Logger.save_in_log_file("Reader", "Have found interaction " + str(interaction) + " element", False)
+
     # Description:
     # This method is responsible for reading of component details.
     def read_component(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Reading component details from .exml files", True)
+        Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
 
         # search for signals target within activity file
         self.read_data_targets()
@@ -577,20 +593,6 @@ class ComponentReader(FileReader):
 
         # check component correctness
         self.check_correctness()
-
-        # display additional details after component reading
-        for connection in self.connection_list:
-            Logger.save_in_log_file("Reader", "Have found connection " + str(connection), False)
-        for interaction in self.interaction_list:
-            Logger.save_in_log_file("Reader", "Have found interaction " + str(interaction), False)
-        for data in self.data_list:
-            Logger.save_in_log_file("Reader", "Have found data " + str(data), False)
-        for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("Reader", "Have found input interface element " + str(input_interface), False)
-        for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("Reader", "Have found output interface element " + str(output_interface), False)
-        for local_data in self.local_data_list:
-            Logger.save_in_log_file("Reader", "Have found local data element " + str(local_data), False)
 
         # append collected data to component reader list
         component_reader_list = []
