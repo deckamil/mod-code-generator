@@ -5,7 +5,7 @@
 #       responsible for sorting of component nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           14 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,8 +42,8 @@ class ComponentSorter(Sorter):
     # and removes $FIRST$ marker.
     def sort_first_input_signals(self):
 
-        # sort first input signals
-        Logger.save_in_log_file("*** sort first input signals")
+        # record info
+        Logger.save_in_log_file("Sorter", "Sorting first input signal in nodes", False)
 
         # for each node check if it contains first input signal
         for node in self.node_list:
@@ -64,12 +64,13 @@ class ComponentSorter(Sorter):
                     # append first input signal at beginning of node input list
                     node.node_input_list = [first_input_signal] + node.node_input_list
 
+        # record info
+        for node in self.node_list:
+            Logger.save_in_log_file("Sorter", "Have sorted " + str(node) + " node", False)
+
     # Description:
     # This method is responsible for sorting of component details.
     def sort_component(self):
-
-        # component sorter
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # sort connections of same action into one place on connections list
         self.sort_connections()
@@ -85,24 +86,6 @@ class ComponentSorter(Sorter):
 
         # sort nodes basing on their dependencies
         self.sort_nodes()
-
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after component sorting
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Sorted Connections:")
-        for connection in self.connection_list:
-            Logger.save_in_log_file("          " + str(connection))
-        Logger.save_in_log_file("Nodes:")
-        for node in self.node_list:
-            Logger.save_in_log_file("          " + str(node))
-        Logger.save_in_log_file("Sorted Nodes:")
-        for sorted_node in self.sorted_node_list:
-            Logger.save_in_log_file("          " + str(sorted_node))
-
-        # end of component sorter
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to component sorter list
         component_sorter_list = []

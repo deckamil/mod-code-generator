@@ -5,7 +5,7 @@
 #       for sorting of model module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           14 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -56,8 +56,8 @@ class Sorter(object):
     # This method sorts connections with same interaction in one place within connection list.
     def sort_connections(self):
 
-        # sort interactions
-        Logger.save_in_log_file("*** sort connections")
+        # record info
+        Logger.save_in_log_file("Sorter", "Sorting module connections", True)
 
         # this index tells where to put connection (defines new position of connection)
         index = 0
@@ -105,13 +105,17 @@ class Sorter(object):
                 index = index - 1
             index = index + 1
 
+        # record info
+        for connection in self.connection_list:
+            Logger.save_in_log_file("Sorter", "Have sorted " + str(connection) + " connection", False)
+
     # Description:
     # This method gathers details of connections from activity diagram and base on them create nodes, where each
     # node describes inputs and output from one unique interaction.
     def find_nodes(self):
 
-        # find nodes
-        Logger.save_in_log_file("*** find nodes")
+        # record info
+        Logger.save_in_log_file("Sorter", "Looking for module nodes", False)
 
         # find node details for each interaction
         for interaction in self.interaction_list:
@@ -172,13 +176,17 @@ class Sorter(object):
                 # append node to node list
                 self.node_list.append(node)
 
+        # record info
+        for node in self.node_list:
+            Logger.save_in_log_file("Sorter", "Have found " + str(node) + " node", False)
+
     # Description:
     # This method finds dependencies of each node, i.e. list of local data elements, which are inputs to node
     # interaction and are required to compute node output.
     def find_dependencies(self):
 
-        # find dependencies
-        Logger.save_in_log_file("*** find dependencies")
+        # record info
+        Logger.save_in_log_file("Sorter", "Looking for dependencies between module nodes", False)
 
         # each node will have dedicated sublist under dependency list
         # the sublist starts with node itself under position 0 and local data elements, which are inputs to that
@@ -205,12 +213,17 @@ class Sorter(object):
             # append dependency to dependency list
             self.dependency_list.append(dependency)
 
+        # record info
+        for dependency in self.dependency_list:
+            Logger.save_in_log_file("Sorter", "Have found dependency on " + str(dependency[1:len(dependency)]) + " in "
+                                    + str(dependency[0]) + " node", False)
+
     # Description:
     # This method sorts nodes basing on their dependencies from sublist under dependency list.
     def sort_nodes(self):
 
-        # sort nodes
-        Logger.save_in_log_file("*** sort nodes")
+        # record info
+        Logger.save_in_log_file("Sorter", "Sorting module nodes", False)
 
         # sort nodes basing on their dependencies
         # first append nodes without dependencies to sorted node list, i.e. look for each sublist on dependency
@@ -265,3 +278,7 @@ class Sorter(object):
 
                     # exit "for i in range" loop
                     break
+
+        # record info
+        for sorted_node in self.sorted_node_list:
+            Logger.save_in_log_file("Sorter", "Have sorted " + str(sorted_node) + " node", False)
