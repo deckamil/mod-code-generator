@@ -6,7 +6,7 @@
 #       format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           21 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -60,6 +60,9 @@ class ComponentConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
+        # record info
+        Logger.save_in_log_file("Converter", "Have converted to " + str(conversion_line) + " line", False)
+
     # Description:
     # This method is responsible for conversion of signal assignment into configuration file.
     def convert_signal_assignment(self, sorted_node):
@@ -75,15 +78,15 @@ class ComponentConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
+        # record info
+        Logger.save_in_log_file("Converter", "Have converted to " + str(conversion_line) + " line", False)
+
     # Description:
     # This method is responsible for converting of component content into configuration file.
     def convert_component(self):
 
-        # component converter
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-
-        # convert header
-        Logger.save_in_log_file("*** convert header")
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module source and name into configuration file", True)
 
         # append start marker of new component section to configuration file
         self.configuration_file.append(str("COMPONENT START"))
@@ -94,11 +97,17 @@ class ComponentConverter(Converter):
         # append component name to configuration file
         self.configuration_file.append(str("COMPONENT NAME ") + str(self.model_element_name))
 
+        # record info
+        Logger.save_in_log_file("Converter", "Have converted to "
+                                + str(self.configuration_file[len(self.configuration_file) - 2]) + " line", False)
+        Logger.save_in_log_file("Converter", "Have converted to "
+                                + str(self.configuration_file[len(self.configuration_file) - 1]) + " line", False)
+
         # convert interface details to configuration file
         self.convert_interfaces(str("COMPONENT"))
 
-        # convert body
-        Logger.save_in_log_file("*** convert body")
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module body into configuration file", False)
 
         # append start marker of function body section to configuration file
         self.configuration_file.append(str("COMPONENT BODY START"))
@@ -137,17 +146,9 @@ class ComponentConverter(Converter):
         # append end marker of new component section to configuration file
         self.configuration_file.append(str("COMPONENT END"))
 
+        # record info
+        Logger.save_in_log_file("Converter", "Saving conversion results into configuration file", False)
+
         # save configuration file
         self.save_in_configuration_file()
 
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after component conversion
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Configuration File:")
-        for line in self.configuration_file:
-            Logger.save_in_log_file("          " + str(line))
-
-        # end of component converter
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<")

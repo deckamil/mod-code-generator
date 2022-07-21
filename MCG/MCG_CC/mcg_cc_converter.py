@@ -5,7 +5,7 @@
 #       for conversion of model module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           21 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -136,12 +136,15 @@ class Converter(object):
             # append configuration file line to configuration file
             self.configuration_file.append(configuration_file_line)
 
+            # record info
+            Logger.save_in_log_file("Converter", "Have converted to " + str(configuration_file_line) + " line", False)
+
     # Description:
     # This method converts input interface, output interface and local data elements into configuration file.
     def convert_interfaces(self, model_element_type):
 
-        # convert interfaces
-        Logger.save_in_log_file("*** convert interfaces")
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module input interface into configuration file", False)
 
         # append start marker of input interface section to configuration file
         self.configuration_file.append(str(model_element_type) + str(" INPUT INTERFACE START"))
@@ -150,12 +153,18 @@ class Converter(object):
         # append end marker of input interface section to configuration file
         self.configuration_file.append(str(model_element_type) + str(" INPUT INTERFACE END"))
 
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module output interface into configuration file", False)
+
         # append start marker of output interface section to configuration file
         self.configuration_file.append(str(model_element_type) + str(" OUTPUT INTERFACE START"))
         # append output interface details to configuration file
         self.convert_specific_interface(self.output_interface_list)
         # append end marker of output interface section to configuration file
         self.configuration_file.append(str(model_element_type) + str(" OUTPUT INTERFACE END"))
+
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module local data into configuration file", False)
 
         # append start marker of local parameters section to configuration file
         self.configuration_file.append(str(model_element_type) + str(" LOCAL DATA START"))
