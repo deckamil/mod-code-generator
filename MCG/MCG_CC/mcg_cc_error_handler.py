@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_error_handler.py
 #
 #   DESCRIPTION:
-#       This module contains definition of ErrorHandler class, which is responsible
-#       for error recording, which may occur during run of Mod Code Generator (MCG)
-#       Converter Component (CC).
+#       This module contains definition of ErrorHandler class, which is
+#       responsible for error recording, which may occur during run of MCG CC.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           19 JAN 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,11 +31,8 @@
 from mcg_cc_logger import Logger
 
 
-# Class:
-# ErrorHandler()
-#
 # Description:
-# This is base class responsible for error recording, which may occur during run of MCG CC.
+# This class is responsible for error recording, which may occur during run of MCG CC.
 class ErrorHandler(object):
 
     # error list
@@ -87,14 +83,8 @@ class ErrorHandler(object):
     GEN_ERR_NO_COM_PAC_ACTIVITY = 272
     GEN_ERR_NO_COM_PAC_INTERFACE = 273
 
-    # Method:
-    # record_error()
-    #
     # Description:
     # This method records error (i.e. append error to error list), found during run of MCG CC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def record_error(error_code, error_info1, error_info2):
 
@@ -333,14 +323,8 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-    # Method:
-    # check_errors()
-    #
     # Description:
     # This method checks if any error was recorded and if yes, then it ends run of MCG CC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def check_errors(model_element_name, activity_source, model_element_type):
 

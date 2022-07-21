@@ -2,11 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of Supporter class, which provides additional
-#       supporting methods and parameters reused by other Mod Code Generator (MCG)
-#       Converter Component (CC) classes.
+#       supporting methods and parameters reused by other classes.
 #
-#   COPYRIGHT:      Copyright (C) 2021 Kamil Deć github.com/deckamil
-#   DATE:           17 DEC 2021
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,11 +28,8 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-# Class:
-# Supporter()
-#
 # Description:
-# This is base class, which provides additional methods and parameters reused by other MCG CC classes.
+# This class provides additional methods and parameters reused by other classes.
 class Supporter(object):
 
     # This parameter defines offset of signal or structure name after "$TARGET$" marker in merged node,

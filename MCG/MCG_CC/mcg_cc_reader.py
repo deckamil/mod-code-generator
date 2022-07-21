@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of Reader class, which is responsible
-#       for reading of .exml file content.
+#       for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,11 +31,8 @@
 from mcg_cc_error_handler import ErrorHandler
 
 
-# Class:
-# Reader()
-#
 # Description:
-# This is base class responsible for reading of .exml file content.
+# This class allows to read model module content from .exml file.
 class Reader(object):
 
     # This parameter defines start offset of name element after "name" marker in line of .exml file, i.e.
@@ -58,15 +55,9 @@ class Reader(object):
     # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
     UID_END_OFFSET = -3
 
-    # Method:
-    # get_name()
-    #
     # Description:
     # This method looks for <name> element within line of .exml file, an example of .exml file line:
     # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
-    #
-    # Returns:
-    # This method returns <name> element.
     @staticmethod
     def get_name(line, line_number):
 
@@ -88,15 +79,9 @@ class Reader(object):
         # return name
         return name
 
-    # Method:
-    # get_uid()
-    #
     # Description:
     # This method looks for <uid> element within line of .exml file, an example of .exml file line:
     # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
-    #
-    # Returns:
-    # This method returns <uid> element.
     @staticmethod
     def get_uid(line, line_number):
 

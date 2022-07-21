@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of Converter class, which is responsible
-#       for conversion of model element content into configuration file.
+#       for conversion of model module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           21 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,25 +35,16 @@ from mcg_cc_sorter import Sorter
 from mcg_cc_logger import Logger
 
 
-# Class:
-# Converter()
-#
 # Description:
-# This is base class responsible for conversion of model element content into configuration file.
+# This allows to convert model module content into configuration file format.
 class Converter(object):
 
     # initialize class data
     configuration_file_disk = ""
     configuration_file_path = ""
 
-    # Method:
-    # __init__()
-    #
     # Description:
     # This is class constructor.
-    #
-    # Returns:
-    # This method does not return anything.
     def __init__(self, file_finder_list, reader_list, sorter_list):
 
         # initialize object data
@@ -66,14 +57,8 @@ class Converter(object):
         self.sorted_node_list = sorter_list[Sorter.SORTED_NODE_LIST_INDEX]
         self.configuration_file = []
 
-    # Method:
-    # set_configuration_file_path()
-    #
     # Description:
     # This method sets path to configuration file, which will contain input configuration to MCG CGC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def set_configuration_file_path(output_dir_path):
 
@@ -84,14 +69,8 @@ class Converter(object):
         Converter.configuration_file_disk = open(Converter.configuration_file_path, "w")
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # save_configuration_file_header()
-    #
     # Description:
     # This method saves header info in configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_configuration_file_header():
 
@@ -102,20 +81,13 @@ class Converter(object):
         date = datetime.datetime.now()
 
         # write header info to configuration file on hard disk
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG START\n"))
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n\n"))
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG START ") + str(date) + str("\n\n"))
 
         # close file
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # save_configuration_file_footer()
-    #
     # Description:
     # This method saves footer info in configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def save_configuration_file_footer():
 
@@ -126,20 +98,13 @@ class Converter(object):
         date = datetime.datetime.now()
 
         # write footer info to configuration file on hard disk
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG DATE ") + str(date) + str("\n"))
-        Converter.configuration_file_disk.write(str("MCG CGC CONFIG END\n"))
+        Converter.configuration_file_disk.write(str("MCG CGC CONFIG END ") + str(date))
 
         # close file
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # save_in_configuration_file()
-    #
     # Description:
     # This method saves configuration in configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def save_in_configuration_file(self):
 
         # open file in append mode, ready to save fresh configuration file content
@@ -156,14 +121,8 @@ class Converter(object):
         # close file
         Converter.configuration_file_disk.close()
 
-    # Method:
-    # convert_specific_interface()
-    #
     # Description:
     # This method converts specific interface type into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_specific_interface(self, interface_element_list):
 
         # append interface details to configuration file
@@ -177,36 +136,39 @@ class Converter(object):
             # append configuration file line to configuration file
             self.configuration_file.append(configuration_file_line)
 
-    # Method:
-    # convert_interfaces()
-    #
+            # record info
+            Logger.save_in_log_file("Converter", "Have converted to " + str(configuration_file_line) + " line", False)
+
     # Description:
     # This method converts input interface, output interface and local data elements into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
-    def convert_interfaces(self):
+    def convert_interfaces(self, model_element_type):
 
-        # convert interfaces
-        Logger.save_in_log_file("*** convert interfaces")
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module input interface into configuration file", False)
 
         # append start marker of input interface section to configuration file
-        self.configuration_file.append(str("INPUT INTERFACE START"))
+        self.configuration_file.append(str(model_element_type) + str(" INPUT INTERFACE START"))
         # append input interface details to configuration file
         self.convert_specific_interface(self.input_interface_list)
         # append end marker of input interface section to configuration file
-        self.configuration_file.append(str("INPUT INTERFACE END"))
+        self.configuration_file.append(str(model_element_type) + str(" INPUT INTERFACE END"))
+
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module output interface into configuration file", False)
 
         # append start marker of output interface section to configuration file
-        self.configuration_file.append(str("OUTPUT INTERFACE START"))
+        self.configuration_file.append(str(model_element_type) + str(" OUTPUT INTERFACE START"))
         # append output interface details to configuration file
         self.convert_specific_interface(self.output_interface_list)
         # append end marker of output interface section to configuration file
-        self.configuration_file.append(str("OUTPUT INTERFACE END"))
+        self.configuration_file.append(str(model_element_type) + str(" OUTPUT INTERFACE END"))
+
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module local data into configuration file", False)
 
         # append start marker of local parameters section to configuration file
-        self.configuration_file.append(str("LOCAL DATA START"))
+        self.configuration_file.append(str(model_element_type) + str(" LOCAL DATA START"))
         # append local data details to configuration file
         self.convert_specific_interface(self.local_data_list)
         # append end marker of local parameters section to configuration file
-        self.configuration_file.append(str("LOCAL DATA END"))
+        self.configuration_file.append(str(model_element_type) + str(" LOCAL DATA END"))

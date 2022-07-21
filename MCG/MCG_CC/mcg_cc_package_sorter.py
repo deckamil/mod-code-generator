@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_package_sorter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of PackageSorter class, which is child
-#       class of Sorter class and is responsible for sorting of package content,
-#       i.e. nodes of activity diagram.
+#       This module contains definition of PackageSorter class, which is
+#       responsible for sorting of package nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,21 +34,12 @@ from mcg_cc_file_reader import FileReader
 from mcg_cc_node import Node
 
 
-# Class:
-# PackageSorter()
-#
 # Description:
-# This is child class responsible for sorting of package content, i.e. nodes of activity diagram.
+# This class allows to sort package nodes.
 class PackageSorter(Sorter):
 
-    # Method:
-    # remove_input_output_interface_element()
-    #
     # Description:
     # This method removes Input Interface and Output Interface elements from local data list.
-    #
-    # Returns:
-    # This method does not return anything.
     def remove_input_output_interface_element(self):
 
         # remove input output interface element
@@ -73,14 +63,8 @@ class PackageSorter(Sorter):
                 # break for loop
                 break
 
-    # Method:
-    # replace_output_assignment()
-    #
     # Description:
     # This method replaces nodes, where node input is assignment to Output Interface structure, with one node.
-    #
-    # Returns:
-    # This method does not return anything.
     def replace_output_assignment(self):
 
         # replace output assignment
@@ -117,14 +101,8 @@ class PackageSorter(Sorter):
         # append node replacement to sorted node list
         self.sorted_node_list.append(sorted_node_replacement)
 
-    # Method:
-    # sort_package()
-    #
     # Description:
     # This method is responsible for sorting of package details.
-    #
-    # Returns:
-    # This method returns sorted node list.
     def sort_package(self):
 
         # package sorter

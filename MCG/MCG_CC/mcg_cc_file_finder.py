@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_file_finder.py
 #
 #   DESCRIPTION:
-#       This module contains definition of FileFinder class, which is child
-#       class or Reader class and is responsible for finding .exml files, which
-#       describe model content.
+#       This module contains definition of FileFinder class, which is
+#       responsible for finding .exml files, which describe model content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           13 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,11 +34,8 @@ from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
 
 
-# Class:
-# FileFinder()
-#
 # Description:
-# This is child class responsible for finding .exml files, which describe model content.
+# This class allows to find .exml files, which describe model content.
 class FileFinder(Reader):
 
     # initialize class data
@@ -74,14 +70,8 @@ class FileFinder(Reader):
     LOCAL_DATA_SOURCE_INDEX = 8
     LOCAL_DATA_FILE_INDEX = 9
 
-    # Method:
-    # set_model_dir_path()
-    #
     # Description:
     # This method sets path to model directory with .exml files, which describe model content.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def set_model_dir_path(model_dir_path):
 
@@ -98,14 +88,8 @@ class FileFinder(Reader):
         # get number of activity .exml files
         FileFinder.number_of_activity_sources = len(FileFinder.activity_source_list)
 
-    # Method:
-    # clear_collected_data()
-    #
     # Description:
     # This method clears collected data, which represents either component or package element.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def clear_collected_data():
 
@@ -120,14 +104,8 @@ class FileFinder(Reader):
         FileFinder.local_data_source = ""
         FileFinder.local_data_file = []
 
-    # Method:
-    # check_interface_file()
-    #
     # Description:
     # This method checks if content of given interface file represents desired interface element.
-    #
-    # Method:
-    # This method returns interface marker.
     @staticmethod
     def check_interface_file(model_element_type, interface_type, interface_file):
 
@@ -150,20 +128,14 @@ class FileFinder(Reader):
         # return interface marker
         return interface_found
 
-    # Method:
-    # find_interface_files()
-    #
     # Description:
-    # This function looks for content of .exml files, which represent interface elements of either
+    # This method looks for content of .exml files, which represent interface elements of either
     # component or package element.
-    #
-    # Returns:
-    # This method returns interface marker.
     @staticmethod
     def find_interface_files(model_element_type):
 
-        # find interface files
-        Logger.save_in_log_file("*** find interface files")
+        # record info
+        Logger.save_in_log_file("FileFinder", "Looking for module interface .exml files", False)
 
         # interface markers show whether interface was found or not
         interface_found = False
@@ -278,18 +250,22 @@ class FileFinder(Reader):
         if input_interface_found and output_interface_found and local_data_found:
             # change interface marker
             interface_found = True
+            # record info
+            Logger.save_in_log_file("FileFinder",
+                                    "Have found module input interface " + FileFinder.input_interface_source
+                                    + " file", False)
+            Logger.save_in_log_file("FileFinder",
+                                    "Have found module output interface " + FileFinder.output_interface_source
+                                    + " file", False)
+            Logger.save_in_log_file("FileFinder",
+                                    "Have found module local data " + FileFinder.local_data_source
+                                    + " file", False)
 
         # return interface marker
         return interface_found
 
-    # Method:
-    # check_activity_file()
-    #
     # Description:
     # This method checks if content of activity file represents desired activity element.
-    #
-    # Returns:
-    # This method returns activity marker and model element name.
     @staticmethod
     def check_activity_file(model_element_type, activity_file):
 
@@ -318,20 +294,14 @@ class FileFinder(Reader):
         # return activity marker and model element name
         return activity_found, model_element_name
 
-    # Method:
-    # find_activity_file()
-    #
     # Description:
-    # This function looks for content of .exml file, which represents activity element of either
+    # This method looks for content of .exml file, which represents activity element of either
     # component or package element.
-    #
-    # Returns:
-    # This method returns activity marker.
     @staticmethod
     def find_activity_file(model_element_type):
 
-        # find activity files
-        Logger.save_in_log_file("*** find activity file")
+        # record info
+        Logger.save_in_log_file("FileFinder", "Looking for module activity diagram .exml files", False)
 
         # get source list index
         if "Standard.Component" in model_element_type:
@@ -378,6 +348,10 @@ class FileFinder(Reader):
                     FileFinder.activity_source = activity_source
                     # set activity file
                     FileFinder.activity_file = activity_file
+                    # record info
+                    Logger.save_in_log_file("FileFinder",
+                                            "Have found module " + FileFinder.model_element_name + " "
+                                            + FileFinder.activity_source + " file", False)
 
             # else if end of source list is reached
             else:
@@ -395,15 +369,9 @@ class FileFinder(Reader):
         # return activity marker
         return activity_found
 
-    # Method:
-    # find_files()
-    #
     # Description:
     # This method looks for set of .exml files, which describe entire content of one model element
     # (either component or package element), i.e. activity diagram and related interface elements.
-    #
-    # Returns:
-    # This method returns file finder list, which contains activity and interface files.
     @staticmethod
     def find_files(model_element_type):
 
@@ -415,8 +383,8 @@ class FileFinder(Reader):
         # clear collected data
         FileFinder.clear_collected_data()
 
-        # file finder
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        # record info
+        Logger.save_in_log_file("FileFinder", "Searching for set of .exml files that describe module details", True)
 
         # if model element type is correct
         if ("Standard.Component" in model_element_type) or ("Standard.Package" in model_element_type):
@@ -434,43 +402,17 @@ class FileFinder(Reader):
             print("Unknown model element type in FileFinder.find_next_file_set() function: " + str(model_element_type))
             print()
 
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
         # check activity and interface markers
         if activity_found and interface_found:
             # change files marker
             files_found = True
 
-            # print details
-            if "Standard.Component" in model_element_type:
-                Logger.save_in_log_file("\nComponent Source:    " + str(FileFinder.activity_source))
-                Logger.save_in_log_file("Component Name:      " + str(FileFinder.model_element_name))
-            else:
-                Logger.save_in_log_file("\nPackage Source:      " + str(FileFinder.activity_source))
-                Logger.save_in_log_file("Package Name:        " + str(FileFinder.model_element_name))
-
-            Logger.save_in_log_file("")
-            Logger.save_in_log_file("Interface Source:    " + str(FileFinder.input_interface_source))
-            Logger.save_in_log_file("Interface Type:      " + str("Input Interface"))
-
-            Logger.save_in_log_file("")
-            Logger.save_in_log_file("Interface Source:    " + str(FileFinder.output_interface_source))
-            Logger.save_in_log_file("Interface Type:      " + str("Output Interface"))
-
-            Logger.save_in_log_file("")
-            Logger.save_in_log_file("Interface Source:    " + str(FileFinder.local_data_source))
-            Logger.save_in_log_file("Interface Type:      " + str("Local Data"))
-
         else:
             # clear once again collected data before return
             FileFinder.clear_collected_data()
 
-            # files not found
-            Logger.save_in_log_file("FILES NOT FOUND")
-
-        # end of file finder
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF FILE FINDER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            # record info
+            Logger.save_in_log_file("FileFinder", "No further .exml files have been found", False)
 
         # append collected data to file finder list
         file_finder_list = []

@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_component_reader.py
 #
 #   DESCRIPTION:
-#       This module contains definition of ComponentReader class, which is child
-#       class of FileReader class and is responsible for reading of component content,
-#       i.e. activity diagram and interface details from .exml files.
+#       This module contains definition of ComponentReader class, which is
+#       responsible for reading of component content (activity diagram and
+#       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           13 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -36,11 +36,8 @@ from mcg_cc_logger import Logger
 from mcg_cc_connection import Connection
 
 
-# Class:
-# ComponentReader()
-#
 # Description:
-# This is child class responsible for reading of component .exml file content.
+# This class allows to read component content (activity diagram and interface details) from .exml files.
 class ComponentReader(FileReader):
 
     # This list defines all valid action types.
@@ -49,18 +46,12 @@ class ComponentReader(FileReader):
     # This list defines all valid action types, which requires in addition first input signal marker.
     action_type_with_first_input_signal_list = ["SUB", "DIV"]
 
-    # Function:
-    # check_correctness()
-    #
     # Description:
-    # This function checks correctness of component content.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks correctness of component content.
     def check_correctness(self):
 
-        # check correctness
-        Logger.save_in_log_file("*** check correctness")
+        # record info
+        Logger.save_in_log_file("Reader", "Checking module correctness", False)
 
         # check signal-related errors
         self.check_signal_errors()
@@ -71,14 +62,8 @@ class ComponentReader(FileReader):
         # check interface-related errors
         self.check_interface_errors()
 
-    # Function:
-    # check_signal_errors()
-    #
     # Description:
-    # This function checks any signal-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any signal-related errors and issues.
     def check_signal_errors(self):
 
         # *******************************************************************
@@ -100,14 +85,8 @@ class ComponentReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_INPUTS, signal_name, "none")
 
-    # Function:
-    # check_action_errors()
-    #
     # Description:
-    # This function checks any action-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any action-related errors and issues.
     def check_action_errors(self):
 
         # ******************************************************
@@ -124,14 +103,8 @@ class ComponentReader(FileReader):
                 # record error
                 ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
 
-    # Function:
-    # check_interface_errors()
-    #
     # Description:
-    # This function checks any interface-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any interface-related errors and issues.
     def check_interface_errors(self):
 
         # ************************************************************************
@@ -277,14 +250,8 @@ class ComponentReader(FileReader):
                                               interface_element_name,
                                               connection.connection_target)
 
-    # Method:
-    # check_if_action_type()
-    #
     # Description:
     # This method checks if reference contains valid action type.
-    #
-    # Returns:
-    # This method returns action marker.
     @staticmethod
     def check_if_action_type(ref_action_type):
         # action type marker shows whether valid acton type was found or not within reference
@@ -302,14 +269,8 @@ class ComponentReader(FileReader):
         # return action type marker
         return action_type_found
 
-    # Method:
-    # check_if_action_type_with_first_input_signal()
-    #
     # Description:
     # This method checks if reference contains valid action type, which requires in addition first input signal marker.
-    #
-    # Returns:
-    # This method returns action marker.
     @staticmethod
     def check_if_action_type_with_first_input_signal(ref_action_type_with_first_input_signal):
         # action type marker shows whether valid action type, which requires in addition first input signal marker,
@@ -328,14 +289,8 @@ class ComponentReader(FileReader):
         # return action type marker
         return action_type_with_first_input_signal_found
 
-    # Function:
-    # find_first_input_signal_name()
-    #
     # Description:
-    # This function looks for first input signal, recognized by $FIRST$ marker, of given target action.
-    #
-    # Returns:
-    # This function returns first input signal name.
+    # This method looks for first input signal, recognized by $FIRST$ marker, of given target action.
     def find_first_input_signal_name(self, target_action, target_action_uid):
         # local data
         first_input_signal_name = ""
@@ -379,18 +334,12 @@ class ComponentReader(FileReader):
         # return first input signal name
         return first_input_signal_name
 
-    # Function:
-    # read_data_targets()
-    #
     # Description:
-    # This function looks data targets, i.e. component signals and their targets from activity diagram.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method looks for data targets, i.e. component signals and their targets from activity diagram.
     def read_data_targets(self):
 
-        # read data targets
-        Logger.save_in_log_file("*** read data targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
 
         # search for signals in activity file
         for i in range(0, len(self.activity_file)):
@@ -428,6 +377,8 @@ class ComponentReader(FileReader):
                         connection.connection_target = "$EMPTY$"
                         # append connection to connection list
                         self.connection_list.append(connection)
+                        # record info
+                        Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
                         # exit "for j in range" loop
                         break
 
@@ -476,6 +427,8 @@ class ComponentReader(FileReader):
                             connection.connection_target = target_action
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                         # if signal is target of given signal
                         if ("<ID name=" in self.activity_file[j + 2]) and \
@@ -507,6 +460,8 @@ class ComponentReader(FileReader):
                             connection.connection_target = target_signal_name
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -516,18 +471,16 @@ class ComponentReader(FileReader):
         # remove duplicates from data list
         self.data_list = list(set(self.data_list))
 
-    # Function:
-    # read_interaction_targets()
-    #
+        # record info
+        for data in self.data_list:
+            Logger.save_in_log_file("Reader", "Have found data " + str(data) + " element", False)
+
     # Description:
-    # This function looks interaction targets, i.e. component actions and their targets from activity diagram.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method looks for interaction targets, i.e. component actions and their targets from activity diagram.
     def read_interaction_targets(self):
 
-        # read interaction targets
-        Logger.save_in_log_file("*** read interaction targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module interaction targets in .exml file", False)
 
         # search for actions in activity file
         for i in range(0, len(self.activity_file)):
@@ -607,6 +560,8 @@ class ComponentReader(FileReader):
                             connection.connection_target = target_signal_name
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                     # if line contains </COMP> that means end of targets for given signal
                     if "</COMP>" in self.activity_file[j]:
@@ -616,18 +571,16 @@ class ComponentReader(FileReader):
         # remove duplicates from interaction list
         self.interaction_list = list(set(self.interaction_list))
 
-    # Method:
-    # read_component()
-    #
+        # record info
+        for interaction in self.interaction_list:
+            Logger.save_in_log_file("Reader", "Have found interaction " + str(interaction) + " element", False)
+
     # Description:
     # This method is responsible for reading of component details.
-    #
-    # Returns:
-    # This method returns component reader list, which describes component content and its activity.
     def read_component(self):
 
-        # component reader
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        # record info
+        Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
 
         # search for signals target within activity file
         self.read_data_targets()
@@ -640,33 +593,6 @@ class ComponentReader(FileReader):
 
         # check component correctness
         self.check_correctness()
-
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after component reading
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Connections:")
-        for connection in self.connection_list:
-            Logger.save_in_log_file("          " + str(connection))
-        Logger.save_in_log_file("Actions:")
-        for interaction in self.interaction_list:
-            Logger.save_in_log_file("          " + str(interaction))
-        Logger.save_in_log_file("Signals:")
-        for data in self.data_list:
-            Logger.save_in_log_file("          " + str(data))
-        Logger.save_in_log_file("Input Interface:")
-        for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("          " + str(input_interface))
-        Logger.save_in_log_file("Output Interface:")
-        for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("          " + str(output_interface))
-        Logger.save_in_log_file("Local Data:")
-        for local_data in self.local_data_list:
-            Logger.save_in_log_file("          " + str(local_data))
-
-        # end of component reader
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>> END OF COMPONENT READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to component reader list
         component_reader_list = []

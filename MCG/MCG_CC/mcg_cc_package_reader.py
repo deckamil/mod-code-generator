@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_package_reader.py
 #
 #   DESCRIPTION:
-#       This module contains definition of PackageReader class, which is child
-#       class of FileReader class and is responsible for reading of package content,
-#       i.e. activity diagram and interface details from .exml files.
+#       This module contains definition of PackageReader class, which is
+#       responsible for reading of package content (activity diagram and
+#       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,21 +35,12 @@ from mcg_cc_logger import Logger
 from mcg_cc_connection import Connection
 
 
-# Class:
-# PackageReader()
-#
 # Description:
-# This is child class responsible for reading of package .exml file content.
+# This class allows to read package content (activity diagram and interface details) from .exml files.
 class PackageReader(FileReader):
 
-    # Function:
-    # check_correctness()
-    #
     # Description:
-    # This function checks correctness of package content.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks correctness of package content.
     def check_correctness(self):
 
         # check correctness
@@ -61,14 +52,8 @@ class PackageReader(FileReader):
         # check interface-related errors
         self.check_interface_errors()
 
-    # Function:
-    # check_structure_errors()
-    #
     # Description:
-    # This function checks any structure-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any structure-related errors and issues.
     def check_structure_errors(self):
 
         # **********************************************************************
@@ -94,14 +79,8 @@ class PackageReader(FileReader):
                     # record error
                     ErrorHandler.record_error(ErrorHandler.STR_ERR_MORE_INPUTS, structure_name, "none")
 
-    # Function:
-    # check_interface_errors()
-    #
     # Description:
-    # This function checks any interface-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any interface-related errors and issues.
     def check_interface_errors(self):
 
         # ***************************************************************************
@@ -204,14 +183,8 @@ class PackageReader(FileReader):
                                           connection.connection_target,
                                           "none")
 
-    # Function:
-    # read_data_targets()
-    #
     # Description:
-    # This function looks data targets, i.e. package structures and their targets from activity diagram.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method looks for data targets, i.e. package structures and their targets from activity diagram.
     def read_data_targets(self):
 
         # read data targets
@@ -309,14 +282,8 @@ class PackageReader(FileReader):
         # remove duplicates from data list
         self.data_list = list(set(self.data_list))
 
-    # Function:
-    # read_interaction_targets()
-    #
     # Description:
-    # This function looks interaction targets, i.e. package components and their targets from activity diagram.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method looks for interaction targets, i.e. package components and their targets from activity diagram.
     def read_interaction_targets(self):
 
         # read interaction targets
@@ -427,14 +394,8 @@ class PackageReader(FileReader):
         # remove duplicates from interaction list
         self.interaction_list = list(set(self.interaction_list))
 
-    # Method:
-    # read_package()
-    #
     # Description:
     # This method is responsible for reading of package details.
-    #
-    # Returns:
-    # This method returns package reader list, which describes package content and its activity.
     def read_package(self):
 
         # package reader
