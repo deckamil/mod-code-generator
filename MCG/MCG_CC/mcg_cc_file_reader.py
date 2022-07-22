@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           13 JUL 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -239,4 +239,4 @@ class FileReader(Reader):
         for output_interface in self.output_interface_list:
             Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element", False)
         for local_data in self.local_data_list:
-            Logger.save_in_log_file("Reader", "Have found local data " + str(local_data) + "element", False)
+            Logger.save_in_log_file("Reader", "Have found local data " + str(local_data) + " element", False)

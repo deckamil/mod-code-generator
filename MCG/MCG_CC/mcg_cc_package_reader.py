@@ -6,7 +6,7 @@
 #       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -43,8 +43,8 @@ class PackageReader(FileReader):
     # This method checks correctness of package content.
     def check_correctness(self):
 
-        # check correctness
-        Logger.save_in_log_file("*** check correctness")
+        # record info
+        Logger.save_in_log_file("Reader", "Checking module correctness", False)
 
         # check structure-related errors
         self.check_structure_errors()
@@ -187,8 +187,8 @@ class PackageReader(FileReader):
     # This method looks for data targets, i.e. package structures and their targets from activity diagram.
     def read_data_targets(self):
 
-        # read data targets
-        Logger.save_in_log_file("*** read data targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
 
         # search for structures in activity file
         for i in range(0, len(self.activity_file)):
@@ -226,6 +226,8 @@ class PackageReader(FileReader):
                         connection.connection_target = "$EMPTY$"
                         # append connection to connection list
                         self.connection_list.append(connection)
+                        # record info
+                        Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
                         # exit "for j in range" loop
                         break
 
@@ -273,6 +275,8 @@ class PackageReader(FileReader):
                             connection.connection_target = target_element
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -282,12 +286,16 @@ class PackageReader(FileReader):
         # remove duplicates from data list
         self.data_list = list(set(self.data_list))
 
+        # record info
+        for data in self.data_list:
+            Logger.save_in_log_file("Reader", "Have found data " + str(data) + " element", False)
+
     # Description:
     # This method looks for interaction targets, i.e. package components and their targets from activity diagram.
     def read_interaction_targets(self):
 
-        # read interaction targets
-        Logger.save_in_log_file("*** read interaction targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module interaction targets in .exml file", False)
 
         # search for components in activity file
         for i in range(0, len(self.activity_file)):
@@ -380,6 +388,9 @@ class PackageReader(FileReader):
                                     connection.connection_target = target_structure_name
                                     # append connection to connection list
                                     self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
 
                             # if line contains </COMP> that means end of targets for given component
                             if "</COMP>" in self.activity_file[k]:
@@ -394,12 +405,16 @@ class PackageReader(FileReader):
         # remove duplicates from interaction list
         self.interaction_list = list(set(self.interaction_list))
 
+        # record info
+        for interaction in self.interaction_list:
+            Logger.save_in_log_file("Reader", "Have found interaction " + str(interaction) + " element", False)
+
     # Description:
     # This method is responsible for reading of package details.
     def read_package(self):
 
-        # package reader
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        # record info
+        Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
 
         # search for structure targets within activity file
         self.read_data_targets()
@@ -412,33 +427,6 @@ class PackageReader(FileReader):
 
         # check package correctness
         self.check_correctness()
-
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after package reading
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Connections:")
-        for connection in self.connection_list:
-            Logger.save_in_log_file("          " + str(connection))
-        Logger.save_in_log_file("Components:")
-        for interaction in self.interaction_list:
-            Logger.save_in_log_file("          " + str(interaction))
-        Logger.save_in_log_file("Structures:")
-        for data in self.data_list:
-            Logger.save_in_log_file("          " + str(data))
-        Logger.save_in_log_file("Input Interface:")
-        for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("          " + str(input_interface))
-        Logger.save_in_log_file("Output Interface:")
-        for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("          " + str(output_interface))
-        Logger.save_in_log_file("Local Data:")
-        for local_data in self.local_data_list:
-            Logger.save_in_log_file("          " + str(local_data))
-
-        # end of package reader
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to package reader list
         package_reader_list = []
