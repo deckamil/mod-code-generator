@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           3 JUL 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -270,7 +270,7 @@ class ConfigConverter(object):
 
                 # append instance of module input data
                 module.module_body_list.append("// Input data")
-                module.module_body_list.append(module_name + "_input_type " + module_name + "_input" +
+                module.module_body_list.append(module_name + "_input_type " + module_name + "_input_local" +
                                                " = *" + module_name + "_input")
 
                 # continue reading of body elements until end of body section is reached
@@ -302,6 +302,8 @@ class ConfigConverter(object):
                         invoked_module_arguments = line[line.find("(")+1:line.find(")")]
                         # split string representation of invoked module arguments into list form
                         invoked_module_argument_list = invoked_module_arguments.split(", ")
+                        # append header of invoked module
+                        module.include_list.append(invoked_module_name + ".h")
 
                         # find input interface of invoked module
                         invoked_module_input_interface_list = \
@@ -354,7 +356,7 @@ class ConfigConverter(object):
                                         # if input data comes from main Input Interface
                                         if invoked_module_argument == "Input Interface":
                                             # replace Input Interface with name of input data structure
-                                            invoked_module_argument = module_name + "_input"
+                                            invoked_module_argument = module_name + "_input_local"
 
                                         # append invoked module input
                                         module.module_body_list.append(invoked_module_name + "_input." +

@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           21 MAY 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -48,6 +48,7 @@ class Module(object):
         self.module_name = ""
         self.generation_date = ""
         self.header_comment_list = []
+        self.include_list = []
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_data_list = []
@@ -81,7 +82,14 @@ class Module(object):
 
         # set includes
         module = module + "#include \"" + self.module_name + ".h\"\n"
-        module = module + "#include \"basic_data_types.h\"\n\n"
+        module = module + "#include \"basic_data_types.h\"\n"
+
+        # append additional includes
+        for include in self.include_list:
+            module = module + "#include \"" + include + "\"\n"
+
+        # set separator line
+        module = module + "\n"
 
         # ********** FUNCTION HEADER ********** #
 
@@ -144,7 +152,7 @@ class Module(object):
 
         # collect output data into output data structure
         for output_interface in self.output_interface_list:
-            module = module + self.indent + self.module_name + "_output->" + \
+            module = module + self.indent + self.module_name + "_output." + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
