@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CC.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           24 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -326,24 +326,20 @@ class ErrorHandler(object):
     # Description:
     # This method checks if any error was recorded and if yes, then it ends run of MCG CC.
     @staticmethod
-    def check_errors(model_element_name, activity_source, model_element_type):
+    def check_errors():
 
         # if any error was recorded
         if len(ErrorHandler.error_list) > 0:
             # error handler
-            Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-
-            # print model element details
-            Logger.save_in_log_file("Model Element Name:      " + str(model_element_name))
-            Logger.save_in_log_file("Model Element Source:    " + str(activity_source))
-            Logger.save_in_log_file("Model Element Type:      " + str(model_element_type))
-            Logger.save_in_log_file("*** ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT")
+            Logger.save_in_log_file("ErrorHandler",
+                                    "ERRORS FOUND, Mod Code Generator (MCG) Code Generator Component (CGC) WILL EXIT",
+                                    True)
             # display errors
             for error in ErrorHandler.error_list:
-                Logger.save_in_log_file(error)
+                Logger.save_in_log_file("ErrorHandler", error, False)
 
-            # end of error handler
-            Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            # save log file footer
+            Logger.save_log_file_footer()
 
-            # exit MCG CC.
+            # exit MCG CGC.
             exit()

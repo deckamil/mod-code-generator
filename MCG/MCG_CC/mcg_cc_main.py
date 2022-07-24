@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           12 JUL 2022
+#   DATE:           24 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -140,9 +140,7 @@ class Main(object):
             files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
             # check errors
-            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                      "Standard.Component")
+            ErrorHandler.check_errors()
 
             # if component files were found
             if files_found:
@@ -153,9 +151,7 @@ class Main(object):
                 component_reader_list = component_reader.read_component()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Component")
+                ErrorHandler.check_errors()
 
                 # initialize component sorter
                 component_sorter = ComponentSorter(component_reader_list)
@@ -163,9 +159,7 @@ class Main(object):
                 component_sorter_list = component_sorter.sort_component()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Component")
+                ErrorHandler.check_errors()
 
                 # initialize component converter
                 component_converter = ComponentConverter(file_finder_list, component_reader_list, component_sorter_list)
@@ -190,9 +184,7 @@ class Main(object):
             files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
             # check errors
-            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                      "Standard.Package")
+            ErrorHandler.check_errors()
 
             # if package files were found
             if files_found:
@@ -203,9 +195,7 @@ class Main(object):
                 package_reader_list = package_reader.read_package()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Package")
+                ErrorHandler.check_errors()
 
                 # initialize package sorter
                 package_sorter = PackageSorter(package_reader_list)
@@ -213,9 +203,7 @@ class Main(object):
                 package_sorter_list = package_sorter.sort_package()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Package")
+                ErrorHandler.check_errors()
 
                 # initialize package converter
                 package_converter = PackageConverter(file_finder_list, package_reader_list, package_sorter_list)
