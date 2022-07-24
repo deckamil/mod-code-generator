@@ -6,7 +6,7 @@
 #       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           22 JUL 2022
+#   DATE:           24 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -182,6 +182,21 @@ class PackageReader(FileReader):
                 ErrorHandler.record_error(ErrorHandler.INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC,
                                           connection.connection_target,
                                           "none")
+
+        # ****************************************************************************
+        # check if output interface structure is connected as output (target) of interaction element
+        for connection in self.connection_list:
+            # if connection target is same as interface element name and connection source is interaction element,
+            # then it means that output interface element is connected as output (target) of interaction element
+            if (connection.connection_target == "Output Interface") and (connection.connection_source != "$EMPTY$"):
+                # check interaction list
+                for interaction in self.interaction_list:
+                    # if connection source is same as interaction element
+                    if connection.connection_source == interaction:
+                        # record error
+                        ErrorHandler.record_error(ErrorHandler.INT_ERR_OUT_INT_STR_IS_INTER_TAR_IN_PAC,
+                                                  interaction,
+                                                  "none")
 
     # Description:
     # This method looks for data targets, i.e. package structures and their targets from activity diagram.

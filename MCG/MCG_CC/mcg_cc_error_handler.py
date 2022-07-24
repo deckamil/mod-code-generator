@@ -53,7 +53,7 @@ class ErrorHandler(object):
     STR_ERR_MORE_INPUTS = 101
     STR_ERR_NO_COM_STR_UID_TARGET = 120
 
-    # COMPONENT errors
+    # COM_ERR_NO_TARGET errors
     COM_ERR_NO_TARGET = 170
     COM_ERR_NO_STR_UID_TARGET = 171
 
@@ -76,6 +76,7 @@ class ErrorHandler(object):
     INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM = 221
     INT_ERR_INP_INT_STR_IS_TAR_IN_PAC = 222
     INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC = 223
+    INT_ERR_OUT_INT_STR_IS_INTER_TAR_IN_PAC = 224
 
     # GENERAL errors
     GEN_ERR_NO_NAME_ELEMENT = 270
@@ -287,6 +288,13 @@ class ErrorHandler(object):
             # set error notification
             error = "ERROR " + str(error_code) + ": Output Interface structure is connected as input (source) of " \
                     + str(error_info1) + " within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
+        elif error_code == ErrorHandler.INT_ERR_OUT_INT_STR_IS_INTER_TAR_IN_PAC:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as output (target) of " \
+                    + str(error_info1) + " interaction within package content"
             # append error to error list
             ErrorHandler.error_list.append(error)
 
