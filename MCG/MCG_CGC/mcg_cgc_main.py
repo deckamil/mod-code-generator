@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   DATE:           12 SEP 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -50,6 +50,9 @@ class Main(object):
     CONFIG_FILE_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
 
+    # MCG CGC version
+    MCG_CGC_VERSION = "v0.1.0-in-dev"
+
     # Description:
     # This is main method, which display short notice and start code generation process.
     @staticmethod
@@ -60,6 +63,7 @@ class Main(object):
         print("Mod Code Generator (MCG)")
         print("Copyright (C) 2022 Kamil Deć github.com/deckamil")
         print("This is Code Generator Component (CGC) of Mod Code Generator (MCG)")
+        print(Main.MCG_CGC_VERSION)
         print()
         print("License GPLv3+: GNU GPL version 3 or later.")
         print("This is free software; see the source for copying conditions. There is NO")
@@ -90,10 +94,10 @@ class Main(object):
             print("Usage: python mcg_cgc_main.py \"<config_file_path>\" \"<output_dir_path>\"")
             print("Arguments:")
             print("    <config_file_path>     Path to configuration file, which contains source data to code generation")
-            print("    <output_dir_path>      Path to output directory, where results from MCG will be saved")
+            print("    <output_dir_path>      Path to output directory, where results from MCG CGC will be saved")
             print("")
             print("Keep specific order of arguments, as pointed in usage above.")
-            print("See Mod Code Generator Manual for further information.")
+            print("See Mod Code Generator Manual for further details.")
 
     # Description:
     # This method invokes process of code generation from the configuration file.

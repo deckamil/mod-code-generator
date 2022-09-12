@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2022
+#   DATE:           12 SEP 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,6 +57,9 @@ class Main(object):
     MODEL_DIR_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
 
+    # MCG CC version
+    MCG_CC_VERSION = "v0.1.0-in-dev"
+
     # Description:
     # This is main method, which display short notice and start conversion process.
     @staticmethod
@@ -67,6 +70,7 @@ class Main(object):
         print("Mod Code Generator (MCG)")
         print("Copyright (C) 2021-2022 Kamil Deć github.com/deckamil")
         print("This is Converter Component (CC) of Mod Code Generator (MCG)")
+        print(Main.MCG_CC_VERSION)
         print()
         print("License GPLv3+: GNU GPL version 3 or later.")
         print("This is free software; see the source for copying conditions. There is NO")
@@ -97,10 +101,10 @@ class Main(object):
             print("Usage: python mcg_cc_main.py \"<model_dir_path>\" \"<output_dir_path>\"")
             print("Arguments:")
             print("    <model_dir_path>       Path to model directory, where all catalogs with .exml files are stored")
-            print("    <output_dir_path>      Path to output directory, where results from MCG will be saved")
+            print("    <output_dir_path>      Path to output directory, where results from MCG CC will be saved")
             print("")
             print("Keep specific order of arguments, as pointed in usage above.")
-            print("See Mod Code Generator Manual for further information.")
+            print("See Mod Code Generator Manual for further details.")
 
     # Description:
     # This method invokes conversion of model content in form of .exml files into configuration file.
