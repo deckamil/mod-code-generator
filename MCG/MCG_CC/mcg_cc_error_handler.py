@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CC.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           24 JUL 2022
+#   DATE:           21 SEP 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -340,7 +340,7 @@ class ErrorHandler(object):
         if len(ErrorHandler.error_list) > 0:
             # error handler
             Logger.save_in_log_file("ErrorHandler",
-                                    "ERRORS FOUND, Mod Code Generator (MCG) Code Generator Component (CGC) WILL EXIT",
+                                    "ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT",
                                     True)
             # display errors
             for error in ErrorHandler.error_list:
