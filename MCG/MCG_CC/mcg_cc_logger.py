@@ -5,7 +5,7 @@
 #       for log recording during MCG CC run.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           12 JUL 2022
+#   DATE:           26 SEP 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -65,7 +65,7 @@ class Logger(object):
     def save_log_file_footer():
 
         # write footer info in log
-        Logger.save_in_log_file("Logger", "End of MCG CGC log", True)
+        Logger.save_in_log_file("Logger", "End of MCG CC log", True)
 
     # Description:
     # This method prints and saves info in log file.
