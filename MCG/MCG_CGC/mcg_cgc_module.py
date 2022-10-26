@@ -139,9 +139,22 @@ class Module(object):
 
         # ********** FUNCTION BODY ********** #
 
+        # distinguish if first line of function body was added or not to module content
+        first_body_line_added = False
+
         # append function body
         for module_body in self.module_body_list:
-            module = module + self.indent + module_body + ";\n"
+
+            # if first line was added and current line contains comment
+            if first_body_line_added and "// " in module_body:
+                # add new line separation before comment
+                module = module + "\n" + self.indent + module_body + ";\n"
+            else:
+                # add new body line
+                module = module + self.indent + module_body + ";\n"
+
+            # first body line was added
+            first_body_line_added = True
 
         module = module + "\n"
 
