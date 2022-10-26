@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           22 JUL 2022
+#   DATE:           26 OCT 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -101,7 +101,7 @@ class Module(object):
         # set function name
         module = module + self.module_name
         # set function argument
-        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input){\n\n"
+        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input) {\n\n"
 
         # ********** FUNCTION INTERFACE ********** #
 
@@ -217,7 +217,7 @@ class Module(object):
         module = module + "// This is input interface type of module function\n"
 
         # set input interface struct definition
-        module = module + "typedef struct{\n"
+        module = module + "typedef struct {\n"
 
         # append input interface
         for input_interface in self.input_interface_list:
@@ -233,7 +233,7 @@ class Module(object):
         module = module + "// This is output interface type of module function\n"
 
         # set output interface struct definition
-        module = module + "typedef struct{\n"
+        module = module + "typedef struct {\n"
 
         # append output interface
         for output_interface in self.output_interface_list:
