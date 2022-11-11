@@ -3,12 +3,11 @@
 #   DESCRIPTION:
 #       This is main module of Mod Code Generator (MCG) Converter Component (CC)
 #       and it contains definition of Main class, which uses other MCG CC classes
-#       to convert component and package content from .exml file into configuration
-#       file. The configuration file will be used by Mod Code Generator (MCG) Code
-#       Generator Component (CGC) to generate C code from the model.
+#       to convert component and package content from .exml files into configuration
+#       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           11 NOV 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -44,11 +43,8 @@ from mcg_cc_package_sorter import PackageSorter
 from mcg_cc_package_converter import PackageConverter
 
 
-# Class:
-# Main()
-#
 # Description:
-# This is base class, which uses other MCG CC classes to generate configuration file.
+# This is main class, which controls conversion process of model content into configuration file.
 class Main(object):
 
     # This parameter defines expected number of command line arguments passed to MCG CC,
@@ -61,14 +57,11 @@ class Main(object):
     MODEL_DIR_PATH_INDEX = 1
     OUTPUT_DIR_PATH_INDEX = 2
 
-    # Method:
-    # main()
-    #
+    # MCG CC version
+    MCG_CC_VERSION = "v0.1.0-alpha"
+
     # Description:
-    # This is main method of MCGCCMain class.
-    #
-    # Returns:
-    # This method does not return anything.
+    # This is main method, which display short notice and start conversion process.
     @staticmethod
     def main():
 
@@ -77,6 +70,7 @@ class Main(object):
         print("Mod Code Generator (MCG)")
         print("Copyright (C) 2021-2022 Kamil Deć github.com/deckamil")
         print("This is Converter Component (CC) of Mod Code Generator (MCG)")
+        print(Main.MCG_CC_VERSION)
         print()
         print("License GPLv3+: GNU GPL version 3 or later.")
         print("This is free software; see the source for copying conditions. There is NO")
@@ -107,19 +101,13 @@ class Main(object):
             print("Usage: python mcg_cc_main.py \"<model_dir_path>\" \"<output_dir_path>\"")
             print("Arguments:")
             print("    <model_dir_path>       Path to model directory, where all catalogs with .exml files are stored")
-            print("    <output_dir_path>      Path to output directory, where results from MCG will be saved")
+            print("    <output_dir_path>      Path to output directory, where results from MCG CC will be saved")
             print("")
             print("Keep specific order of arguments, as pointed in usage above.")
-            print("See Mod Code Generator Manual for further information.")
+            print("See Mod Code Generator Manual for further details.")
 
-    # Method:
-    # convert_model()
-    #
     # Description:
     # This method invokes conversion of model content in form of .exml files into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def convert_model():
 
@@ -138,15 +126,9 @@ class Main(object):
         # saves log file footer
         Logger.save_log_file_footer()
 
-    # Method:
-    # run_component_conversion()
-    #
     # Description:
     # This method is responsible for processing of component content from .exml file
     # into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def run_component_conversion():
 
@@ -156,18 +138,13 @@ class Main(object):
         # repeat until all components are converted into configuration file
         while files_found:
 
-            Logger.save_in_log_file("\n                         *** COMPONENT PROCESSING ***"
-                                    "                          \n")
-
             # find component files
             file_finder_list = FileFinder.find_files("Standard.Component")
             # get files marker
             files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
             # check errors
-            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                      "Standard.Component")
+            ErrorHandler.check_errors()
 
             # if component files were found
             if files_found:
@@ -178,9 +155,7 @@ class Main(object):
                 component_reader_list = component_reader.read_component()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Component")
+                ErrorHandler.check_errors()
 
                 # initialize component sorter
                 component_sorter = ComponentSorter(component_reader_list)
@@ -188,24 +163,16 @@ class Main(object):
                 component_sorter_list = component_sorter.sort_component()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Component")
+                ErrorHandler.check_errors()
 
                 # initialize component converter
                 component_converter = ComponentConverter(file_finder_list, component_reader_list, component_sorter_list)
                 # convert component content
                 component_converter.convert_component()
 
-    # Method:
-    # run_package_conversion()
-    #
     # Description:
     # This method is responsible for processing of package content from .exml file
     # into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def run_package_conversion():
 
@@ -215,18 +182,13 @@ class Main(object):
         # repeat until all packages are converted into configuration file
         while files_found:
 
-            Logger.save_in_log_file("\n                          *** PACKAGE PROCESSING ***"
-                                    "                           \n")
-
             # find package files
             file_finder_list = FileFinder.find_files("Standard.Package")
             # get files marker
             files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
 
             # check errors
-            ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                      file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                      "Standard.Package")
+            ErrorHandler.check_errors()
 
             # if package files were found
             if files_found:
@@ -237,9 +199,7 @@ class Main(object):
                 package_reader_list = package_reader.read_package()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Package")
+                ErrorHandler.check_errors()
 
                 # initialize package sorter
                 package_sorter = PackageSorter(package_reader_list)
@@ -247,9 +207,7 @@ class Main(object):
                 package_sorter_list = package_sorter.sort_package()
 
                 # check errors
-                ErrorHandler.check_errors(file_finder_list[FileFinder.MODEL_ELEMENT_NAME_INDEX],
-                                          file_finder_list[FileFinder.ACTIVITY_SOURCE_INDEX],
-                                          "Standard.Package")
+                ErrorHandler.check_errors()
 
                 # initialize package converter
                 package_converter = PackageConverter(file_finder_list, package_reader_list, package_sorter_list)

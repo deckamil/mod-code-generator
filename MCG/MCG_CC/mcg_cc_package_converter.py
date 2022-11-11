@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_package_converter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of PackageConverter class, which is child
-#       class of Converter class and is responsible for conversion of package content
-#       into configuration file.
+#       This module contains definition of PackageConverter class, which is
+#       responsible for conversion of package content into configuration file
+#       format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,21 +34,12 @@ from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 
 
-# Class:
-# PackageConverter()
-#
 # Description:
-# This is child class responsible for converting of package content into configuration file.
+# This class allows to convert package content into configuration file format.
 class PackageConverter(Converter):
 
-    # Method:
-    # convert_component_interaction()
-    #
     # Description:
     # This method is responsible for conversion of component interaction into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_component_interaction(self, sorted_node):
 
         # find component name
@@ -75,14 +66,11 @@ class PackageConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Method:
-    # convert_structure_assignment()
-    #
+        # record info
+        Logger.save_in_log_file("Converter", "Have converted to " + str(conversion_line) + " line", False)
+
     # Description:
     # This method is responsible for conversion of structure assignment into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_structure_assignment(self, sorted_node):
 
         # append Output Interface structure to conversion line
@@ -105,21 +93,15 @@ class PackageConverter(Converter):
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
-    # Method:
-    # convert_package()
-    #
+        # record info
+        Logger.save_in_log_file("Converter", "Have converted to " + str(conversion_line) + " line", False)
+
     # Description:
     # This method is responsible for converting of package content into configuration file.
-    #
-    # Returns:
-    # This method does not return anything.
     def convert_package(self):
 
-        # package converter
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-
-        # convert header
-        Logger.save_in_log_file("*** convert header")
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module source and name into configuration file", True)
 
         # append start marker of new package section to configuration file
         self.configuration_file.append(str("PACKAGE START"))
@@ -130,14 +112,20 @@ class PackageConverter(Converter):
         # append package name to configuration file
         self.configuration_file.append(str("PACKAGE NAME ") + str(self.model_element_name))
 
-        # convert interface details to configuration file
-        self.convert_interfaces()
+        # record info
+        Logger.save_in_log_file("Converter", "Have converted to "
+                                + str(self.configuration_file[len(self.configuration_file) - 2]) + " line", False)
+        Logger.save_in_log_file("Converter", "Have converted to "
+                                + str(self.configuration_file[len(self.configuration_file) - 1]) + " line", False)
 
-        # convert body
-        Logger.save_in_log_file("*** convert body")
+        # convert interface details to configuration file
+        self.convert_interfaces("PACKAGE")
+
+        # record info
+        Logger.save_in_log_file("Converter", "Converting module body into configuration file", False)
 
         # append start marker of function body section to configuration file
-        self.configuration_file.append(str("BODY START"))
+        self.configuration_file.append(str("PACKAGE BODY START"))
 
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
@@ -151,22 +139,13 @@ class PackageConverter(Converter):
                 self.convert_structure_assignment(sorted_node)
 
         # append end marker of function body section to configuration file
-        self.configuration_file.append(str("BODY END"))
+        self.configuration_file.append(str("PACKAGE BODY END"))
 
         # append end marker of new package section to configuration file
         self.configuration_file.append(str("PACKAGE END"))
 
+        # record info
+        Logger.save_in_log_file("Converter", "Saving conversion results into configuration file", False)
+
         # save configuration file
         self.save_in_configuration_file()
-
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after package conversion
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Configuration File:")
-        for line in self.configuration_file:
-            Logger.save_in_log_file("          " + str(line))
-
-        # end of package converter
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE CONVERTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<")

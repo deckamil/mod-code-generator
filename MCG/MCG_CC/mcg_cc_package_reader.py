@@ -1,12 +1,12 @@
 #   FILE:           mcg_cc_package_reader.py
 #
 #   DESCRIPTION:
-#       This module contains definition of PackageReader class, which is child
-#       class of FileReader class and is responsible for reading of package content,
-#       i.e. activity diagram and interface details from .exml files.
+#       This module contains definition of PackageReader class, which is
+#       responsible for reading of package content (activity diagram and
+#       interface details) from .exml files.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           24 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,25 +35,16 @@ from mcg_cc_logger import Logger
 from mcg_cc_connection import Connection
 
 
-# Class:
-# PackageReader()
-#
 # Description:
-# This is child class responsible for reading of package .exml file content.
+# This class allows to read package content (activity diagram and interface details) from .exml files.
 class PackageReader(FileReader):
 
-    # Function:
-    # check_correctness()
-    #
     # Description:
-    # This function checks correctness of package content.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks correctness of package content.
     def check_correctness(self):
 
-        # check correctness
-        Logger.save_in_log_file("*** check correctness")
+        # record info
+        Logger.save_in_log_file("Reader", "Checking module correctness", False)
 
         # check structure-related errors
         self.check_structure_errors()
@@ -61,14 +52,8 @@ class PackageReader(FileReader):
         # check interface-related errors
         self.check_interface_errors()
 
-    # Function:
-    # check_structure_errors()
-    #
     # Description:
-    # This function checks any structure-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any structure-related errors and issues.
     def check_structure_errors(self):
 
         # **********************************************************************
@@ -94,14 +79,8 @@ class PackageReader(FileReader):
                     # record error
                     ErrorHandler.record_error(ErrorHandler.STR_ERR_MORE_INPUTS, structure_name, "none")
 
-    # Function:
-    # check_interface_errors()
-    #
     # Description:
-    # This function checks any interface-related errors and issues.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method checks any interface-related errors and issues.
     def check_interface_errors(self):
 
         # ***************************************************************************
@@ -204,18 +183,27 @@ class PackageReader(FileReader):
                                           connection.connection_target,
                                           "none")
 
-    # Function:
-    # read_data_targets()
-    #
+        # ****************************************************************************
+        # check if output interface structure is connected as output (target) of interaction element
+        for connection in self.connection_list:
+            # if connection target is same as interface element name and connection source is interaction element,
+            # then it means that output interface element is connected as output (target) of interaction element
+            if (connection.connection_target == "Output Interface") and (connection.connection_source != "$EMPTY$"):
+                # check interaction list
+                for interaction in self.interaction_list:
+                    # if connection source is same as interaction element
+                    if connection.connection_source == interaction:
+                        # record error
+                        ErrorHandler.record_error(ErrorHandler.INT_ERR_OUT_INT_STR_IS_INTER_TAR_IN_PAC,
+                                                  interaction,
+                                                  "none")
+
     # Description:
-    # This function looks data targets, i.e. package structures and their targets from activity diagram.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method looks for data targets, i.e. package structures and their targets from activity diagram.
     def read_data_targets(self):
 
-        # read data targets
-        Logger.save_in_log_file("*** read data targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
 
         # search for structures in activity file
         for i in range(0, len(self.activity_file)):
@@ -253,6 +241,8 @@ class PackageReader(FileReader):
                         connection.connection_target = "$EMPTY$"
                         # append connection to connection list
                         self.connection_list.append(connection)
+                        # record info
+                        Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
                         # exit "for j in range" loop
                         break
 
@@ -300,6 +290,8 @@ class PackageReader(FileReader):
                             connection.connection_target = target_element
                             # append connection to connection list
                             self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
 
                     # if line contains </COMP> that means end of targets for given structure
                     if "</COMP>" in self.activity_file[j]:
@@ -309,18 +301,16 @@ class PackageReader(FileReader):
         # remove duplicates from data list
         self.data_list = list(set(self.data_list))
 
-    # Function:
-    # read_interaction_targets()
-    #
+        # record info
+        for data in self.data_list:
+            Logger.save_in_log_file("Reader", "Have found data " + str(data) + " element", False)
+
     # Description:
-    # This function looks interaction targets, i.e. package components and their targets from activity diagram.
-    #
-    # Returns:
-    # This function does not return anything.
+    # This method looks for interaction targets, i.e. package components and their targets from activity diagram.
     def read_interaction_targets(self):
 
-        # read interaction targets
-        Logger.save_in_log_file("*** read interaction targets")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module interaction targets in .exml file", False)
 
         # search for components in activity file
         for i in range(0, len(self.activity_file)):
@@ -413,6 +403,9 @@ class PackageReader(FileReader):
                                     connection.connection_target = target_structure_name
                                     # append connection to connection list
                                     self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
 
                             # if line contains </COMP> that means end of targets for given component
                             if "</COMP>" in self.activity_file[k]:
@@ -427,18 +420,16 @@ class PackageReader(FileReader):
         # remove duplicates from interaction list
         self.interaction_list = list(set(self.interaction_list))
 
-    # Method:
-    # read_package()
-    #
+        # record info
+        for interaction in self.interaction_list:
+            Logger.save_in_log_file("Reader", "Have found interaction " + str(interaction) + " element", False)
+
     # Description:
     # This method is responsible for reading of package details.
-    #
-    # Returns:
-    # This method returns package reader list, which describes package content and its activity.
     def read_package(self):
 
-        # package reader
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+        # record info
+        Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
 
         # search for structure targets within activity file
         self.read_data_targets()
@@ -451,33 +442,6 @@ class PackageReader(FileReader):
 
         # check package correctness
         self.check_correctness()
-
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after package reading
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Connections:")
-        for connection in self.connection_list:
-            Logger.save_in_log_file("          " + str(connection))
-        Logger.save_in_log_file("Components:")
-        for interaction in self.interaction_list:
-            Logger.save_in_log_file("          " + str(interaction))
-        Logger.save_in_log_file("Structures:")
-        for data in self.data_list:
-            Logger.save_in_log_file("          " + str(data))
-        Logger.save_in_log_file("Input Interface:")
-        for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("          " + str(input_interface))
-        Logger.save_in_log_file("Output Interface:")
-        for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("          " + str(output_interface))
-        Logger.save_in_log_file("Local Data:")
-        for local_data in self.local_data_list:
-            Logger.save_in_log_file("          " + str(local_data))
-
-        # end of package reader
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE READER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to package reader list
         package_reader_list = []

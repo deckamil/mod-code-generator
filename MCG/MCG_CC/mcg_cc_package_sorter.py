@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_package_sorter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of PackageSorter class, which is child
-#       class of Sorter class and is responsible for sorting of package content,
-#       i.e. nodes of activity diagram.
+#       This module contains definition of PackageSorter class, which is
+#       responsible for sorting of package nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           20 FEB 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,25 +34,16 @@ from mcg_cc_file_reader import FileReader
 from mcg_cc_node import Node
 
 
-# Class:
-# PackageSorter()
-#
 # Description:
-# This is child class responsible for sorting of package content, i.e. nodes of activity diagram.
+# This class allows to sort package nodes.
 class PackageSorter(Sorter):
 
-    # Method:
-    # remove_input_output_interface_element()
-    #
     # Description:
     # This method removes Input Interface and Output Interface elements from local data list.
-    #
-    # Returns:
-    # This method does not return anything.
     def remove_input_output_interface_element(self):
 
-        # remove input output interface element
-        Logger.save_in_log_file("*** remove input output interface element")
+        # record info
+        Logger.save_in_log_file("Sorter", "Removing input and output interface elements from local data", False)
 
         # remove Input Interface elements from local data list
         for local_data in self.local_data_list:
@@ -73,18 +63,12 @@ class PackageSorter(Sorter):
                 # break for loop
                 break
 
-    # Method:
-    # replace_output_assignment()
-    #
     # Description:
     # This method replaces nodes, where node input is assignment to Output Interface structure, with one node.
-    #
-    # Returns:
-    # This method does not return anything.
     def replace_output_assignment(self):
 
-        # replace output assignment
-        Logger.save_in_log_file("*** replace output assignment")
+        # record info
+        Logger.save_in_log_file("Sorter", "Sorting data assignment to output interface element", False)
 
         # replacement of sorted nodes, with structure assignment to Output Interface
         sorted_node_replacement = Node()
@@ -117,18 +101,13 @@ class PackageSorter(Sorter):
         # append node replacement to sorted node list
         self.sorted_node_list.append(sorted_node_replacement)
 
-    # Method:
-    # sort_package()
-    #
+        # record info
+        for sorted_node in self.sorted_node_list:
+            Logger.save_in_log_file("Sorter", "Have sorted " + str(sorted_node) + " node", False)
+
     # Description:
     # This method is responsible for sorting of package details.
-    #
-    # Returns:
-    # This method returns sorted node list.
     def sort_package(self):
-
-        # package sorter
-        Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
         # sort connections of same component into one place on connections list
         self.sort_connections()
@@ -147,24 +126,6 @@ class PackageSorter(Sorter):
 
         # replace nodes with structure assignment to Output Interface
         self.replace_output_assignment()
-
-        # process completed
-        Logger.save_in_log_file("PROCESS COMPLETED")
-
-        # display additional details after package sorting
-        Logger.save_in_log_file("")
-        Logger.save_in_log_file("Sorted Connections:")
-        for connection in self.connection_list:
-            Logger.save_in_log_file("          " + str(connection))
-        Logger.save_in_log_file("Nodes:")
-        for node in self.node_list:
-            Logger.save_in_log_file("          " + str(node))
-        Logger.save_in_log_file("Sorted Nodes:")
-        for sorted_node in self.sorted_node_list:
-            Logger.save_in_log_file("          " + str(sorted_node))
-
-        # end of package sorter
-        Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF PACKAGE SORTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         # append collected data to package sorter list
         package_sorter_list = []

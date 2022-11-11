@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_error_handler.py
 #
 #   DESCRIPTION:
-#       This module contains definition of ErrorHandler class, which is responsible
-#       for error recording, which may occur during run of Mod Code Generator (MCG)
-#       Converter Component (CC).
+#       This module contains definition of ErrorHandler class, which is
+#       responsible for error recording, which may occur during run of MCG CC.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           19 JAN 2022
+#   DATE:           21 SEP 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,11 +31,8 @@
 from mcg_cc_logger import Logger
 
 
-# Class:
-# ErrorHandler()
-#
 # Description:
-# This is base class responsible for error recording, which may occur during run of MCG CC.
+# This class is responsible for error recording, which may occur during run of MCG CC.
 class ErrorHandler(object):
 
     # error list
@@ -57,7 +53,7 @@ class ErrorHandler(object):
     STR_ERR_MORE_INPUTS = 101
     STR_ERR_NO_COM_STR_UID_TARGET = 120
 
-    # COMPONENT errors
+    # COM_ERR_NO_TARGET errors
     COM_ERR_NO_TARGET = 170
     COM_ERR_NO_STR_UID_TARGET = 171
 
@@ -80,6 +76,7 @@ class ErrorHandler(object):
     INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM = 221
     INT_ERR_INP_INT_STR_IS_TAR_IN_PAC = 222
     INT_ERR_OUT_INT_STR_IS_SRC_IN_PAC = 223
+    INT_ERR_OUT_INT_STR_IS_INTER_TAR_IN_PAC = 224
 
     # GENERAL errors
     GEN_ERR_NO_NAME_ELEMENT = 270
@@ -87,14 +84,8 @@ class ErrorHandler(object):
     GEN_ERR_NO_COM_PAC_ACTIVITY = 272
     GEN_ERR_NO_COM_PAC_INTERFACE = 273
 
-    # Method:
-    # record_error()
-    #
     # Description:
     # This method records error (i.e. append error to error list), found during run of MCG CC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
     def record_error(error_code, error_info1, error_info2):
 
@@ -300,6 +291,13 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
+        elif error_code == ErrorHandler.INT_ERR_OUT_INT_STR_IS_INTER_TAR_IN_PAC:
+            # set error notification
+            error = "ERROR " + str(error_code) + ": Output Interface structure is connected as output (target) of " \
+                    + str(error_info1) + " interaction within package content"
+            # append error to error list
+            ErrorHandler.error_list.append(error)
+
         # GENERAL errors, range 251-300
         elif error_code == ErrorHandler.GEN_ERR_NO_NAME_ELEMENT:
             # set error notification
@@ -333,33 +331,23 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-    # Method:
-    # check_errors()
-    #
     # Description:
     # This method checks if any error was recorded and if yes, then it ends run of MCG CC.
-    #
-    # Returns:
-    # This method does not return anything.
     @staticmethod
-    def check_errors(model_element_name, activity_source, model_element_type):
+    def check_errors():
 
         # if any error was recorded
         if len(ErrorHandler.error_list) > 0:
             # error handler
-            Logger.save_in_log_file(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
-
-            # print model element details
-            Logger.save_in_log_file("Model Element Name:      " + str(model_element_name))
-            Logger.save_in_log_file("Model Element Source:    " + str(activity_source))
-            Logger.save_in_log_file("Model Element Type:      " + str(model_element_type))
-            Logger.save_in_log_file("*** ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT")
+            Logger.save_in_log_file("ErrorHandler",
+                                    "ERRORS FOUND, Mod Code Generator (MCG) Converter Component (CC) WILL EXIT",
+                                    True)
             # display errors
             for error in ErrorHandler.error_list:
-                Logger.save_in_log_file(error)
+                Logger.save_in_log_file("ErrorHandler", error, False)
 
-            # end of error handler
-            Logger.save_in_log_file("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>> END OF ERROR HANDLER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            # save log file footer
+            Logger.save_log_file_footer()
 
-            # exit MCG CC.
+            # exit MCG CGC.
             exit()

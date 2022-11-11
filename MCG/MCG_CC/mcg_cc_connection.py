@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of Connection class, which represents connection
-#       between two model elements from activity diagram.
+#       between two model elements on activity diagram.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2022
+#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
+#   DATE:           7 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,34 +28,19 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-# Class:
-# Connection()
-#
 # Description:
-# This is base class responsible for storing details of connection between two model elements from activity diagram.
+# This class represents connection between two model elements on activity diagram.
 class Connection(object):
 
-    # Method:
-    # __init__()
-    #
     # Description:
     # This is class constructor.
-    #
-    # Returns:
-    # This method does not return anything.
     def __init__(self):
         # initialize object data
         self.connection_source = ""
         self.connection_target = ""
 
-    # Method:
-    # __str__()
-    #
     # Description:
-    # This is string representation of object data.
-    #
-    # Returns:
-    # This method return string representation of object data.
+    # This method returns string representation of connection between two model elements on activity diagram.
     def __str__(self):
         # append source marker and data
         line = "$SOURCE$: " + self.connection_source + " "

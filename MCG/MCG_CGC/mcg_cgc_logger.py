@@ -1,11 +1,11 @@
-#   FILE:           mcg_cc_logger.py
+#   FILE:           mcg_cgc_logger.py
 #
 #   DESCRIPTION:
 #       This module contains definition of Logger class, which is responsible
-#       for log recording during MCG CC run.
+#       for log recording during MCG CGC run.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 SEP 2022
+#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
+#   DATE:           28 MAY 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,7 +32,7 @@ from datetime import datetime
 
 
 # Description:
-# This class is responsible for log recording during MCG CC run.
+# This class is responsible for log recording during MCG CGC run.
 class Logger(object):
 
     # initialize class data
@@ -40,12 +40,12 @@ class Logger(object):
     log_file_path = ""
 
     # Description:
-    # This method sets path to log file, which will contain events record from MCG CC.
+    # This method sets path to log file, which will contain events record from MCG CGC.
     @staticmethod
     def set_log_file_path(output_dir_path):
 
         # set log file path
-        Logger.log_file_path = output_dir_path + str("\\mcg_cc_log.txt")
+        Logger.log_file_path = output_dir_path + str("\\mcg_cgc_log.txt")
 
         # open new file in write mode, then close file, to clear previous content
         Logger.log_file_disk = open(Logger.log_file_path, "w")
@@ -57,7 +57,7 @@ class Logger(object):
     def save_log_file_header():
 
         # write header info in log file
-        Logger.save_in_log_file("Logger", "Start of MCG CC log", False)
+        Logger.save_in_log_file("Logger", "Start of MCG CGC log", False)
 
     # Description:
     # This method saves footer info in log file.
@@ -65,7 +65,7 @@ class Logger(object):
     def save_log_file_footer():
 
         # write footer info in log
-        Logger.save_in_log_file("Logger", "End of MCG CC log", True)
+        Logger.save_in_log_file("Logger", "End of MCG CGC log", True)
 
     # Description:
     # This method prints and saves info in log file.

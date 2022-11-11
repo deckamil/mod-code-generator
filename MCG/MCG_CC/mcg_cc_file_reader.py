@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_file_reader.py
 #
 #   DESCRIPTION:
-#       This module contains definition of FileReader class, which is child
-#       class or Reader class and is responsible for reading of .exml file
-#       content.
+#       This module contains definition of FileReader class, which is
+#       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           26 JAN 2022
+#   DATE:           22 JUL 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,11 +33,8 @@ from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
 
 
-# Class:
-# FileReader()
-#
 # Description:
-# This is child class responsible for reading of .exml file content.
+# This class allows to read model module content from .exml files.
 class FileReader(Reader):
 
     # This parameter defines index of target element marker from list of target elements returned
@@ -72,14 +68,8 @@ class FileReader(Reader):
     OUTPUT_INTERFACE_LIST_INDEX = 3
     LOCAL_DATA_LIST_INDEX = 4
 
-    # Method:
-    # __init__()
-    #
     # Description:
     # This is class constructor.
-    #
-    # Returns:
-    # This method does not return anything.
     def __init__(self, file_finder_list):
 
         # initialize object data
@@ -94,14 +84,8 @@ class FileReader(Reader):
         self.output_interface_list = []
         self.local_data_list = []
 
-    # Method:
-    # check_if_interface_element_type()
-    #
     # Description:
     # This method checks if reference contains valid interface element type
-    #
-    # Returns:
-    # This method returns interface marker.
     @staticmethod
     def check_if_interface_element_type(ref_interface_element_type, interface_element):
         # interface element type marker shows whether valid interface element type was found or not within reference
@@ -134,16 +118,10 @@ class FileReader(Reader):
         # return interface element type marker
         return interface_element_type_found
 
-    # Method:
-    # find_target_element_name()
-    #
     # Description:
     # This method looks for <name> element, basing on target element type and its uid, within
     # content of .exml file, an example of .exml file line:
     # <ID name="input3" mc="Standard.Attribute" uid="338540aa-439c-4dc7-8414-a275ba3c08e1"/>
-    #
-    # Returns:
-    # This method returns target element list.
     def find_target_element_name(self, target_element_uid, target_element_type):
 
         # target element marker shows whether target element was found or not
@@ -197,17 +175,11 @@ class FileReader(Reader):
         # return target element list
         return target_element_list
 
-    # Method:
-    # find_interface_elements()
-    #
     # Description:
     # This method looks for name and type of interface signals/structures within content of .exml file,
     # an example of .exml file line:
     # <ID name="loc_add_result" mc="Standard.Attribute" uid="47398f97-728c-4e18-aa19-d36a5c099ba7"/>
     # <ID name="INT16" mc="Standard.DataType" uid="e7213c05-8c48-4585-8bc5-cc8690ffd6be"/>
-    #
-    # Returns:
-    # This method returns interface signal list.
     @staticmethod
     def find_interface_elements(interface_file):
         # local data
@@ -245,18 +217,12 @@ class FileReader(Reader):
         # return interface element list
         return interface_element_list
 
-    # Method:
-    # read_interface_elements()
-    #
     # Description:
     # This method looks for signals/structures of input interface, output interface and local data elements.
-    #
-    # Returns:
-    # This method does not return anything.
     def read_interface_elements(self):
 
-        # read interface elements
-        Logger.save_in_log_file("*** read interface elements")
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module interface details in .exml files", False)
 
         # find input interface elements
         self.input_interface_list = FileReader.find_interface_elements(self.input_interface_file)
@@ -266,3 +232,11 @@ class FileReader(Reader):
 
         # find local data interface elements
         self.local_data_list = FileReader.find_interface_elements(self.local_data_file)
+
+        # record info
+        for input_interface in self.input_interface_list:
+            Logger.save_in_log_file("Reader", "Have found input interface " + str(input_interface) + " element", False)
+        for output_interface in self.output_interface_list:
+            Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element", False)
+        for local_data in self.local_data_list:
+            Logger.save_in_log_file("Reader", "Have found local data " + str(local_data) + " element", False)
