@@ -58,7 +58,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CC version
-    MCG_CC_VERSION = "v0.1.0-alpha"
+    MCG_CC_VERSION = "v0.2.0-in-dev"
 
     # Description:
     # This is main method, which display short notice and start conversion process.
