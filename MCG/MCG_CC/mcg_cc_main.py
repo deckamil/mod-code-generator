@@ -35,7 +35,7 @@ from mcg_cc_file_finder import FileFinder
 from mcg_cc_converter import Converter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
-from mcg_cc_component_reader import ComponentReader
+from mcg_cc_file_reader import FileReader
 from mcg_cc_component_sorter import ComponentSorter
 from mcg_cc_component_converter import ComponentConverter
 
@@ -113,7 +113,7 @@ class Main(object):
         # saves configuration file header
         Converter.save_configuration_file_header()
 
-        # flag to distinguish if set of matching .exml files was found further conversion
+        # flag to distinguish if set of matching .exml files was found for further conversion
         files_found = True
 
         # repeat until all model modules are converted into configuration file
@@ -128,11 +128,11 @@ class Main(object):
             ErrorHandler.check_errors()
 
             # if files were found
-            # if files_found:
-            #     # initialize reader
-            #     component_reader = ComponentReader(file_finder_list)
-            #     # read module content
-            #     component_reader_list = component_reader.read_component()
+            if files_found:
+                # initialize file reader
+                file_reader = FileReader(file_finder_list)
+                # read module content
+                file_reader_list = file_reader.read_files()
             #
             #     # check errors
             #     ErrorHandler.check_errors()
