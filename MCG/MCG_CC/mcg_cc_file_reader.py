@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           22 JUL 2022
+#   DATE:           28 NOV 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,14 +28,13 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-from mcg_cc_reader import Reader
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
 
 
 # Description:
 # This class allows to read model module content from .exml files.
-class FileReader(Reader):
+class FileReader(object):
 
     # This parameter defines index of target element marker from list of target elements returned
     # by find_target_element_name() method
@@ -53,13 +52,10 @@ class FileReader(Reader):
     # by find_interface_elements() method
     INTERFACE_ELEMENT_TYPE_INDEX = 1
 
-    # This list defines all valid interface signal types
-    interface_signal_type_list = ["INT8", "INT16", "INT32", "INT64",
-                                  "UINT8", "UINT16", "UINT32", "UINT64",
-                                  "FLOAT32", "FLOAT64"]
-
-    # This list defines all valid interface structure types
-    interface_structure_type_list = ["DATA"]
+    # This list defines all valid interface types
+    interface_type_list = ["INT8", "INT16", "INT32", "INT64",
+                           "UINT8", "UINT16", "UINT32", "UINT64",
+                           "FLOAT32", "FLOAT64"]
 
     # Indexes of reader list
     CONNECTION_LIST_INDEX = 0
@@ -73,10 +69,8 @@ class FileReader(Reader):
     def __init__(self, file_finder_list):
 
         # initialize object data
+        self.module_file = file_finder_list[FileFinder.MODULE_FILE_INDEX]
         self.activity_file = file_finder_list[FileFinder.ACTIVITY_FILE_INDEX]
-        self.input_interface_file = file_finder_list[FileFinder.INPUT_INTERFACE_FILE_INDEX]
-        self.output_interface_file = file_finder_list[FileFinder.OUTPUT_INTERFACE_FILE_INDEX]
-        self.local_data_file = file_finder_list[FileFinder.LOCAL_DATA_FILE_INDEX]
         self.connection_list = []
         self.data_list = []
         self.interaction_list = []
@@ -240,3 +234,33 @@ class FileReader(Reader):
             Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element", False)
         for local_data in self.local_data_list:
             Logger.save_in_log_file("Reader", "Have found local data " + str(local_data) + " element", False)
+
+    # Description:
+    # This method is responsible for reading of module details.
+    def read_files(self):
+
+        # record info
+        Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
+
+        # search for interface details
+        # self.read_interface_elements()
+
+        # search for data targets
+        # self.read_data_targets()
+
+        # search for interaction targets
+        # self.read_interaction_targets()
+
+        # check module correctness
+        # self.check_correctness()
+
+        # append collected data to module reader list
+        # component_reader_list = []
+        # component_reader_list.insert(ComponentReader.CONNECTION_LIST_INDEX, self.connection_list)
+        # component_reader_list.insert(ComponentReader.INTERACTION_LIST_INDEX, self.interaction_list)
+        # component_reader_list.insert(ComponentReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
+        # component_reader_list.insert(ComponentReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
+        # component_reader_list.insert(ComponentReader.LOCAL_DATA_LIST_INDEX, self.local_data_list)
+        #
+        # # return module reader list
+        # return component_reader_list
