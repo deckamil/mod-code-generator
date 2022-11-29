@@ -5,7 +5,7 @@
 #       supporting methods and parameters reused by other classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           28 NOV 2022
+#   DATE:           29 NOV 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -77,22 +77,15 @@ class Supporter(object):
     # This method looks for <name> element within line of .exml file, an example of .exml file line:
     # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
     @staticmethod
-    def get_name(line, line_number):
+    def get_name(line):
 
         # find position of name within the line
         name_position = line.find("name")
         # find position of mc within the line
         mc_position = line.find("mc")
 
-        # check if <name> and <mc> position is found
-        if (name_position == -1) or (mc_position == -1):
-            # record error
-            ErrorHandler.record_error(ErrorHandler.GEN_ERR_NO_NAME_ELEMENT, line_number, "none")
-            # set error name
-            name = "NAME_NOT_FOUND"
-        else:
-            # get name
-            name = line[name_position + Supporter.NAME_START_OFFSET:mc_position + Supporter.NAME_END_OFFSET]
+        # get name
+        name = line[name_position + Supporter.NAME_START_OFFSET:mc_position + Supporter.NAME_END_OFFSET]
 
         # return name
         return name
@@ -101,20 +94,13 @@ class Supporter(object):
     # This method looks for <uid> element within line of .exml file, an example of .exml file line:
     # <ID name="ADD" mc="Standard.OpaqueAction" uid="4f855500-ccdd-43a6-87d3-cc06dd16a59b"/>
     @staticmethod
-    def get_uid(line, line_number):
+    def get_uid(line):
 
         # find position of uid within the line
         uid_position = line.find("uid")
 
-        # check if <uid> position is found
-        if uid_position == -1:
-            # record error
-            ErrorHandler.record_error(ErrorHandler.GEN_ERR_NO_UID_ELEMENT, line_number, "none")
-            # set error uid
-            uid = "UID_NOT_FOUND"
-        else:
-            # get uid
-            uid = line[uid_position + Supporter.UID_START_OFFSET:len(line) + Supporter.UID_END_OFFSET]
+        # get uid
+        uid = line[uid_position + Supporter.UID_START_OFFSET:len(line) + Supporter.UID_END_OFFSET]
 
         # return uid
         return uid

@@ -186,7 +186,7 @@ class FileReader(object):
             # if parameter name if found
             if "<ID name=" in self.module_file[i] and "mc=\"Standard.Parameter\"" in self.module_file[i]:
                 # get parameter name
-                parameter_name = Supporter.get_name(self.module_file[i], i+1)
+                parameter_name = Supporter.get_name(self.module_file[i])
 
                 # search for parameter input/output direction and type
                 for j in range(i, len(self.module_file)):
@@ -202,7 +202,7 @@ class FileReader(object):
                     # if parameter type is found
                     if "<ID name=" in self.module_file[j] and "mc=\"Standard.DataType\"" in self.module_file[j]:
                         # get parameter type
-                        parameter_type = Supporter.get_name(self.module_file[j], j+1)
+                        parameter_type = Supporter.get_name(self.module_file[j])
 
                         # interface element
                         interface_element = []
