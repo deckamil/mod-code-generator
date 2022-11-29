@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           28 NOV 2022
+#   DATE:           29 NOV 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,6 +30,7 @@
 
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
+from mcg_cc_supporter import Supporter
 
 
 # Description:
@@ -44,12 +45,10 @@ class FileReader(object):
     # by find_target_element_name() method
     TARGET_ELEMENT_NAME_INDEX = 1
 
-    # This parameter defines index of interface element name from list of interface element returned
-    # by find_interface_elements() method
+    # This parameter defines index of interface element name
     INTERFACE_ELEMENT_NAME_INDEX = 0
 
-    # This parameter defines index of interface element type from list of interface element returned
-    # by find_interface_elements() method
+    # This parameter defines index of interface element type
     INTERFACE_ELEMENT_TYPE_INDEX = 1
 
     # This list defines all valid interface types
@@ -170,70 +169,66 @@ class FileReader(object):
         return target_element_list
 
     # Description:
-    # This method looks for name and type of interface signals/structures within content of .exml file,
-    # an example of .exml file line:
-    # <ID name="loc_add_result" mc="Standard.Attribute" uid="47398f97-728c-4e18-aa19-d36a5c099ba7"/>
-    # <ID name="INT16" mc="Standard.DataType" uid="e7213c05-8c48-4585-8bc5-cc8690ffd6be"/>
-    @staticmethod
-    def find_interface_elements(interface_file):
-        # local data
-        interface_element = []
-        interface_element_list = []
-
-        # search for interface elements in interface file
-        for i in range(0, len(interface_file)):
-
-            # if given line contains definition of interface element name
-            if ("<ID name=" in interface_file[i]) and ("Standard.Attribute" in interface_file[i]):
-                # get line
-                line = interface_file[i]
-                # get line number
-                line_number = i + 1
-                # get interface element name
-                interface_element_name = FileReader.get_name(line, line_number)
-                # append interface element name to interface element
-                interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
-            # if given line contain definition of interface element type
-            if ("<ID name=" in interface_file[i]) and ("Standard.DataType" in interface_file[i]):
-                # get line
-                line = interface_file[i]
-                # get line number
-                line_number = i + 1
-                # get interface element type
-                interface_element_type = FileReader.get_name(line, line_number)
-                # append interface element type to interface element
-                interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
-                # append interface element to interface element list
-                interface_element_list.append(interface_element)
-                # clear interface element
-                interface_element = []
-
-        # return interface element list
-        return interface_element_list
-
-    # Description:
-    # This method looks for signals/structures of input interface, output interface and local data elements.
+    # This method looks for interface details of module operation.
     def read_interface_elements(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Looking for module interface details in .exml files", False)
+        Logger.save_in_log_file("Reader", "Looking for module interface details in .exml file", False)
 
-        # find input interface elements
-        self.input_interface_list = FileReader.find_interface_elements(self.input_interface_file)
+        # search for interface details of operation in module file
+        for i in range(0, len(self.module_file)):
 
-        # find output interface elements
-        self.output_interface_list = FileReader.find_interface_elements(self.output_interface_file)
+            # parameter details
+            parameter_name = "UNKNOWN_NAME"
+            parameter_direction = "UNKNOWN_DIRECTION"
+            parameter_type = "UNKNOWN_TYPE"
 
-        # find local data interface elements
-        self.local_data_list = FileReader.find_interface_elements(self.local_data_file)
+            # if parameter name if found
+            if "<ID name=" in self.module_file[i] and "mc=\"Standard.Parameter\"" in self.module_file[i]:
+                # get parameter name
+                parameter_name = Supporter.get_name(self.module_file[i], i+1)
+
+                # search for parameter input/output direction and type
+                for j in range(i, len(self.module_file)):
+
+                    # if parameter direction is found
+                    if "<ATT name=\"ParameterPassing\">In</ATT>" in self.module_file[j]:
+                        # set input direction
+                        parameter_direction = "INPUT"
+                    elif "<ATT name=\"ParameterPassing\">Out</ATT>" in self.module_file[j]:
+                        # set output direction
+                        parameter_direction = "OUTPUT"
+
+                    # if parameter type is found
+                    if "<ID name=" in self.module_file[j] and "mc=\"Standard.DataType\"" in self.module_file[j]:
+                        # get parameter type
+                        parameter_type = Supporter.get_name(self.module_file[j], j+1)
+
+                        # interface element
+                        interface_element = []
+
+                        # append parameter name to interface element
+                        interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, parameter_name)
+                        # append parameter type to interface element
+                        interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, parameter_type)
+
+                        # if it is input parameter
+                        if parameter_direction == "INPUT":
+                            # append interface element to input interface list
+                            self.input_interface_list.append(interface_element)
+                        # else if it is output parameter
+                        elif parameter_direction == "OUTPUT":
+                            # append interface element to output interface list
+                            self.output_interface_list.append(interface_element)
+
+                        # exit 'for j in range' loop
+                        break
 
         # record info
         for input_interface in self.input_interface_list:
             Logger.save_in_log_file("Reader", "Have found input interface " + str(input_interface) + " element", False)
         for output_interface in self.output_interface_list:
             Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element", False)
-        for local_data in self.local_data_list:
-            Logger.save_in_log_file("Reader", "Have found local data " + str(local_data) + " element", False)
 
     # Description:
     # This method is responsible for reading of module details.
@@ -243,7 +238,7 @@ class FileReader(object):
         Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
 
         # search for interface details
-        # self.read_interface_elements()
+        self.read_interface_elements()
 
         # search for data targets
         # self.read_data_targets()
