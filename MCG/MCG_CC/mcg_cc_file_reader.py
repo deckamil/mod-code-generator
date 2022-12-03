@@ -244,12 +244,21 @@ class FileReader(object):
             # if parameter section if found
             if "<OBJECT>" in self.activity_file[i] and \
                     "<ID name=" in self.activity_file[i + 1] and \
-                    "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i + 1]:
+                    (("mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]) or
+                     ("mc=\"Standard.InstanceNode\"" in self.activity_file[i+1])):
 
-                # get data name
-                data_name = Supporter.get_name(self.activity_file[i + 1])
+                # if parameter data
+                if "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]:
+                    # set parameter source type
+                    source_data_type = Connection.PARAMETER
+                # if local data
+                else:
+                    source_data_type = Connection.LOCAL
+
+                # get source data name
+                source_data_name = Supporter.get_name(self.activity_file[i + 1])
                 # append data to data list
-                self.data_list.append(data_name)
+                self.data_list.append(source_data_name)
 
                 # search for targets
                 for j in range(i, len(self.activity_file)):
@@ -265,8 +274,8 @@ class FileReader(object):
 
                                 # new connection instance
                                 connection = Connection()
-                                connection.source_name = data_name
-                                connection.source_type = Connection.PARAMETER
+                                connection.source_name = source_data_name
+                                connection.source_type = source_data_type
 
                                 # if local data is target
                                 if "<ID name=" in self.activity_file[k + 2] and \
