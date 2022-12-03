@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           29 NOV 2022
+#   DATE:           3 DEC 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,12 +31,12 @@
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
 from mcg_cc_supporter import Supporter
+from mcg_cc_connection import Connection
 
 
 # Description:
 # This class allows to read model module content from .exml files.
 class FileReader(object):
-
     # This parameter defines index of target element marker from list of target elements returned
     # by find_target_element_name() method
     TARGET_ELEMENT_FOUND_INDEX = 0
@@ -228,7 +228,153 @@ class FileReader(object):
         for input_interface in self.input_interface_list:
             Logger.save_in_log_file("Reader", "Have found input interface " + str(input_interface) + " element", False)
         for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element", False)
+            Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element",
+                                    False)
+
+    # Description:
+    # This method looks for data targets on activity diagram.
+    def read_data_targets(self):
+
+        # record info
+        Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
+
+        # search for parameters in activity file
+        for i in range(0, len(self.activity_file)):
+
+            # if parameter section if found
+            if "<OBJECT>" in self.activity_file[i] and \
+                    "<ID name=" in self.activity_file[i + 1] and \
+                    "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i + 1]:
+
+                # get data name
+                data_name = Supporter.get_name(self.activity_file[i + 1])
+                # append data to data list
+                self.data_list.append(data_name)
+
+                # search for targets
+                for j in range(i, len(self.activity_file)):
+
+                    # if parameter has targets
+                    if "<COMP relation=\"Outgoing\">" in self.activity_file[j]:
+
+                        # search for target references
+                        for k in range(j, len(self.activity_file)):
+
+                            # if target reference if found
+                            if "<LINK relation=\"Target\">" in self.activity_file[k]:
+
+                                # new connection instance
+                                connection = Connection()
+                                connection.source_name = data_name
+                                connection.source_type = Connection.PARAMETER
+
+                                # if local data is target
+                                if "<ID name=" in self.activity_file[k + 2] and \
+                                        "mc=\"Standard.InstanceNode\"" in self.activity_file[k + 2]:
+                                    # get target data name
+                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
+                                    # set connection target name
+                                    connection.target_name = target_data_name
+                                    # set connection target type
+                                    connection.target_type = Connection.LOCAL
+                                    # append connection to connection list
+                                    self.connection_list.append(connection)
+
+                                # if local parameter is target
+                                if "<ID name=" in self.activity_file[k + 2] and \
+                                        "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[k + 2]:
+                                    # get target data name
+                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
+                                    # set connection target name
+                                    connection.target_name = target_data_name
+                                    # set connection target type
+                                    connection.target_type = Connection.PARAMETER
+                                    # append connection to connection list
+                                    self.connection_list.append(connection)
+
+                                # if local action is target
+                                if "<ID name=" in self.activity_file[k + 2] and \
+                                        "mc=\"Standard.OpaqueAction\"" in self.activity_file[k + 2]:
+                                    # get target action name
+                                    target_action_name = Supporter.get_name(self.activity_file[k + 2])
+                                    # get target action uid
+                                    target_action_uid = Supporter.get_uid(self.activity_file[k + 2])
+                                    # set connection target name
+                                    connection.target_name = target_action_name
+                                    # set connection target uid
+                                    connection.target_uid = target_action_uid
+                                    # set connection target type
+                                    connection.target_type = Connection.ACTION
+                                    # append connection to connection list
+                                    self.connection_list.append(connection)
+
+                                # if other operation is target
+                                if "<ID name=" in self.activity_file[k + 2] and \
+                                        "mc=\"Standard.InputPin\"" in self.activity_file[k + 2]:
+                                    # get target pin name
+                                    target_pin_name = Supporter.get_name(self.activity_file[k + 2])
+                                    # get target pin uid
+                                    target_pin_uid = Supporter.get_uid(self.activity_file[k + 2])
+                                    # find target operation name and uid
+                                    target_operation_name, target_operation_uid = self.find_operation(target_pin_uid)
+                                    # set connection target pin
+                                    connection.target_pin = target_pin_name
+                                    # set connection target name
+                                    connection.target_name = target_operation_name
+                                    # set connection uid
+                                    connection.target_uid = target_operation_uid
+                                    # set connection type
+                                    connection.target_type = Connection.OPERATION
+                                    # append connection to connection list
+                                    self.connection_list.append(connection)
+
+                            # if end of target section is found
+                            if "</COMP>" in self.activity_file[k]:
+                                # exit 'for k in range' loop
+                                break
+
+                    # if end of parameter section if found
+                    if "</DEPENDENCIES>" in self.activity_file[j] and "</OBJECT>" in self.activity_file[j + 1]:
+                        # exit 'for j in range' loop
+                        break
+
+        # remove duplicates from data list
+        self.data_list = list(set(self.data_list))
+
+        # record info
+        for connection in self.connection_list:
+            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
+
+    # Description:
+    # This method looks for operation on activity diagram, basing on uid of operation input pis.
+    def find_operation(self, input_pin_uid):
+
+        # operation details
+        operation_name = "UNKNOWN_NAME"
+        operation_uid = "UNKNOWN_UID"
+
+        # search for operation in activity file
+        for i in range(0, len(self.activity_file)):
+
+            # if operation section if found
+            if "<OBJECT>" in self.activity_file[i] and \
+                    "<ID name=" in self.activity_file[i + 1] and \
+                    "mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1]:
+                # get operation name
+                operation_name = Supporter.get_name(self.activity_file[i + 1])
+                # get operation uid
+                operation_uid = Supporter.get_uid(self.activity_file[i + 1])
+
+            # if input uid if found under above operation
+            if "<OBJECT>" in self.activity_file[i] and \
+                    "<ID name=" in self.activity_file[i + 1] and \
+                    "mc=\"Standard.InputPin\"" in self.activity_file[i + 1] and \
+                    input_pin_uid in self.activity_file[i + 1]:
+                # exit 'for i in range' loop
+                break
+
+        # return operation
+        return operation_name, operation_uid
 
     # Description:
     # This method is responsible for reading of module details.
@@ -241,7 +387,7 @@ class FileReader(object):
         self.read_interface_elements()
 
         # search for data targets
-        # self.read_data_targets()
+        self.read_data_targets()
 
         # search for interaction targets
         # self.read_interaction_targets()
