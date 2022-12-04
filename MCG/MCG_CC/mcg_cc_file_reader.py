@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           3 DEC 2022
+#   DATE:           4 DEC 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -226,7 +226,8 @@ class FileReader(object):
 
         # record info
         for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("Reader", "Have found input interface " + str(input_interface) + " element", False)
+            Logger.save_in_log_file("Reader", "Have found input interface " + str(input_interface) + " element",
+                                    False)
         for output_interface in self.output_interface_list:
             Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element",
                                     False)
@@ -238,10 +239,10 @@ class FileReader(object):
         # record info
         Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
 
-        # search for parameters in activity file
+        # search for data elements in activity file
         for i in range(0, len(self.activity_file)):
 
-            # if parameter section if found
+            # if data section if found
             if "<OBJECT>" in self.activity_file[i] and \
                     "<ID name=" in self.activity_file[i + 1] and \
                     (("mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]) or
@@ -253,17 +254,16 @@ class FileReader(object):
                     source_data_type = Connection.PARAMETER
                 # if local data
                 else:
+                    # set local data source type
                     source_data_type = Connection.LOCAL
 
                 # get source data name
                 source_data_name = Supporter.get_name(self.activity_file[i + 1])
-                # append data to data list
-                self.data_list.append(source_data_name)
 
                 # search for targets
                 for j in range(i, len(self.activity_file)):
 
-                    # if parameter has targets
+                    # if data section has targets
                     if "<COMP relation=\"Outgoing\">" in self.activity_file[j]:
 
                         # search for target references
@@ -288,6 +288,9 @@ class FileReader(object):
                                     connection.target_type = Connection.LOCAL
                                     # append connection to connection list
                                     self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
 
                                 # if local parameter is target
                                 if "<ID name=" in self.activity_file[k + 2] and \
@@ -300,6 +303,9 @@ class FileReader(object):
                                     connection.target_type = Connection.PARAMETER
                                     # append connection to connection list
                                     self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
 
                                 # if local action is target
                                 if "<ID name=" in self.activity_file[k + 2] and \
@@ -316,6 +322,9 @@ class FileReader(object):
                                     connection.target_type = Connection.ACTION
                                     # append connection to connection list
                                     self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
 
                                 # if other operation is target
                                 if "<ID name=" in self.activity_file[k + 2] and \
@@ -336,6 +345,9 @@ class FileReader(object):
                                     connection.target_type = Connection.OPERATION
                                     # append connection to connection list
                                     self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
 
                             # if end of target section is found
                             if "</COMP>" in self.activity_file[k]:
@@ -347,12 +359,85 @@ class FileReader(object):
                         # exit 'for j in range' loop
                         break
 
-        # remove duplicates from data list
-        self.data_list = list(set(self.data_list))
+    # Description:
+    # This method looks for interaction targets on activity diagram.
+    def read_interaction_targets(self):
 
         # record info
-        for connection in self.connection_list:
-            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection", False)
+        Logger.save_in_log_file("Reader", "Looking for module interaction targets in .exml file", False)
+
+        # search for interaction elements in activity file
+        for i in range(0, len(self.activity_file)):
+
+            # if interaction section if found
+            if "<OBJECT>" in self.activity_file[i] and \
+                    "<ID name=" in self.activity_file[i + 1] and \
+                    "mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]:
+
+                # get source action name
+                source_action_name = Supporter.get_name(self.activity_file[i+1])
+                # get source action uid
+                source_action_uid = Supporter.get_uid(self.activity_file[i+1])
+                # set action source type
+                source_interaction_type = Connection.ACTION
+
+                # search for targets
+                for j in range(i, len(self.activity_file)):
+
+                    # if interaction section has targets
+                    if "<COMP relation=\"Outgoing\">" in self.activity_file[j]:
+
+                        # search for target references
+                        for k in range(j, len(self.activity_file)):
+
+                            # if target reference if found
+                            if "<LINK relation=\"Target\">" in self.activity_file[k]:
+
+                                # new connection instance
+                                connection = Connection()
+                                connection.source_name = source_action_name
+                                connection.source_uid = source_action_uid
+                                connection.source_type = source_interaction_type
+
+                                # if local data is target
+                                if "<ID name=" in self.activity_file[k + 2] and \
+                                        "mc=\"Standard.InstanceNode\"" in self.activity_file[k + 2]:
+                                    # get target data name
+                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
+                                    # set connection target name
+                                    connection.target_name = target_data_name
+                                    # set connection target type
+                                    connection.target_type = Connection.LOCAL
+                                    # append connection to connection list
+                                    self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
+
+                                # if local parameter is target
+                                if "<ID name=" in self.activity_file[k + 2] and \
+                                        "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[k + 2]:
+                                    # get target data name
+                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
+                                    # set connection target name
+                                    connection.target_name = target_data_name
+                                    # set connection target type
+                                    connection.target_type = Connection.PARAMETER
+                                    # append connection to connection list
+                                    self.connection_list.append(connection)
+                                    # record info
+                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                            False)
+
+                            # if end of target section is found
+                            if "</COMP>" in self.activity_file[k]:
+                                # exit 'for k in range' loop
+                                break
+
+                    # if end of interaction section if found
+                    if "</DEPENDENCIES>" in self.activity_file[j] and "</OBJECT>" in self.activity_file[j + 1]:
+                        # exit 'for j in range' loop
+                        break
 
     # Description:
     # This method looks for operation on activity diagram, basing on uid of operation input pis.
@@ -399,7 +484,7 @@ class FileReader(object):
         self.read_data_targets()
 
         # search for interaction targets
-        # self.read_interaction_targets()
+        self.read_interaction_targets()
 
         # check module correctness
         # self.check_correctness()
