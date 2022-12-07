@@ -65,7 +65,7 @@ class FileReader(object):
     def read_interface_elements(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Looking for module interface details in .exml file", False)
+        Logger.save_in_log_file("FileReader", "Looking for module interface details in .exml file", False)
 
         # search for external interface details of operation in module file
         # i.e. operation input and output parameters
@@ -156,13 +156,13 @@ class FileReader(object):
 
         # record info
         for input_interface in self.input_interface_list:
-            Logger.save_in_log_file("Reader", "Have found input interface " + str(input_interface) + " element",
+            Logger.save_in_log_file("FileReader", "Have found input interface " + str(input_interface) + " element",
                                     False)
         for output_interface in self.output_interface_list:
-            Logger.save_in_log_file("Reader", "Have found output interface " + str(output_interface) + " element",
+            Logger.save_in_log_file("FileReader", "Have found output interface " + str(output_interface) + " element",
                                     False)
         for local_interface in self.local_interface_list:
-            Logger.save_in_log_file("Reader", "Have found local interface " + str(local_interface) + " element",
+            Logger.save_in_log_file("FileReader", "Have found local interface " + str(local_interface) + " element",
                                     False)
 
     # Description:
@@ -170,7 +170,7 @@ class FileReader(object):
     def read_data_targets(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Looking for module data targets in .exml file", False)
+        Logger.save_in_log_file("FileReader", "Looking for module data targets in .exml file", False)
 
         # search for data elements in activity file
         for i in range(0, len(self.activity_file)):
@@ -224,7 +224,7 @@ class FileReader(object):
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
-                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                            Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
                         # if local parameter is target
@@ -239,7 +239,7 @@ class FileReader(object):
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
-                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                            Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
                         # if local action is target
@@ -258,7 +258,7 @@ class FileReader(object):
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
-                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                            Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
                         # if other operation is target
@@ -281,7 +281,7 @@ class FileReader(object):
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
-                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                            Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
                     # if end of target section is found
@@ -299,7 +299,7 @@ class FileReader(object):
     def read_interaction_targets(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Looking for module interaction targets in .exml file", False)
+        Logger.save_in_log_file("FileReader", "Looking for module interaction targets in .exml file", False)
 
         # search for interaction elements in activity file
         for i in range(0, len(self.activity_file)):
@@ -370,7 +370,7 @@ class FileReader(object):
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
-                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                            Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
                         # if local parameter is target
@@ -385,7 +385,7 @@ class FileReader(object):
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
-                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                            Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
                     # if end of target section if found
@@ -434,7 +434,7 @@ class FileReader(object):
     def read_files(self):
 
         # record info
-        Logger.save_in_log_file("Reader", "Reading module details from set of .exml files", True)
+        Logger.save_in_log_file("FileReader", "Reading module details from set of .exml files", True)
 
         # search for interface details
         self.read_interface_elements()
