@@ -5,7 +5,7 @@
 #       responsible for reading of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           4 DEC 2022
+#   DATE:           7 DEC 2022
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -248,114 +248,116 @@ class FileReader(object):
                     (("mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]) or
                      ("mc=\"Standard.InstanceNode\"" in self.activity_file[i+1])):
 
-                # if parameter data
-                if "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]:
-                    # set parameter source type
-                    source_data_type = Connection.PARAMETER
-                # if local data
-                else:
-                    # set local data source type
-                    source_data_type = Connection.LOCAL
-
                 # get source data name
                 source_data_name = Supporter.get_name(self.activity_file[i + 1])
+
+                # if data is parameter type
+                if "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]:
+                    # set parameter type
+                    source_data_type = Connection.PARAMETER
+                # if data is local type
+                else:
+                    # set local type
+                    source_data_type = Connection.LOCAL
+
+                # assume that data element does not have target section
+                target_section_found = False
 
                 # search for targets
                 for j in range(i, len(self.activity_file)):
 
-                    # if data section has targets
+                    # if target section is found
                     if "<COMP relation=\"Outgoing\">" in self.activity_file[j]:
+                        # set flag
+                        target_section_found = True
 
-                        # search for target references
-                        for k in range(j, len(self.activity_file)):
+                    # if target reference if found
+                    if "<LINK relation=\"Target\">" in self.activity_file[j]:
 
-                            # if target reference if found
-                            if "<LINK relation=\"Target\">" in self.activity_file[k]:
+                        # new connection instance
+                        connection = Connection()
+                        connection.source_name = source_data_name
+                        connection.source_type = source_data_type
 
-                                # new connection instance
-                                connection = Connection()
-                                connection.source_name = source_data_name
-                                connection.source_type = source_data_type
+                        # if local data is target
+                        if "<ID name=" in self.activity_file[j + 2] and \
+                                "mc=\"Standard.InstanceNode\"" in self.activity_file[j + 2]:
+                            # get target data name
+                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            # set connection target name
+                            connection.target_name = target_data_name
+                            # set connection target type
+                            connection.target_type = Connection.LOCAL
+                            # append connection to connection list
+                            self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                    False)
 
-                                # if local data is target
-                                if "<ID name=" in self.activity_file[k + 2] and \
-                                        "mc=\"Standard.InstanceNode\"" in self.activity_file[k + 2]:
-                                    # get target data name
-                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
-                                    # set connection target name
-                                    connection.target_name = target_data_name
-                                    # set connection target type
-                                    connection.target_type = Connection.LOCAL
-                                    # append connection to connection list
-                                    self.connection_list.append(connection)
-                                    # record info
-                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
-                                                            False)
+                        # if local parameter is target
+                        if "<ID name=" in self.activity_file[j + 2] and \
+                                "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[j + 2]:
+                            # get target data name
+                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            # set connection target name
+                            connection.target_name = target_data_name
+                            # set connection target type
+                            connection.target_type = Connection.PARAMETER
+                            # append connection to connection list
+                            self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                    False)
 
-                                # if local parameter is target
-                                if "<ID name=" in self.activity_file[k + 2] and \
-                                        "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[k + 2]:
-                                    # get target data name
-                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
-                                    # set connection target name
-                                    connection.target_name = target_data_name
-                                    # set connection target type
-                                    connection.target_type = Connection.PARAMETER
-                                    # append connection to connection list
-                                    self.connection_list.append(connection)
-                                    # record info
-                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
-                                                            False)
+                        # if local action is target
+                        if "<ID name=" in self.activity_file[j + 2] and \
+                                "mc=\"Standard.OpaqueAction\"" in self.activity_file[j + 2]:
+                            # get target action name
+                            target_action_name = Supporter.get_name(self.activity_file[j + 2])
+                            # get target action uid
+                            target_action_uid = Supporter.get_uid(self.activity_file[j + 2])
+                            # set connection target name
+                            connection.target_name = target_action_name
+                            # set connection target uid
+                            connection.target_uid = target_action_uid
+                            # set connection target type
+                            connection.target_type = Connection.ACTION
+                            # append connection to connection list
+                            self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                    False)
 
-                                # if local action is target
-                                if "<ID name=" in self.activity_file[k + 2] and \
-                                        "mc=\"Standard.OpaqueAction\"" in self.activity_file[k + 2]:
-                                    # get target action name
-                                    target_action_name = Supporter.get_name(self.activity_file[k + 2])
-                                    # get target action uid
-                                    target_action_uid = Supporter.get_uid(self.activity_file[k + 2])
-                                    # set connection target name
-                                    connection.target_name = target_action_name
-                                    # set connection target uid
-                                    connection.target_uid = target_action_uid
-                                    # set connection target type
-                                    connection.target_type = Connection.ACTION
-                                    # append connection to connection list
-                                    self.connection_list.append(connection)
-                                    # record info
-                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
-                                                            False)
+                        # if other operation is target
+                        if "<ID name=" in self.activity_file[j + 2] and \
+                                "mc=\"Standard.InputPin\"" in self.activity_file[j + 2]:
+                            # get target pin name
+                            target_pin_name = Supporter.get_name(self.activity_file[j + 2])
+                            # get target pin uid
+                            target_pin_uid = Supporter.get_uid(self.activity_file[j + 2])
+                            # find target operation name and uid
+                            target_operation_name, target_operation_uid = self.find_operation(target_pin_uid)
+                            # set connection target pin
+                            connection.target_pin = target_pin_name
+                            # set connection target name
+                            connection.target_name = target_operation_name
+                            # set connection uid
+                            connection.target_uid = target_operation_uid
+                            # set connection type
+                            connection.target_type = Connection.OPERATION
+                            # append connection to connection list
+                            self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                    False)
 
-                                # if other operation is target
-                                if "<ID name=" in self.activity_file[k + 2] and \
-                                        "mc=\"Standard.InputPin\"" in self.activity_file[k + 2]:
-                                    # get target pin name
-                                    target_pin_name = Supporter.get_name(self.activity_file[k + 2])
-                                    # get target pin uid
-                                    target_pin_uid = Supporter.get_uid(self.activity_file[k + 2])
-                                    # find target operation name and uid
-                                    target_operation_name, target_operation_uid = self.find_operation(target_pin_uid)
-                                    # set connection target pin
-                                    connection.target_pin = target_pin_name
-                                    # set connection target name
-                                    connection.target_name = target_operation_name
-                                    # set connection uid
-                                    connection.target_uid = target_operation_uid
-                                    # set connection type
-                                    connection.target_type = Connection.OPERATION
-                                    # append connection to connection list
-                                    self.connection_list.append(connection)
-                                    # record info
-                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
-                                                            False)
+                    # if end of target section is found
+                    if "</COMP>" in self.activity_file[j]:
+                        # exit 'for j in range' loop
+                        break
 
-                            # if end of target section is found
-                            if "</COMP>" in self.activity_file[k]:
-                                # exit 'for k in range' loop
-                                break
-
-                    # if end of parameter section if found
-                    if "</DEPENDENCIES>" in self.activity_file[j] and "</OBJECT>" in self.activity_file[j + 1]:
+                    # if there is no target section and end of dependencies section is found
+                    if "</DEPENDENCIES>" in self.activity_file[j] and not target_section_found:
                         # exit 'for j in range' loop
                         break
 
@@ -372,70 +374,94 @@ class FileReader(object):
             # if interaction section if found
             if "<OBJECT>" in self.activity_file[i] and \
                     "<ID name=" in self.activity_file[i + 1] and \
-                    "mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]:
+                    (("mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]) or
+                     ("mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1])):
 
-                # get source action name
-                source_action_name = Supporter.get_name(self.activity_file[i+1])
-                # get source action uid
-                source_action_uid = Supporter.get_uid(self.activity_file[i+1])
-                # set action source type
-                source_interaction_type = Connection.ACTION
+                # get source interaction name
+                source_interaction_name = Supporter.get_name(self.activity_file[i+1])
+                # get source interaction uid
+                source_interaction_uid = Supporter.get_uid(self.activity_file[i+1])
+
+                # if interaction is action type
+                if "mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]:
+                    # set action type
+                    source_interaction_type = Connection.ACTION
+                # if interaction is operation type
+                else:
+                    # set operation type
+                    source_interaction_type = Connection.OPERATION
+
+                # unknown output pin from operation
+                source_pin_name = "N/A"
+
+                # assume that interaction element does not have target section
+                target_section_found = False
 
                 # search for targets
                 for j in range(i, len(self.activity_file)):
 
-                    # if interaction section has targets
+                    # if target section is found
                     if "<COMP relation=\"Outgoing\">" in self.activity_file[j]:
+                        # set flag
+                        target_section_found = True
 
-                        # search for target references
-                        for k in range(j, len(self.activity_file)):
+                    # if source pin is found
+                    if "<ID name=" in self.activity_file[j] and "mc=\"Standard.OutputPin\"" in self.activity_file[j]:
 
-                            # if target reference if found
-                            if "<LINK relation=\"Target\">" in self.activity_file[k]:
+                        # get source pin name
+                        source_pin_name = Supporter.get_name(self.activity_file[j])
 
-                                # new connection instance
-                                connection = Connection()
-                                connection.source_name = source_action_name
-                                connection.source_uid = source_action_uid
-                                connection.source_type = source_interaction_type
+                    # if target reference if found
+                    if "<LINK relation=\"Target\">" in self.activity_file[j]:
 
-                                # if local data is target
-                                if "<ID name=" in self.activity_file[k + 2] and \
-                                        "mc=\"Standard.InstanceNode\"" in self.activity_file[k + 2]:
-                                    # get target data name
-                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
-                                    # set connection target name
-                                    connection.target_name = target_data_name
-                                    # set connection target type
-                                    connection.target_type = Connection.LOCAL
-                                    # append connection to connection list
-                                    self.connection_list.append(connection)
-                                    # record info
-                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
-                                                            False)
+                        # new connection instance
+                        connection = Connection()
+                        connection.source_name = source_interaction_name
+                        connection.source_uid = source_interaction_uid
+                        connection.source_type = source_interaction_type
 
-                                # if local parameter is target
-                                if "<ID name=" in self.activity_file[k + 2] and \
-                                        "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[k + 2]:
-                                    # get target data name
-                                    target_data_name = Supporter.get_name(self.activity_file[k + 2])
-                                    # set connection target name
-                                    connection.target_name = target_data_name
-                                    # set connection target type
-                                    connection.target_type = Connection.PARAMETER
-                                    # append connection to connection list
-                                    self.connection_list.append(connection)
-                                    # record info
-                                    Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
-                                                            False)
+                        # if operation
+                        if connection.source_type == Connection.OPERATION:
+                            # set connection source pin
+                            connection.source_pin = source_pin_name
 
-                            # if end of target section is found
-                            if "</COMP>" in self.activity_file[k]:
-                                # exit 'for k in range' loop
-                                break
+                        # if local data is target
+                        if "<ID name=" in self.activity_file[j + 2] and \
+                                "mc=\"Standard.InstanceNode\"" in self.activity_file[j + 2]:
+                            # get target data name
+                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            # set connection target name
+                            connection.target_name = target_data_name
+                            # set connection target type
+                            connection.target_type = Connection.LOCAL
+                            # append connection to connection list
+                            self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                    False)
 
-                    # if end of interaction section if found
-                    if "</DEPENDENCIES>" in self.activity_file[j] and "</OBJECT>" in self.activity_file[j + 1]:
+                        # if local parameter is target
+                        if "<ID name=" in self.activity_file[j + 2] and \
+                                "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[j + 2]:
+                            # get target data name
+                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            # set connection target name
+                            connection.target_name = target_data_name
+                            # set connection target type
+                            connection.target_type = Connection.PARAMETER
+                            # append connection to connection list
+                            self.connection_list.append(connection)
+                            # record info
+                            Logger.save_in_log_file("Reader", "Have found " + str(connection) + " connection",
+                                                    False)
+
+                    # if end of target section if found
+                    if "</COMP>" in self.activity_file[j]:
+                        # exit "for j in range" loop
+                        break
+
+                    # if there is no target section and end of dependencies section is found
+                    if "</DEPENDENCIES>" in self.activity_file[j] and not target_section_found:
                         # exit 'for j in range' loop
                         break
 
