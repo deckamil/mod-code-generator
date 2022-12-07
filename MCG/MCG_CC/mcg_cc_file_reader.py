@@ -38,16 +38,15 @@ from mcg_cc_connection import Connection
 # This class allows to read model module content from .exml files.
 class FileReader(object):
 
-    # Indexes of interface element list
+    # indexes of interface element list
     INTERFACE_ELEMENT_NAME_INDEX = 0
     INTERFACE_ELEMENT_TYPE_INDEX = 1
 
-    # Indexes of reader list
+    # indexes of return data
     CONNECTION_LIST_INDEX = 0
-    INTERACTION_LIST_INDEX = 1
-    INPUT_INTERFACE_LIST_INDEX = 2
-    OUTPUT_INTERFACE_LIST_INDEX = 3
-    LOCAL_DATA_LIST_INDEX = 4
+    INPUT_INTERFACE_LIST_INDEX = 1
+    OUTPUT_INTERFACE_LIST_INDEX = 2
+    LOCAL_INTERFACE_LIST_INDEX = 3
 
     # Description:
     # This is class constructor.
@@ -57,8 +56,6 @@ class FileReader(object):
         self.module_file = file_finder_list[FileFinder.MODULE_FILE_INDEX]
         self.activity_file = file_finder_list[FileFinder.ACTIVITY_FILE_INDEX]
         self.connection_list = []
-        self.data_list = []
-        self.interaction_list = []
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_interface_list = []
@@ -448,13 +445,12 @@ class FileReader(object):
         # search for interaction targets
         self.read_interaction_targets()
 
-        # append collected data to module reader list
-        # component_reader_list = []
-        # component_reader_list.insert(ComponentReader.CONNECTION_LIST_INDEX, self.connection_list)
-        # component_reader_list.insert(ComponentReader.INTERACTION_LIST_INDEX, self.interaction_list)
-        # component_reader_list.insert(ComponentReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
-        # component_reader_list.insert(ComponentReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
-        # component_reader_list.insert(ComponentReader.LOCAL_DATA_LIST_INDEX, self.local_data_list)
-        #
-        # # return module reader list
-        # return component_reader_list
+        # append collected data to file reader list
+        file_reader_list = []
+        file_reader_list.insert(FileReader.CONNECTION_LIST_INDEX, self.connection_list)
+        file_reader_list.insert(FileReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
+        file_reader_list.insert(FileReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
+        file_reader_list.insert(FileReader.LOCAL_INTERFACE_LIST_INDEX, self.local_interface_list)
+
+        # return file reader list
+        return file_reader_list
