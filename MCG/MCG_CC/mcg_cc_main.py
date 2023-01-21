@@ -6,8 +6,8 @@
 #       to convert content of model modules from .exml files into configuration
 #       file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           28 NOV 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,12 +32,11 @@
 
 from sys import argv
 from mcg_cc_file_finder import FileFinder
+from mcg_cc_file_reader import FileReader
+from mcg_cc_module_sorter import ModuleSorter
 from mcg_cc_converter import Converter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
-from mcg_cc_file_reader import FileReader
-from mcg_cc_component_sorter import ComponentSorter
-from mcg_cc_component_converter import ComponentConverter
 
 
 # Description:
@@ -119,7 +118,7 @@ class Main(object):
         # repeat until all model modules are converted into configuration file
         while files_found:
 
-            # find component files
+            # find module files
             file_finder_list = FileFinder.find_files()
             # get files flag
             files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
@@ -133,14 +132,14 @@ class Main(object):
                 file_reader = FileReader(file_finder_list)
                 # read module content
                 file_reader_list = file_reader.read_files()
-            #
-            #     # check errors
-            #     ErrorHandler.check_errors()
-            #
-            #     # initialize sorter
-            #     component_sorter = ComponentSorter(component_reader_list)
-            #     # sort module content
-            #     component_sorter_list = component_sorter.sort_component()
+
+                # check errors
+                ErrorHandler.check_errors()
+
+                # initialize sorter
+                module_sorter = ModuleSorter(file_reader_list)
+                # sort module content
+                module_sorter_list = module_sorter.sort_module()
             #
             #     # check errors
             #     ErrorHandler.check_errors()

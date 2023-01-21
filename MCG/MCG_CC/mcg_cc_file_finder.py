@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of FileFinder class, which is
-#       responsible for finding .exml files, that describe model content.
+#       responsible for finding .exml files, that describe module content.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           29 NOV 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,7 +34,7 @@ from mcg_cc_supporter import Supporter
 
 
 # Description:
-# This class allows to find .exml files, which describe model content.
+# This class allows to find .exml files, which describe module content.
 class FileFinder(object):
 
     # class data

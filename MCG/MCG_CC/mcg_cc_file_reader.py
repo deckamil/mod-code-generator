@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of FileReader class, which is
-#       responsible for reading of model module content from .exml file.
+#       responsible for reading of module content from .exml file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 DEC 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -35,7 +35,7 @@ from mcg_cc_connection import Connection
 
 
 # Description:
-# This class allows to read model module content from .exml files.
+# This class allows to read module content from .exml files.
 class FileReader(object):
 
     # indexes of interface element list
@@ -430,7 +430,7 @@ class FileReader(object):
         return operation_name, operation_uid
 
     # Description:
-    # This method is responsible for reading of module details.
+    # This method is responsible for reading of module content.
     def read_files(self):
 
         # record info

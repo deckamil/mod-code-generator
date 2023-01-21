@@ -1,11 +1,11 @@
-#   FILE:           mcg_cc_sorter.py
+#   FILE:           mcg_cc_module_sorter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Sorter class, which is responsible
-#       for sorting of model module nodes.
+#       This module contains definition of ModuleSorter class, which is responsible
+#       for finding and sorting of module nodes.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           14 JUL 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,20 +34,19 @@ from mcg_cc_node import Node
 
 
 # Description:
-# This class allows to sort model module nodes.
-class Sorter(object):
+# This class allows to find and sort module nodes.
+class ModuleSorter(object):
 
     # indexes of sorter list
     SORTED_NODE_LIST_INDEX = 0
 
     # Description:
     # This is class constructor.
-    def __init__(self, reader_list):
+    def __init__(self, file_reader_list):
 
         # initialize object data
-        self.connection_list = reader_list[FileReader.CONNECTION_LIST_INDEX]
-        self.interaction_list = reader_list[FileReader.INTERACTION_LIST_INDEX]
-        self.local_data_list = reader_list[FileReader.LOCAL_DATA_LIST_INDEX]
+        self.connection_list = file_reader_list[FileReader.CONNECTION_LIST_INDEX]
+        self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
         self.node_list = []
         self.dependency_list = []
         self.sorted_node_list = []
@@ -282,3 +281,61 @@ class Sorter(object):
         # record info
         for sorted_node in self.sorted_node_list:
             Logger.save_in_log_file("Sorter", "Have sorted " + str(sorted_node) + " node", False)
+
+    # Description:
+    # This method moves first input signal, recognized by $FIRST$ marker, at beginning of node input list
+    # and removes $FIRST$ marker.
+    def sort_first_input_signals(self):
+
+        # record info
+        Logger.save_in_log_file("Sorter", "Sorting first input signal in nodes", False)
+
+        # for each node check if it contains first input signal
+        for node in self.node_list:
+
+            # go through all node inputs of node
+            for node_input in node.node_input_list:
+
+                # if given node input contains $FIRST$ marker
+                if "$FIRST$" in node_input:
+
+                    # find marker position
+                    first_position = node_input.find("$FIRST$")
+                    # get first input signal
+                    first_input_signal = node_input[first_position + Supporter.FIRST_INPUT_SIGNAL_OFFSET:
+                                                    len(node_input)]
+                    # remove node input from the list
+                    node.node_input_list.remove(node_input)
+                    # append first input signal at beginning of node input list
+                    node.node_input_list = [first_input_signal] + node.node_input_list
+
+        # record info
+        for node in self.node_list:
+            Logger.save_in_log_file("Sorter", "Have sorted " + str(node) + " node", False)
+
+    # Description:
+    # This method is responsible for finding and sorting of module nodes.
+    def sort_module(self):
+
+        # sort connections of same action into one place on connections list
+        # self.sort_connections()
+        TBD = ""
+
+        # find nodes base on connections and interactions
+        # self.find_nodes()
+
+        # sort first input signals within nodes
+        # self.sort_first_input_signals()
+
+        # find dependencies between nodes
+        # self.find_dependencies()
+
+        # sort nodes basing on their dependencies
+        # self.sort_nodes()
+
+        # append collected data to component sorter list
+        # component_sorter_list = []
+        # component_sorter_list.insert(Sorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
+
+        # return component sorter list
+        # return component_sorter_list

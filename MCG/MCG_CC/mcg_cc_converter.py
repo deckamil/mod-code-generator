@@ -4,8 +4,8 @@
 #       This module contains definition of Converter class, which is responsible
 #       for conversion of model module content into configuration file format.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           21 JUL 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -31,7 +31,7 @@
 import datetime
 from mcg_cc_file_reader import FileReader
 from mcg_cc_file_finder import FileFinder
-from mcg_cc_sorter import Sorter
+from mcg_cc_module_sorter import ModuleSorter
 from mcg_cc_logger import Logger
 
 
