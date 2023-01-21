@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_node.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Node class, which stores together all
-#       details of model node form activity diagram, i.e. node inputs, node
-#       interaction and node output.
+#       This module contains definition of Node class, which represents node on
+#       activity diagram, i.e. interaction together with its input and output data.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,32 +29,43 @@
 
 
 # Description:
-# This class represents model module node.
+# This class represents node on activity diagram, i.e. interaction together with its input and output data.
 class Node(object):
+
+    # Interaction types
+    UNKNOWN = 10
+    ACTION = 40
+    OPERATION = 50
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        self.node_input_list = []
-        self.node_interaction = ""
-        self.node_output = ""
+        self.input_list = []
+        self.interaction_name = "N/A"
+        self.interaction_uid = "N/A"
+        self.interaction_type = Node.UNKNOWN
+        self.output = "N/A"
 
     # Description:
-    # This method returns string representation of model module node.
+    # This method returns string representation of Node class.
     def __str__(self):
         # append input marker
         line = "$INPUTS$: "
 
         # append input data
-        for node_input in self.node_input_list:
+        for node_input in self.input_list:
             line = line + node_input + " "
 
-        # append interaction marker and data
-        line = line + "$INTERACTION$: " + self.node_interaction + " "
+        # if operation is interaction
+        if self.interaction_type == Node.OPERATION:
+            line = line + "$INTERACTION$: " + self.interaction_name + "() " + self.interaction_uid + " "
+        # if action is interaction
+        elif self.interaction_type == Node.ACTION:
+            line = line + "$INTERACTION$: " + self.interaction_name + " " + self.interaction_uid + " "
 
         # append output marker and data
-        line = line + "$OUTPUT$: " + self.node_output
+        line = line + "$OUTPUT$: " + self.output
 
         # return string representation
         return line

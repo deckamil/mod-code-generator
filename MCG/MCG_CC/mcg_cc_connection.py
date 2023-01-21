@@ -4,8 +4,8 @@
 #       This module contains definition of Connection class, which represents connection
 #       between two model elements on activity diagram.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           3 DEC 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -53,7 +53,7 @@ class Connection(object):
         self.target_type = Connection.UNKNOWN
 
     # Description:
-    # This method returns string representation of connection between two model elements on activity diagram.
+    # This method returns string representation of Connection class.
     def __str__(self):
 
         # source

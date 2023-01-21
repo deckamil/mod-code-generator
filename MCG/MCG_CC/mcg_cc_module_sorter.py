@@ -30,6 +30,7 @@
 
 from mcg_cc_file_reader import FileReader
 from mcg_cc_logger import Logger
+from mcg_cc_connection import Connection
 from mcg_cc_node import Node
 
 
@@ -52,11 +53,104 @@ class ModuleSorter(object):
         self.sorted_node_list = []
 
     # Description:
+    # This method looks for node interactions.
+    def find_node_interactions(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Looking for node interactions", False)
+
+        # interaction uid list
+        interaction_uid_list = []
+
+        # search for module interactions
+        for connection in self.connection_list:
+
+            # if action is connection source
+            if connection.source_type == Connection.ACTION:
+
+                # if new integration is found in connection
+                if connection.source_uid not in interaction_uid_list:
+
+                    # create new node instance
+                    node = Node()
+                    # set interaction name
+                    node.interaction_name = connection.source_name
+                    # set interaction uid
+                    node.interaction_uid = connection.source_uid
+                    # append interaction uid to interaction uid list
+                    interaction_uid_list.append(connection.source_uid)
+                    # set interaction type
+                    node.interaction_type = Node.ACTION
+                    # append interaction to node list
+                    self.node_list.append(node)
+
+            # if action is connection target
+            elif connection.target_type == Connection.ACTION:
+
+                # if new integration is found in connection
+                if connection.target_uid not in interaction_uid_list:
+
+                    # create new node instance
+                    node = Node()
+                    # set interaction name
+                    node.interaction_name = connection.target_name
+                    # set interaction uid
+                    node.interaction_uid = connection.target_uid
+                    # append interaction uid to interaction uid list
+                    interaction_uid_list.append(connection.target_uid)
+                    # set interaction type
+                    node.interaction_type = Node.ACTION
+                    # append interaction to node list
+                    self.node_list.append(node)
+
+            # if operation is connection source
+            if connection.source_type == Connection.OPERATION:
+
+                # if new integration is found in connection
+                if connection.source_uid not in interaction_uid_list:
+
+                    # create new node instance
+                    node = Node()
+                    # set interaction name
+                    node.interaction_name = connection.source_name
+                    # set interaction uid
+                    node.interaction_uid = connection.source_uid
+                    # append interaction uid to interaction uid list
+                    interaction_uid_list.append(connection.source_uid)
+                    # set interaction type
+                    node.interaction_type = Node.OPERATION
+                    # append interaction to node list
+                    self.node_list.append(node)
+
+            # if operation is connection target
+            elif connection.target_type == Connection.OPERATION:
+
+                # if new integration is found in connection
+                if connection.target_uid not in interaction_uid_list:
+
+                    # create new node instance
+                    node = Node()
+                    # set interaction name
+                    node.interaction_name = connection.target_name
+                    # set interaction uid
+                    node.interaction_uid = connection.target_uid
+                    # append interaction uid to interaction uid list
+                    interaction_uid_list.append(connection.target_uid)
+                    # set interaction type
+                    node.interaction_type = Node.OPERATION
+                    # append interaction to node list
+                    self.node_list.append(node)
+
+        # record info
+        for node in self.node_list:
+            Logger.save_in_log_file("ModuleSorter", "Have found node " + str(node) + " interaction", False)
+
+    # Description:
     # This method sorts connections with same interaction in one place within connection list.
     def sort_connections(self):
 
         # record info
-        Logger.save_in_log_file("Sorter", "Sorting module connections", True)
+        Logger.save_in_log_file("ModuleSorter", "Sorting module connections", True)
 
         # this index tells where to put connection (defines new position of connection)
         index = 0
@@ -317,9 +411,14 @@ class ModuleSorter(object):
     # This method is responsible for finding and sorting of module nodes.
     def sort_module(self):
 
-        # sort connections of same action into one place on connections list
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Sorting module details from set of .exml files", True)
+
+        # find node interactions
+        self.find_node_interactions()
+
+        # sort connections of same interaction into one place on connections list
         # self.sort_connections()
-        TBD = ""
 
         # find nodes base on connections and interactions
         # self.find_nodes()
