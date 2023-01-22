@@ -5,7 +5,7 @@
 #       activity diagram, i.e. interaction together with its input and output data.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2023
+#   DATE:           22 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -53,15 +53,24 @@ class Node(object):
         # append input marker
         line = "$INPUTS$: "
 
-        # append input data
-        for node_input in self.input_list:
-            line = line + node_input + " "
-
         # if operation is interaction
         if self.interaction_type == Node.OPERATION:
+
+            # append input data
+            for node_input in self.input_list:
+                line = line + node_input[0] + "->" + node_input[1] + " "
+
+            # append interaction name and uid
             line = line + "$INTERACTION$: " + self.interaction_name + "() " + self.interaction_uid + " "
+
         # if action is interaction
         elif self.interaction_type == Node.ACTION:
+
+            # append input data
+            for node_input in self.input_list:
+                line = line + node_input + " "
+
+            # append interaction name and uid
             line = line + "$INTERACTION$: " + self.interaction_name + " " + self.interaction_uid + " "
 
         # append output marker and data

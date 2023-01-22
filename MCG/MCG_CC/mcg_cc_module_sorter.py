@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2023
+#   DATE:           22 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -53,16 +53,16 @@ class ModuleSorter(object):
         self.sorted_node_list = []
 
     # Description:
-    # This method looks for node interactions.
-    def find_node_interactions(self):
+    # This method looks for interaction (action or operation) of each node on activity diagram.
+    def find_node_interaction(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for node interactions", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for node interaction", False)
 
         # interaction uid list
         interaction_uid_list = []
 
-        # search for module interactions
+        # search for node interaction
         for connection in self.connection_list:
 
             # if action is connection source
@@ -144,6 +144,49 @@ class ModuleSorter(object):
         # record info
         for node in self.node_list:
             Logger.save_in_log_file("ModuleSorter", "Have found node " + str(node) + " interaction", False)
+
+    # Description:
+    # This method looks for input and output data (local or parameter) of each node on activity diagram.
+    def find_node_data(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Looking for node data", False)
+
+        # search for node data
+        for node in self.node_list:
+
+            # check each connection it source of target has interaction uid
+            for connection in self.connection_list:
+
+                # if node interaction is connection target then
+                # connection source is node input data
+                if node.interaction_uid == connection.target_uid:
+
+                    # if interaction is action type
+                    if node.interaction_type == Node.ACTION:
+                        # append input data to interaction
+                        node.input_list.append(connection.source_name)
+                    # if interaction is operation type
+                    elif node.interaction_type == Node.OPERATION:
+                        # get data source name
+                        source_name = connection.source_name
+                        # get data target pin
+                        target_pin = connection.target_pin
+                        # set input link
+                        input_link = [source_name, target_pin]
+                        # append input link to interaction
+                        node.input_list.append(input_link)
+
+                # if node interaction is connection source then
+                # connection target is node output data
+                if node.interaction_uid == connection.source_uid:
+
+                    # append output data to interaction
+                    node.output = connection.target_name
+
+        # record info
+        for node in self.node_list:
+            Logger.save_in_log_file("ModuleSorter", "Have found node " + str(node) + " data", False)
 
     # Description:
     # This method sorts connections with same interaction in one place within connection list.
@@ -414,8 +457,11 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting module details from set of .exml files", True)
 
-        # find node interactions
-        self.find_node_interactions()
+        # find interaction of each node
+        self.find_node_interaction()
+
+        # find data of each node
+        self.find_node_data()
 
         # sort connections of same interaction into one place on connections list
         # self.sort_connections()
