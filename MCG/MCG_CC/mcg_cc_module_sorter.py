@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           22 JAN 2023
+#   DATE:           4 FEB 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -152,10 +152,10 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Looking for node data", False)
 
-        # search for node data
+        # search for input and output data of nodes with interactions
         for node in self.node_list:
 
-            # check each connection it source of target has interaction uid
+            # check source and target uid of each connection
             for connection in self.connection_list:
 
                 # if node interaction is connection target then
@@ -183,6 +183,24 @@ class ModuleSorter(object):
 
                     # append output data to interaction
                     node.output = connection.target_name
+
+        # search for input and output data of nodes without interaction
+        for connection in self.connection_list:
+
+            # if connection is between two data points
+            if (connection.source_type == Connection.LOCAL or connection.source_type == Connection.PARAMETER) and \
+                    (connection.target_type == Connection.LOCAL or connection.target_type == Connection.PARAMETER):
+
+                # create new node instance
+                node = Node()
+                # set interaction type
+                node.interaction_type = Node.DATA
+                # append input data to interaction
+                node.input_list.append(connection.source_name)
+                # append output data to interaction
+                node.output = connection.target_name
+                # append interaction to node list
+                self.node_list.append(node)
 
         # record info
         for node in self.node_list:
