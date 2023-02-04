@@ -48,19 +48,17 @@ class ModuleSorter(object):
         # initialize object data
         self.connection_list = file_reader_list[FileReader.CONNECTION_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
+        self.interaction_uid_list = []
         self.node_list = []
         self.dependency_list = []
         self.sorted_node_list = []
 
     # Description:
-    # This method looks for interaction (action or operation) of each node on activity diagram.
-    def find_node_interaction(self):
+    # This method looks for list of interactions that appear on activity diagram.
+    def find_interactions(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for node interaction", False)
-
-        # interaction uid list
-        interaction_uid_list = []
+        Logger.save_in_log_file("ModuleSorter", "Looking for interactions on activity diagram", False)
 
         # search for node interaction
         for connection in self.connection_list:
@@ -69,105 +67,73 @@ class ModuleSorter(object):
             if connection.source_type == Connection.ACTION:
 
                 # if new integration is found in connection
-                if connection.source_uid not in interaction_uid_list:
-
-                    # create new node instance
-                    node = Node()
-                    # set interaction name
-                    node.interaction_name = connection.source_name
-                    # set interaction uid
-                    node.interaction_uid = connection.source_uid
+                if connection.source_uid not in self.interaction_uid_list:
                     # append interaction uid to interaction uid list
-                    interaction_uid_list.append(connection.source_uid)
-                    # set interaction type
-                    node.interaction_type = Node.ACTION
-                    # append interaction to node list
-                    self.node_list.append(node)
+                    self.interaction_uid_list.append(connection.source_uid)
 
             # if action is connection target
             elif connection.target_type == Connection.ACTION:
 
                 # if new integration is found in connection
-                if connection.target_uid not in interaction_uid_list:
-
-                    # create new node instance
-                    node = Node()
-                    # set interaction name
-                    node.interaction_name = connection.target_name
-                    # set interaction uid
-                    node.interaction_uid = connection.target_uid
+                if connection.target_uid not in self.interaction_uid_list:
                     # append interaction uid to interaction uid list
-                    interaction_uid_list.append(connection.target_uid)
-                    # set interaction type
-                    node.interaction_type = Node.ACTION
-                    # append interaction to node list
-                    self.node_list.append(node)
+                    self.interaction_uid_list.append(connection.target_uid)
 
             # if operation is connection source
             if connection.source_type == Connection.OPERATION:
 
                 # if new integration is found in connection
-                if connection.source_uid not in interaction_uid_list:
-
-                    # create new node instance
-                    node = Node()
-                    # set interaction name
-                    node.interaction_name = connection.source_name
-                    # set interaction uid
-                    node.interaction_uid = connection.source_uid
+                if connection.source_uid not in self.interaction_uid_list:
                     # append interaction uid to interaction uid list
-                    interaction_uid_list.append(connection.source_uid)
-                    # set interaction type
-                    node.interaction_type = Node.OPERATION
-                    # append interaction to node list
-                    self.node_list.append(node)
+                    self.interaction_uid_list.append(connection.source_uid)
 
             # if operation is connection target
             elif connection.target_type == Connection.OPERATION:
 
                 # if new integration is found in connection
-                if connection.target_uid not in interaction_uid_list:
-
-                    # create new node instance
-                    node = Node()
-                    # set interaction name
-                    node.interaction_name = connection.target_name
-                    # set interaction uid
-                    node.interaction_uid = connection.target_uid
+                if connection.target_uid not in self.interaction_uid_list:
                     # append interaction uid to interaction uid list
-                    interaction_uid_list.append(connection.target_uid)
-                    # set interaction type
-                    node.interaction_type = Node.OPERATION
-                    # append interaction to node list
-                    self.node_list.append(node)
+                    self.interaction_uid_list.append(connection.target_uid)
 
         # record info
-        for node in self.node_list:
-            Logger.save_in_log_file("ModuleSorter", "Have found node " + str(node) + " interaction", False)
+        for interaction_uid in self.interaction_uid_list:
+            Logger.save_in_log_file("ModuleSorter", "Have found " + str(interaction_uid) + " interaction uid", False)
 
     # Description:
-    # This method looks for input and output data (local or parameter) of each node on activity diagram.
-    def find_node_data(self):
+    # This method looks for list of nodes that appear on activity diagram.
+    def find_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for node data", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for nodes on activity diagram", False)
 
-        # search for input and output data of nodes with interactions
-        for node in self.node_list:
+        # search for nodes with interaction, i.e. nodes that represent either action or operation
+        for interaction_uid in self.interaction_uid_list:
+
+            # create new node instance
+            node = Node()
 
             # check source and target uid of each connection
             for connection in self.connection_list:
 
-                # if node interaction is connection target then
+                # if interaction is connection target then
                 # connection source is node input data
-                if node.interaction_uid == connection.target_uid:
+                if interaction_uid == connection.target_uid:
 
-                    # if interaction is action type
-                    if node.interaction_type == Node.ACTION:
+                    # set interaction name
+                    node.interaction_name = connection.target_name
+                    # set interaction uid
+                    node.interaction_uid = connection.target_uid
+
+                    # if action is connection target
+                    if connection.target_type == Connection.ACTION:
+                        # set interaction type
+                        node.interaction_type = Node.ACTION
                         # append input data to interaction
                         node.input_list.append(connection.source_name)
-                    # if interaction is operation type
-                    elif node.interaction_type == Node.OPERATION:
+                    # if operation is connection target
+                    elif connection.target_type == Connection.OPERATION:
+                        # set interaction type
+                        node.interaction_type = Node.OPERATION
                         # get data source name
                         source_name = connection.source_name
                         # get data target pin
@@ -177,14 +143,16 @@ class ModuleSorter(object):
                         # append input link to interaction
                         node.input_list.append(input_link)
 
-                # if node interaction is connection source then
+                # if interaction is connection source then
                 # connection target is node output data
-                if node.interaction_uid == connection.source_uid:
-
+                if interaction_uid == connection.source_uid:
                     # append output data to interaction
                     node.output = connection.target_name
 
-        # search for input and output data of nodes without interaction
+            # append node to node list
+            self.node_list.append(node)
+
+        # search for nodes without interaction, i.e. nodes that represent connection between two data points
         for connection in self.connection_list:
 
             # if connection is between two data points
@@ -204,135 +172,7 @@ class ModuleSorter(object):
 
         # record info
         for node in self.node_list:
-            Logger.save_in_log_file("ModuleSorter", "Have found node " + str(node) + " data", False)
-
-    # Description:
-    # This method sorts connections with same interaction in one place within connection list.
-    def sort_connections(self):
-
-        # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting module connections", True)
-
-        # this index tells where to put connection (defines new position of connection)
-        index = 0
-
-        # repeat for each interaction recorded on interaction list
-        # sort connections of given interaction in one place within connection list
-        # first, connections with inputs to interaction are sorted (interaction is connection target),
-        # then, connection with output from interaction is placed after them (interaction is connection source)
-        for i in range(0, len(self.interaction_list)):
-            # go through all connections for each interaction on interaction list
-            for connection in self.connection_list:
-                # if interaction is connection target
-                if connection.connection_target == self.interaction_list[i]:
-                    # remove connection from current position on the list
-                    self.connection_list.remove(connection)
-                    # insert connection under new position defined by index
-                    self.connection_list.insert(index, connection)
-                    # increment index to put next connection right after this connection
-                    index = index + 1
-            # go through all connections for each interaction on interaction list
-            for connection in self.connection_list:
-                # if interaction is connection source
-                if connection.connection_source == self.interaction_list[i]:
-                    # remove connection from current position on the list
-                    self.connection_list.remove(connection)
-                    # insert connection under new position defined by index
-                    self.connection_list.insert(index, connection)
-                    # increment index to put next connection right after this connection
-                    index = index + 1
-
-        # place connections with no target (connection target is $EMPTY$") at the end of connection list
-        for i in range(index, len(self.connection_list)):
-            # if data does not have any target
-            if self.connection_list[index].connection_target == "$EMPTY$":
-                # copy connection from given index
-                connection = self.connection_list[index]
-                # remove connection
-                self.connection_list.remove(connection)
-                # insert connection at the end of list
-                self.connection_list.insert(len(self.connection_list), connection)
-                # decrement index for next iteration, as inserted connection pushes by one position
-                # from right to left other connections, e.g. [...,...,...,A,B,C] -> [...,...,...,B,C,A];
-                # A was placed at the end and now B is under previous position of A,
-                # so at next iteration the same index need to be checked to examine B
-                index = index - 1
-            index = index + 1
-
-        # record info
-        for connection in self.connection_list:
-            Logger.save_in_log_file("Sorter", "Have sorted " + str(connection) + " connection", False)
-
-    # Description:
-    # This method gathers details of connections from activity diagram and base on them create nodes, where each
-    # node describes inputs and output from one unique interaction.
-    def find_nodes(self):
-
-        # record info
-        Logger.save_in_log_file("Sorter", "Looking for module nodes", False)
-
-        # find node details for each interaction
-        for interaction in self.interaction_list:
-            # new node instance
-            node = Node()
-            # set node interaction
-            node.node_interaction = interaction
-
-            # go through all connections for each interaction on interaction list
-            for connection in self.connection_list:
-
-                # if interaction is connection target, then connection source is note input
-                if connection.connection_target == interaction:
-                    # get node input
-                    node_input = connection.connection_source
-                    # append node input
-                    node.node_input_list.append(node_input)
-
-                # if interaction is connection source, then connection target is node output
-                elif connection.connection_source == interaction:
-                    # get node output
-                    node_output = connection.connection_target
-                    # set node output
-                    node.node_output = node_output
-
-            # append node to node list
-            self.node_list.append(node)
-
-        # find node details for connections with data assignment, i.e. without interaction or $EMPTY$ marker
-        for connection in self.connection_list:
-
-            # interaction marker show whether interaction was found or not within connection
-            interaction_found = False
-
-            # check if connection contains interaction
-            for interaction in self.interaction_list:
-                # if interaction is found within connection
-                if (connection.connection_source == interaction) or (connection.connection_target == interaction):
-                    # change interaction marker
-                    interaction_found = True
-                    # exit loop
-                    break
-
-            # if any interaction was not found within connection and connection does not contain "$EMPTY$" target
-            if (not interaction_found) and (connection.connection_target != "$EMPTY$"):
-                # new node instance
-                node = Node()
-                # get node input
-                node_input = connection.connection_source
-                # get node output
-                node_output = connection.connection_target
-                # append node input
-                node.node_input_list.append(node_input)
-                # set node interaction
-                node.node_interaction = "ASSIGNMENT"
-                # set node output
-                node.node_output = node_output
-                # append node to node list
-                self.node_list.append(node)
-
-        # record info
-        for node in self.node_list:
-            Logger.save_in_log_file("Sorter", "Have found " + str(node) + " node", False)
+            Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
     # Description:
     # This method finds dependencies of each node, i.e. list of local data elements, which are inputs to node
@@ -475,17 +315,11 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting module details from set of .exml files", True)
 
-        # find interaction of each node
-        self.find_node_interaction()
+        # find interactions of activity diagram
+        self.find_interactions()
 
-        # find data of each node
-        self.find_node_data()
-
-        # sort connections of same interaction into one place on connections list
-        # self.sort_connections()
-
-        # find nodes base on connections and interactions
-        # self.find_nodes()
+        # find nodes of activity diagram
+        self.find_nodes()
 
         # sort first input signals within nodes
         # self.sort_first_input_signals()
