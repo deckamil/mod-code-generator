@@ -5,7 +5,7 @@
 #       activity diagram, i.e. interaction together with its input and output data.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           4 FEB 2023
+#   DATE:           5 FEB 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,7 +32,11 @@
 # This class represents node on activity diagram, i.e. interaction together with its input and output data.
 class Node(object):
 
-    # Interaction types
+    # indexes of interface element list
+    INPUT_DATA_NAME_INDEX = 0
+    INPUT_PIN_NAME_INDEX = 1
+
+    # interaction types
     UNKNOWN = 10
     DATA = 30
     ACTION = 40
@@ -42,11 +46,11 @@ class Node(object):
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        self.input_list = []
+        self.input_data_list = []
         self.interaction_name = "N/A"
         self.interaction_uid = "N/A"
         self.interaction_type = Node.UNKNOWN
-        self.output = "N/A"
+        self.output_data = "N/A"
 
     # Description:
     # This method returns string representation of Node class.
@@ -58,8 +62,9 @@ class Node(object):
         if self.interaction_type == Node.OPERATION:
 
             # append input data
-            for node_input in self.input_list:
-                line = line + node_input[0] + "->" + node_input[1] + " "
+            for node_input in self.input_data_list:
+                line = line + node_input[Node.INPUT_DATA_NAME_INDEX] + \
+                       "->" + node_input[Node.INPUT_PIN_NAME_INDEX] + " "
 
             # append interaction name and uid
             line = line + "$INTERACTION$: " + self.interaction_name + "() " + self.interaction_uid + " "
@@ -68,8 +73,8 @@ class Node(object):
         elif self.interaction_type == Node.ACTION:
 
             # append input data
-            for node_input in self.input_list:
-                line = line + node_input + " "
+            for node_input in self.input_data_list:
+                line = line + node_input[Node.INPUT_DATA_NAME_INDEX] + " "
 
             # append interaction name and uid
             line = line + "$INTERACTION$: " + self.interaction_name + " " + self.interaction_uid + " "
@@ -78,14 +83,14 @@ class Node(object):
         else:
 
             # append input data
-            for node_input in self.input_list:
-                line = line + node_input + " "
+            for node_input in self.input_data_list:
+                line = line + node_input[Node.INPUT_DATA_NAME_INDEX] + " "
 
             # append interaction name and uid
             line = line + "$INTERACTION$: ASSIGNMENT "
 
         # append output marker and data
-        line = line + "$OUTPUT$: " + self.output
+        line = line + "$OUTPUT$: " + self.output_data
 
         # return string representation
         return line

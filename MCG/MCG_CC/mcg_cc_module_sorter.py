@@ -63,32 +63,16 @@ class ModuleSorter(object):
         # search for node interaction
         for connection in self.connection_list:
 
-            # if action is connection source
-            if connection.source_type == Connection.ACTION:
+            # if action or operation is connection source
+            if connection.source_type == Connection.ACTION or connection.source_type == Connection.OPERATION:
 
                 # if new integration is found in connection
                 if connection.source_uid not in self.interaction_uid_list:
                     # append interaction uid to interaction uid list
                     self.interaction_uid_list.append(connection.source_uid)
 
-            # if action is connection target
-            elif connection.target_type == Connection.ACTION:
-
-                # if new integration is found in connection
-                if connection.target_uid not in self.interaction_uid_list:
-                    # append interaction uid to interaction uid list
-                    self.interaction_uid_list.append(connection.target_uid)
-
-            # if operation is connection source
-            if connection.source_type == Connection.OPERATION:
-
-                # if new integration is found in connection
-                if connection.source_uid not in self.interaction_uid_list:
-                    # append interaction uid to interaction uid list
-                    self.interaction_uid_list.append(connection.source_uid)
-
-            # if operation is connection target
-            elif connection.target_type == Connection.OPERATION:
+            # if action or operation is connection target
+            if connection.target_type == Connection.ACTION or connection.target_type == Connection.OPERATION:
 
                 # if new integration is found in connection
                 if connection.target_uid not in self.interaction_uid_list:
@@ -119,6 +103,14 @@ class ModuleSorter(object):
                 # connection source is node input data
                 if interaction_uid == connection.target_uid:
 
+                    # get input data name
+                    input_data_name = connection.source_name
+                    # get input pin name
+                    input_pin_name = connection.target_pin
+                    # set input link
+                    input_link = [input_data_name, input_pin_name]
+                    # append input link to node input data list
+                    node.input_data_list.append(input_link)
                     # set interaction name
                     node.interaction_name = connection.target_name
                     # set interaction uid
@@ -128,26 +120,16 @@ class ModuleSorter(object):
                     if connection.target_type == Connection.ACTION:
                         # set interaction type
                         node.interaction_type = Node.ACTION
-                        # append input data to interaction
-                        node.input_list.append(connection.source_name)
                     # if operation is connection target
                     elif connection.target_type == Connection.OPERATION:
                         # set interaction type
                         node.interaction_type = Node.OPERATION
-                        # get data source name
-                        source_name = connection.source_name
-                        # get data target pin
-                        target_pin = connection.target_pin
-                        # set input link
-                        input_link = [source_name, target_pin]
-                        # append input link to interaction
-                        node.input_list.append(input_link)
 
                 # if interaction is connection source then
                 # connection target is node output data
                 if interaction_uid == connection.source_uid:
-                    # append output data to interaction
-                    node.output = connection.target_name
+                    # append output data to node
+                    node.output_data = connection.target_name
 
             # append node to node list
             self.node_list.append(node)
@@ -161,13 +143,19 @@ class ModuleSorter(object):
 
                 # create new node instance
                 node = Node()
+                # get input data name
+                input_data_name = connection.source_name
+                # get input pin name
+                input_pin_name = connection.target_pin
+                # set input link
+                input_link = [input_data_name, input_pin_name]
+                # append input link to node
+                node.input_data_list.append(input_link)
                 # set interaction type
                 node.interaction_type = Node.DATA
-                # append input data to interaction
-                node.input_list.append(connection.source_name)
-                # append output data to interaction
-                node.output = connection.target_name
-                # append interaction to node list
+                # append output data to node
+                node.output_data = connection.target_name
+                # append node to node list
                 self.node_list.append(node)
 
         # record info
@@ -175,7 +163,7 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
     # Description:
-    # This method finds dependencies of each node, i.e. list of local data elements, which are inputs to node
+    # This method finds dependencies between node, i.e. list of local data elements, which are inputs to node
     # interaction and are required to compute node output.
     def find_dependencies(self):
 
@@ -195,22 +183,14 @@ class ModuleSorter(object):
             dependency = [node]
             # go through all local data elements for each node
             for local_interface in self.local_interface_list:
-                # get name of local data element
+                # get local data name
                 local_data_name = local_interface[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
                 # go through all node inputs
-                for node_input in node.input_list:
-                    # if node interaction is of operation type
-                    if node.interaction_type == Node.OPERATION:
-                        # if local data element is input to node
-                        if local_data_name == node_input[0]:
-                            # append name of local data element to dependency sublist
-                            dependency.append(local_data_name)
-                    # if other case
-                    else:
-                        # if local data element is input to node
-                        if local_data_name == node_input:
-                            # append name of local data element to dependency sublist
-                            dependency.append(local_data_name)
+                for input_data in node.input_data_list:
+                    # if local data element is input to node
+                    if local_data_name == input_data[Node.INPUT_DATA_NAME_INDEX]:
+                        # append name of local data element to dependency sublist
+                        dependency.append(local_data_name)
 
             # append dependency to dependency list
             self.dependency_list.append(dependency)
