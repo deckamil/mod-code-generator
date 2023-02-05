@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           4 FEB 2023
+#   DATE:           5 FEB 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -180,7 +180,7 @@ class ModuleSorter(object):
     def find_dependencies(self):
 
         # record info
-        Logger.save_in_log_file("Sorter", "Looking for dependencies between module nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies between nodes", False)
 
         # each node will have dedicated sublist under dependency list
         # the sublist starts with node itself under position 0 and local data elements, which are inputs to that
@@ -194,23 +194,32 @@ class ModuleSorter(object):
             # dependency sublist with node at list beginning
             dependency = [node]
             # go through all local data elements for each node
-            for local_data in self.local_data_list:
+            for local_interface in self.local_interface_list:
                 # get name of local data element
-                local_data_name = local_data[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
+                local_data_name = local_interface[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
                 # go through all node inputs
-                for node_input in node.node_input_list:
-                    # if local data element is input to node
-                    if local_data_name == node_input:
-                        # append name of local data element to dependency sublist
-                        dependency.append(local_data_name)
+                for node_input in node.input_list:
+                    # if node interaction is of operation type
+                    if node.interaction_type == Node.OPERATION:
+                        # if local data element is input to node
+                        if local_data_name == node_input[0]:
+                            # append name of local data element to dependency sublist
+                            dependency.append(local_data_name)
+                    # if other case
+                    else:
+                        # if local data element is input to node
+                        if local_data_name == node_input:
+                            # append name of local data element to dependency sublist
+                            dependency.append(local_data_name)
 
             # append dependency to dependency list
             self.dependency_list.append(dependency)
 
         # record info
         for dependency in self.dependency_list:
-            Logger.save_in_log_file("Sorter", "Have found dependency on " + str(dependency[1:len(dependency)]) + " in "
-                                    + str(dependency[0]) + " node", False)
+            Logger.save_in_log_file("ModuleSorter", "Have found dependency on " +
+                                    str(dependency[1:len(dependency)]) + " in " +
+                                    str(dependency[0]) + " node", False)
 
     # Description:
     # This method sorts nodes basing on their dependencies from sublist under dependency list.
@@ -321,11 +330,8 @@ class ModuleSorter(object):
         # find nodes of activity diagram
         self.find_nodes()
 
-        # sort first input signals within nodes
-        # self.sort_first_input_signals()
-
         # find dependencies between nodes
-        # self.find_dependencies()
+        self.find_dependencies()
 
         # sort nodes basing on their dependencies
         # self.sort_nodes()
