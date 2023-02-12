@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           5 FEB 2023
+#   DATE:           12 FEB 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -206,7 +206,7 @@ class ModuleSorter(object):
     def sort_nodes(self):
 
         # record info
-        Logger.save_in_log_file("Sorter", "Sorting module nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting module nodes basing on their dependencies", False)
 
         # sort nodes basing on their dependencies
         # first append nodes without dependencies to sorted node list, i.e. look for each sublist on dependency
@@ -231,8 +231,8 @@ class ModuleSorter(object):
                     self.sorted_node_list.append(dependency[0])
                     # remove dependency sublist from dependency list
                     self.dependency_list.remove(dependency)
-                    # find node output
-                    node_output = dependency[0].node_output
+                    # find node output data
+                    output_data = dependency[0].output_data
                     # recalculate number of nodes to sort, i.e. length of dependency list
                     dependency_list_length = len(self.dependency_list)
 
@@ -248,7 +248,7 @@ class ModuleSorter(object):
                             for k in range(index, len(dependency)):
                                 # if given node consumes local data elements, which comes from node, which
                                 # was appended above to sorted node list
-                                if node_output == dependency[index]:
+                                if output_data == dependency[index]:
                                     # remove local data element from dependency sublist
                                     dependency.remove(dependency[index])
                                     # decrement index for next iteration, as one dependence was removed
@@ -264,38 +264,7 @@ class ModuleSorter(object):
 
         # record info
         for sorted_node in self.sorted_node_list:
-            Logger.save_in_log_file("Sorter", "Have sorted " + str(sorted_node) + " node", False)
-
-    # Description:
-    # This method moves first input signal, recognized by $FIRST$ marker, at beginning of node input list
-    # and removes $FIRST$ marker.
-    def sort_first_input_signals(self):
-
-        # record info
-        Logger.save_in_log_file("Sorter", "Sorting first input signal in nodes", False)
-
-        # for each node check if it contains first input signal
-        for node in self.node_list:
-
-            # go through all node inputs of node
-            for node_input in node.node_input_list:
-
-                # if given node input contains $FIRST$ marker
-                if "$FIRST$" in node_input:
-
-                    # find marker position
-                    first_position = node_input.find("$FIRST$")
-                    # get first input signal
-                    first_input_signal = node_input[first_position + Supporter.FIRST_INPUT_SIGNAL_OFFSET:
-                                                    len(node_input)]
-                    # remove node input from the list
-                    node.node_input_list.remove(node_input)
-                    # append first input signal at beginning of node input list
-                    node.node_input_list = [first_input_signal] + node.node_input_list
-
-        # record info
-        for node in self.node_list:
-            Logger.save_in_log_file("Sorter", "Have sorted " + str(node) + " node", False)
+            Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node", False)
 
     # Description:
     # This method is responsible for finding and sorting of module nodes.
@@ -314,11 +283,11 @@ class ModuleSorter(object):
         self.find_dependencies()
 
         # sort nodes basing on their dependencies
-        # self.sort_nodes()
+        self.sort_nodes()
 
-        # append collected data to component sorter list
-        # component_sorter_list = []
-        # component_sorter_list.insert(Sorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
+        # append collected data to module sorter list
+        module_sorter_list = []
+        module_sorter_list.insert(ModuleSorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
 
-        # return component sorter list
-        # return component_sorter_list
+        # return module sorter list
+        return module_sorter_list
