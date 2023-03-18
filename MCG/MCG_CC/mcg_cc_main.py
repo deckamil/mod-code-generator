@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2023
+#   DATE:           18 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,7 +34,7 @@ from sys import argv
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_file_reader import FileReader
 from mcg_cc_module_sorter import ModuleSorter
-from mcg_cc_converter import Converter
+from mcg_cc_module_converter import ModuleConverter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
 
@@ -84,7 +84,7 @@ class Main(object):
             # set path to model directory
             FileFinder.set_model_dir_path(model_dir_path)
             # set path to configuration file
-            Converter.set_configuration_file_path(output_dir_path)
+            ModuleConverter.set_configuration_file_path(output_dir_path)
             # set path to log file
             Logger.set_log_file_path(output_dir_path)
 
@@ -110,7 +110,7 @@ class Main(object):
         # saves log file header
         Logger.save_log_file_header()
         # saves configuration file header
-        Converter.save_configuration_file_header()
+        ModuleConverter.save_configuration_file_header()
 
         # flag to distinguish if set of matching .exml files was found for further conversion
         files_found = True
@@ -140,17 +140,17 @@ class Main(object):
                 module_sorter = ModuleSorter(file_reader_list)
                 # sort module content
                 module_sorter_list = module_sorter.sort_module()
-            #
-            #     # check errors
-            #     ErrorHandler.check_errors()
-            #
-            #     # initialize converter
-            #     component_converter = ComponentConverter(file_finder_list, component_reader_list, component_sorter_list)
-            #     # convert module content
-            #     component_converter.convert_component()
+
+                # check errors
+                ErrorHandler.check_errors()
+
+                # initialize converter
+                module_converter = ModuleConverter(file_finder_list, file_reader_list, module_sorter_list)
+                # convert module content
+                module_converter.convert_module()
 
         # saves configuration file footer
-        Converter.save_configuration_file_footer()
+        ModuleConverter.save_configuration_file_footer()
         # saves log file footer
         Logger.save_log_file_footer()
 
