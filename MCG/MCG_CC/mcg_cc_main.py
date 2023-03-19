@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           18 MAR 2023
+#   DATE:           19 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -64,7 +64,7 @@ class Main(object):
         # display short notice
         print()
         print("Mod Code Generator (MCG)")
-        print("Copyright (C) 2021-2022 Kamil Deć github.com/deckamil")
+        print("Copyright (C) 2021-2023 Kamil Deć github.com/deckamil")
         print("This is Converter Component (CC) of Mod Code Generator (MCG)")
         print(Main.MCG_CC_VERSION)
         print()

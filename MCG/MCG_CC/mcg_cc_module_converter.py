@@ -209,7 +209,57 @@ class ModuleConverter(object):
         self.configuration_file.append(str("$LOCAL INTERFACE END$"))
 
     # Description:
-    # This method converts data node into configuration file.
+    # This method converts module specific action node into configuration file.
+    def convert_specific_action_node(self, sorted_node, math_symbol):
+
+        # set beginning of action interaction to conversion line
+        conversion_line = str(sorted_node.output_data) + str(" = ")
+
+        # search for all input data elements of sorted node and put them into conversion line
+        for i in range(0, len(sorted_node.input_data_list)):
+            # get input link
+            input_link = sorted_node.input_data_list[i]
+            # get input data name
+            input_data_name = input_link[0]
+            # append input data element to conversion line
+            conversion_line = conversion_line + str(input_data_name)
+            # if sorted node processing is not completed
+            if i < len(sorted_node.input_data_list) - 1:
+                # append math symbol to conversion line
+                conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
+
+        # append conversion line to configuration file
+        self.configuration_file.append(conversion_line)
+
+        # record info
+        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+
+    # Description:
+    # This method converts module action node into configuration file.
+    def convert_action_node(self, sorted_node):
+
+        # if sorted node contains ADD action
+        if sorted_node.interaction_name[0:3] == "ADD":
+            # convert ADD action
+            self.convert_specific_action_node(sorted_node, "+")
+
+        # if sorted node contains SUB action
+        elif sorted_node.interaction_name[0:3] == "SUB":
+            # convert SUB action
+            self.convert_specific_action_node(sorted_node, "-")
+
+        # if sorted node contains MUL action
+        elif sorted_node.interaction_name[0:3] == "MUL":
+            # convert MUL action
+            self.convert_specific_action_node(sorted_node, "*")
+
+        # if sorted node contains DIV action
+        elif sorted_node.interaction_name[0:3] == "DIV":
+            # convert DIV action
+            self.convert_specific_action_node(sorted_node, "/")
+
+    # Description:
+    # This method converts module data node into configuration file.
     def convert_data_node(self, sorted_node):
 
         # get input link
@@ -246,7 +296,7 @@ class ModuleConverter(object):
             # if node is action type
             elif sorted_node.interaction_type == Node.ACTION:
                 # convert action node
-                tbd = ""
+                self.convert_action_node(sorted_node)
             # if node is data type
             elif sorted_node.interaction_type == Node.DATA:
                 # convert data node
