@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           18 MAR 2023
+#   DATE:           19 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,6 +29,7 @@
 
 
 import datetime
+from mcg_cc_node import Node
 from mcg_cc_file_reader import FileReader
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_module_sorter import ModuleSorter
@@ -121,7 +122,7 @@ class ModuleConverter(object):
         ModuleConverter.configuration_file_disk.close()
 
     # Description:
-    # This method converts header details into configuration file.
+    # This method converts module header details into configuration file.
     def convert_header(self):
 
         # record info
@@ -155,7 +156,7 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
 
     # Description:
-    # This method converts specific interface type into configuration file.
+    # This method converts module specific interface type into configuration file.
     def convert_specific_interface(self, interface_element_list):
 
         # append interface details to configuration file
@@ -173,7 +174,8 @@ class ModuleConverter(object):
             Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
 
     # Description:
-    # This method converts input interface, output interface and local interface elements into configuration file.
+    # This method converts module input interface, output interface and local interface elements
+    # into configuration file.
     def convert_interfaces(self):
 
         # record info
@@ -207,6 +209,52 @@ class ModuleConverter(object):
         self.configuration_file.append(str("$LOCAL INTERFACE END$"))
 
     # Description:
+    # This method converts data node into configuration file.
+    def convert_data_node(self, sorted_node):
+
+        # get input link
+        input_link = sorted_node.input_data_list[0]
+        # get input data name
+        input_data_name = input_link[0]
+        # get output data name
+        output_data_name = sorted_node.output_data
+        # get configuration file line
+        configuration_file_line = str(output_data_name) + " = " + str(input_data_name)
+        # append configuration file line to configuration file
+        self.configuration_file.append(configuration_file_line)
+
+        # record info
+        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+
+    # Description:
+    # This method converts module body into configuration file.
+    def convert_body(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleConverter", "Converting module body into configuration file", False)
+
+        # append start marker of module name section to configuration file
+        self.configuration_file.append(str("$MODULE BODY START$"))
+
+        # repeat for all nodes from sorted node list
+        for sorted_node in self.sorted_node_list:
+
+            # if node is operation type
+            if sorted_node.interaction_type == Node.OPERATION:
+                # convert operation node
+                tbd = ""
+            # if node is action type
+            elif sorted_node.interaction_type == Node.ACTION:
+                # convert action node
+                tbd = ""
+            # if node is data type
+            elif sorted_node.interaction_type == Node.DATA:
+                # convert data node
+                self.convert_data_node(sorted_node)
+
+        self.configuration_file.append(str("$MODULE BODY END$"))
+
+    # Description:
     # This method is responsible for conversion of module content into configuration file format.
     def convert_module(self):
 
@@ -221,6 +269,9 @@ class ModuleConverter(object):
 
         # convert interfaces
         self.convert_interfaces()
+
+        # convert body
+        self.convert_body()
 
         # append end marker of new module section to configuration file
         self.configuration_file.append(str("$MODULE END$"))
