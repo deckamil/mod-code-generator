@@ -209,9 +209,11 @@ class ModuleSorter(object):
 
         # record info
         for dependency in self.dependency_list:
-            Logger.save_in_log_file("ModuleSorter", "Have found dependency on " +
-                                    str(dependency[1:len(dependency)]) + " in " +
-                                    str(dependency[0]) + " node", False)
+            # only if dependency for given node is found
+            if len(dependency) > 1:
+                Logger.save_in_log_file("ModuleSorter", "Have found dependency on " +
+                                        str(dependency[1:len(dependency)]) + " in " +
+                                        str(dependency[0]) + " node", False)
 
     # Description:
     # This method sorts nodes basing on their dependencies from sublist under dependency list.
