@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           12 FEB 2023
+#   DATE:           20 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -111,25 +111,31 @@ class ModuleSorter(object):
                     input_link = [input_data_name, input_pin_name]
                     # append input link to node input data list
                     node.input_data_list.append(input_link)
-                    # set interaction name
-                    node.interaction_name = connection.target_name
-                    # set interaction uid
-                    node.interaction_uid = connection.target_uid
+                    # set node name
+                    node.name = connection.target_name
+                    # set node uid
+                    node.uid = connection.target_uid
 
                     # if action is connection target
                     if connection.target_type == Connection.ACTION:
-                        # set interaction type
-                        node.interaction_type = Node.ACTION
+                        # set node type
+                        node.type = Node.ACTION
                     # if operation is connection target
                     elif connection.target_type == Connection.OPERATION:
-                        # set interaction type
-                        node.interaction_type = Node.OPERATION
+                        # set node type
+                        node.type = Node.OPERATION
 
                 # if interaction is connection source then
                 # connection target is node output data
                 if interaction_uid == connection.source_uid:
-                    # append output data to node
-                    node.output_data = connection.target_name
+                    # get output data name
+                    output_data_name = connection.target_name
+                    # get output pin name
+                    output_pin_name = connection.source_pin
+                    # set output link
+                    output_link = [output_data_name, output_pin_name]
+                    # append output link to node output data list
+                    node.output_data_list.append(output_link)
 
             # append node to node list
             self.node_list.append(node)
@@ -151,10 +157,16 @@ class ModuleSorter(object):
                 input_link = [input_data_name, input_pin_name]
                 # append input link to node
                 node.input_data_list.append(input_link)
-                # set interaction type
-                node.interaction_type = Node.DATA
-                # append output data to node
-                node.output_data = connection.target_name
+                # set node type
+                node.type = Node.DATA
+                # get output data name
+                output_data_name = connection.target_name
+                # get output pin name
+                output_pin_name = connection.source_pin
+                # set output link
+                output_link = [output_data_name, output_pin_name]
+                # append output link to node output data list
+                node.output_data_list.append(output_link)
                 # append node to node list
                 self.node_list.append(node)
 
@@ -188,7 +200,7 @@ class ModuleSorter(object):
                 # go through all node inputs
                 for input_data in node.input_data_list:
                     # if local data element is input to node
-                    if local_data_name == input_data[Node.INPUT_DATA_NAME_INDEX]:
+                    if local_data_name == input_data[Node.DATA_NAME_INDEX]:
                         # append name of local data element to dependency sublist
                         dependency.append(local_data_name)
 
@@ -231,8 +243,10 @@ class ModuleSorter(object):
                     self.sorted_node_list.append(dependency[0])
                     # remove dependency sublist from dependency list
                     self.dependency_list.remove(dependency)
-                    # find node output data
-                    output_data = dependency[0].output_data
+                    # get output link
+                    output_link = dependency[0].output_data_list[0]
+                    # get output data name
+                    output_data_name = output_link[Node.DATA_NAME_INDEX]
                     # recalculate number of nodes to sort, i.e. length of dependency list
                     dependency_list_length = len(self.dependency_list)
 
@@ -248,7 +262,7 @@ class ModuleSorter(object):
                             for k in range(index, len(dependency)):
                                 # if given node consumes local data elements, which comes from node, which
                                 # was appended above to sorted node list
-                                if output_data == dependency[index]:
+                                if output_data_name == dependency[index]:
                                     # remove local data element from dependency sublist
                                     dependency.remove(dependency[index])
                                     # decrement index for next iteration, as one dependence was removed

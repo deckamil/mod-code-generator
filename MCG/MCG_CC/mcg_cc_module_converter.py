@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           19 MAR 2023
+#   DATE:           20 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -212,15 +212,17 @@ class ModuleConverter(object):
     # This method converts module specific action node into configuration file.
     def convert_specific_action_node(self, sorted_node, math_symbol):
 
+        # get output link
+        output_link = sorted_node.output_data_list[0]
         # set beginning of action interaction to conversion line
-        conversion_line = str(sorted_node.output_data) + str(" = ")
+        conversion_line = str(output_link[Node.DATA_NAME_INDEX]) + str(" = ")
 
         # search for all input data elements of sorted node and put them into conversion line
         for i in range(0, len(sorted_node.input_data_list)):
             # get input link
             input_link = sorted_node.input_data_list[i]
             # get input data name
-            input_data_name = input_link[0]
+            input_data_name = input_link[Node.DATA_NAME_INDEX]
             # append input data element to conversion line
             conversion_line = conversion_line + str(input_data_name)
             # if sorted node processing is not completed
@@ -239,22 +241,22 @@ class ModuleConverter(object):
     def convert_action_node(self, sorted_node):
 
         # if sorted node contains ADD action
-        if sorted_node.interaction_name[0:3] == "ADD":
+        if sorted_node.name[0:3] == "ADD":
             # convert ADD action
             self.convert_specific_action_node(sorted_node, "+")
 
         # if sorted node contains SUB action
-        elif sorted_node.interaction_name[0:3] == "SUB":
+        elif sorted_node.name[0:3] == "SUB":
             # convert SUB action
             self.convert_specific_action_node(sorted_node, "-")
 
         # if sorted node contains MUL action
-        elif sorted_node.interaction_name[0:3] == "MUL":
+        elif sorted_node.name[0:3] == "MUL":
             # convert MUL action
             self.convert_specific_action_node(sorted_node, "*")
 
         # if sorted node contains DIV action
-        elif sorted_node.interaction_name[0:3] == "DIV":
+        elif sorted_node.name[0:3] == "DIV":
             # convert DIV action
             self.convert_specific_action_node(sorted_node, "/")
 
@@ -265,9 +267,11 @@ class ModuleConverter(object):
         # get input link
         input_link = sorted_node.input_data_list[0]
         # get input data name
-        input_data_name = input_link[0]
+        input_data_name = input_link[Node.DATA_NAME_INDEX]
+        # get output link
+        output_link = sorted_node.output_data_list[0]
         # get output data name
-        output_data_name = sorted_node.output_data
+        output_data_name = output_link[Node.DATA_NAME_INDEX]
         # get configuration file line
         configuration_file_line = str(output_data_name) + " = " + str(input_data_name)
         # append configuration file line to configuration file
@@ -290,15 +294,15 @@ class ModuleConverter(object):
         for sorted_node in self.sorted_node_list:
 
             # if node is operation type
-            if sorted_node.interaction_type == Node.OPERATION:
+            if sorted_node.type == Node.OPERATION:
                 # convert operation node
                 tbd = ""
             # if node is action type
-            elif sorted_node.interaction_type == Node.ACTION:
+            elif sorted_node.type == Node.ACTION:
                 # convert action node
                 self.convert_action_node(sorted_node)
             # if node is data type
-            elif sorted_node.interaction_type == Node.DATA:
+            elif sorted_node.type == Node.DATA:
                 # convert data node
                 self.convert_data_node(sorted_node)
 
@@ -331,4 +335,3 @@ class ModuleConverter(object):
 
         # save configuration file
         self.save_in_configuration_file()
-

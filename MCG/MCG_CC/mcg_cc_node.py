@@ -5,7 +5,7 @@
 #       activity diagram, i.e. interaction together with its input and output data.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           5 FEB 2023
+#   DATE:           20 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,8 +33,8 @@
 class Node(object):
 
     # indexes of interface element list
-    INPUT_DATA_NAME_INDEX = 0
-    INPUT_PIN_NAME_INDEX = 1
+    DATA_NAME_INDEX = 0
+    PIN_NAME_INDEX = 1
 
     # interaction types
     UNKNOWN = 10
@@ -47,10 +47,10 @@ class Node(object):
     def __init__(self):
         # initialize object data
         self.input_data_list = []
-        self.interaction_name = "N/A"
-        self.interaction_uid = "N/A"
-        self.interaction_type = Node.UNKNOWN
-        self.output_data = "N/A"
+        self.name = "N/A"
+        self.uid = "N/A"
+        self.type = Node.UNKNOWN
+        self.output_data_list = []
 
     # Description:
     # This method returns string representation of Node class.
@@ -58,39 +58,59 @@ class Node(object):
         # append input marker
         line = "$INPUTS$: "
 
-        # if interaction is of operation type
-        if self.interaction_type == Node.OPERATION:
+        # if node is operation type
+        if self.type == Node.OPERATION:
 
             # append input data
             for node_input in self.input_data_list:
-                line = line + node_input[Node.INPUT_DATA_NAME_INDEX] + \
-                       "->" + node_input[Node.INPUT_PIN_NAME_INDEX] + " "
+                line = line + node_input[Node.DATA_NAME_INDEX] + \
+                       "->" + node_input[Node.PIN_NAME_INDEX] + " "
 
             # append interaction name and uid
-            line = line + "$INTERACTION$: " + self.interaction_name + "() " + self.interaction_uid + " "
+            line = line + "$INTERACTION$: " + self.name + "() " + self.uid + " "
 
-        # if interaction is of action type
-        elif self.interaction_type == Node.ACTION:
+            # append output marker and data
+            line = line + "$OUTPUT$: "
+
+            # append output data
+            for node_output in self.output_data_list:
+                line = line + node_output[Node.PIN_NAME_INDEX] + \
+                       "->" + node_output[Node.DATA_NAME_INDEX] + " "
+
+            # remove spare whitespace
+            line = line[0:len(line)-1]
+
+        # if node is action type
+        elif self.type == Node.ACTION:
 
             # append input data
             for node_input in self.input_data_list:
-                line = line + node_input[Node.INPUT_DATA_NAME_INDEX] + " "
+                line = line + node_input[Node.DATA_NAME_INDEX] + " "
 
             # append interaction name and uid
-            line = line + "$INTERACTION$: " + self.interaction_name + " " + self.interaction_uid + " "
+            line = line + "$INTERACTION$: " + self.name + " " + self.uid + " "
+
+            # get output data
+            output_data = self.output_data_list[0]
+
+            # append output marker and data
+            line = line + "$OUTPUT$: " + output_data[Node.DATA_NAME_INDEX]
 
         # if there is no interaction, but only connection between two data points
         else:
 
             # append input data
             for node_input in self.input_data_list:
-                line = line + node_input[Node.INPUT_DATA_NAME_INDEX] + " "
+                line = line + node_input[Node.DATA_NAME_INDEX] + " "
 
-            # append interaction name and uid
+            # append interaction name
             line = line + "$INTERACTION$: ASSIGNMENT "
 
-        # append output marker and data
-        line = line + "$OUTPUT$: " + self.output_data
+            # get output data
+            output_data = self.output_data_list[0]
+
+            # append output marker and data
+            line = line + "$OUTPUT$: " + output_data[Node.DATA_NAME_INDEX]
 
         # return string representation
         return line
