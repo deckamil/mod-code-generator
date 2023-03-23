@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           20 MAR 2023
+#   DATE:           23 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,6 +40,9 @@ class ModuleSorter(object):
 
     # indexes of sorter list
     SORTED_NODE_LIST_INDEX = 0
+
+    # list of action interaction that require to distinguish main data input
+    input_sensitivity_action_list = ["SUB", "DIV"]
 
     # Description:
     # This is class constructor.
@@ -283,6 +286,59 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node", False)
 
     # Description:
+    # This method sorts input data elements if interaction requires to point main data input.
+    def sort_input_data_list(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Sorting nodes input data list", False)
+
+        # some kind of actions require to distinguish which input data element should be
+        # considered as main data element in order to compute correct results;
+
+        # please consider as example a subtraction between two data elements: temp1 and temp2;
+        # the temp1-temp2 gives different result than temp2-temp1, therefore in such case there
+        # is a need to define order by pointing which input data element, temp1 or temp2, should
+        # be considered as main, i.e. the one which needs to appear at beginning of interaction
+
+        # the main data element in pointed by + marker in node name;
+        # input data element with same name as pointed main data element by + marker should be
+        # moved at beginning of input data list
+
+        # repeat for all nodes from sorted node list
+        for sorted_node in self.sorted_node_list:
+
+            # if node is action type
+            if sorted_node.type == Node.ACTION:
+
+                # and if action is input sensitive, i.e. requires to distinguish main data input
+                for input_sensitivity_action in ModuleSorter.input_sensitivity_action_list:
+                    if sorted_node.name[0:3] == input_sensitivity_action:
+
+                        # get marker position
+                        marker_position = sorted_node.name.find("+")
+                        # get main input data name
+                        main_input_data_name = sorted_node.name[marker_position+1:len(sorted_node.name)]
+
+                        # check each input data
+                        for input_data in sorted_node.input_data_list:
+
+                            # if input data is main one
+                            if input_data[Node.DATA_NAME_INDEX] == main_input_data_name:
+
+                                # get input data index
+                                input_data_index = sorted_node.input_data_list.index(input_data)
+                                # remove main input data from current position
+                                main_input_data = sorted_node.input_data_list.pop(input_data_index)
+                                # insert main input data at beginning of input data list
+                                sorted_node.input_data_list.insert(0, main_input_data)
+
+                                # record info
+                                Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",
+                                                        False)
+                                # exit "for input_data in" loop
+                                break
+
+    # Description:
     # This method is responsible for finding and sorting of module nodes.
     def sort_module(self):
 
@@ -300,6 +356,9 @@ class ModuleSorter(object):
 
         # sort nodes basing on their dependencies
         self.sort_nodes()
+
+        # sort input data list
+        self.sort_input_data_list()
 
         # append collected data to module sorter list
         module_sorter_list = []
