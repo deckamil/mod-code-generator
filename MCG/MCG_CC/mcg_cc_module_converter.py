@@ -209,13 +209,44 @@ class ModuleConverter(object):
         self.configuration_file.append(str("$LOCAL INTERFACE END$"))
 
     # Description:
+    # This method converts module operation node into configuration file.
+    def convert_operation_node(self, sorted_node):
+
+        # set operation invocation to conversion line
+        conversion_line = str("$OPE ") + str(sorted_node.name)
+        # append conversion line to configuration file
+        self.configuration_file.append(conversion_line)
+        # record info
+        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+
+        # append input data links
+        for input_link in sorted_node.input_data_list:
+            # set input link to conversion line
+            conversion_line = str("$INP ") + str(input_link[Node.DATA_NAME_INDEX]) + str("->") + \
+                              str(input_link[Node.PIN_NAME_INDEX])
+            # append conversion line to configuration file
+            self.configuration_file.append(conversion_line)
+            # record info
+            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+
+        # append output data links
+        for output_link in sorted_node.output_data_list:
+            # set output link to conversion line
+            conversion_line = str("$OUT ") + str(output_link[Node.PIN_NAME_INDEX]) + str("->") + \
+                              str(output_link[Node.DATA_NAME_INDEX])
+            # append conversion line to configuration file
+            self.configuration_file.append(conversion_line)
+            # record info
+            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+
+    # Description:
     # This method converts module specific action node into configuration file.
     def convert_specific_action_node(self, sorted_node, math_symbol):
 
         # get output link
         output_link = sorted_node.output_data_list[0]
         # set beginning of action interaction to conversion line
-        conversion_line = str(output_link[Node.DATA_NAME_INDEX]) + str(" = ")
+        conversion_line = str("$INS ") + str(output_link[Node.DATA_NAME_INDEX]) + str(" = ")
 
         # search for all input data elements of sorted node and put them into conversion line
         for input_link in sorted_node.input_data_list:
@@ -227,7 +258,7 @@ class ModuleConverter(object):
             conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
 
         # remove spare math symbol and whitespace
-        conversion_line = conversion_line[0:len(conversion_line) - 2]
+        conversion_line = conversion_line[0:len(conversion_line) - 3]
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
@@ -271,7 +302,7 @@ class ModuleConverter(object):
         # get output data name
         output_data_name = output_link[Node.DATA_NAME_INDEX]
         # get configuration file line
-        configuration_file_line = str(output_data_name) + " = " + str(input_data_name)
+        configuration_file_line = str("$INS ") + str(output_data_name) + " = " + str(input_data_name)
         # append configuration file line to configuration file
         self.configuration_file.append(configuration_file_line)
 
@@ -294,7 +325,7 @@ class ModuleConverter(object):
             # if node is operation type
             if sorted_node.type == Node.OPERATION:
                 # convert operation node
-                tbd = ""
+                self.convert_operation_node(sorted_node)
             # if node is action type
             elif sorted_node.type == Node.ACTION:
                 # convert action node
