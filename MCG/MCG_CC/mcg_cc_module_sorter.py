@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           23 MAR 2023
+#   DATE:           25 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -200,10 +200,10 @@ class ModuleSorter(object):
             for local_interface in self.local_interface_list:
                 # get local data name
                 local_data_name = local_interface[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
-                # go through all node inputs
-                for input_data in node.input_data_list:
+                # go through all input links
+                for input_link in node.input_data_list:
                     # if local data element is input to node
-                    if local_data_name == input_data[Node.DATA_NAME_INDEX]:
+                    if local_data_name == input_link[Node.DATA_NAME_INDEX]:
                         # append name of local data element to dependency sublist
                         dependency.append(local_data_name)
 
@@ -310,7 +310,7 @@ class ModuleSorter(object):
             # if node is action type
             if sorted_node.type == Node.ACTION:
 
-                # and if action is input sensitive, i.e. requires to distinguish main data input
+                # and if action is input sensitive, i.e. requires to distinguish main input data
                 for input_sensitivity_action in ModuleSorter.input_sensitivity_action_list:
                     if sorted_node.name[0:3] == input_sensitivity_action:
 
@@ -319,18 +319,18 @@ class ModuleSorter(object):
                         # get main input data name
                         main_input_data_name = sorted_node.name[marker_position+1:len(sorted_node.name)]
 
-                        # check each input data
-                        for input_data in sorted_node.input_data_list:
+                        # check each input link
+                        for input_link in sorted_node.input_data_list:
 
-                            # if input data is main one
-                            if input_data[Node.DATA_NAME_INDEX] == main_input_data_name:
+                            # if input link contains main input data
+                            if input_link[Node.DATA_NAME_INDEX] == main_input_data_name:
 
-                                # get input data index
-                                input_data_index = sorted_node.input_data_list.index(input_data)
-                                # remove main input data from current position
-                                main_input_data = sorted_node.input_data_list.pop(input_data_index)
-                                # insert main input data at beginning of input data list
-                                sorted_node.input_data_list.insert(0, main_input_data)
+                                # get input link index
+                                input_link_index = sorted_node.input_data_list.index(input_link)
+                                # remove main input link from current position
+                                main_input_link = sorted_node.input_data_list.pop(input_link_index)
+                                # insert main input link at beginning of input data list
+                                sorted_node.input_data_list.insert(0, main_input_link)
 
                                 # record info
                                 Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",

@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           20 MAR 2023
+#   DATE:           25 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -218,18 +218,16 @@ class ModuleConverter(object):
         conversion_line = str(output_link[Node.DATA_NAME_INDEX]) + str(" = ")
 
         # search for all input data elements of sorted node and put them into conversion line
-        for i in range(0, len(sorted_node.input_data_list)):
-            # get input link
-            input_link = sorted_node.input_data_list[i]
+        for input_link in sorted_node.input_data_list:
             # get input data name
             input_data_name = input_link[Node.DATA_NAME_INDEX]
             # append input data element to conversion line
             conversion_line = conversion_line + str(input_data_name)
-            # if sorted node processing is not completed
-            if i < len(sorted_node.input_data_list) - 1:
-                # append math symbol to conversion line
-                conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
+            # append math symbol to conversion line
+            conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
 
+        # remove spare math symbol and whitespace
+        conversion_line = conversion_line[0:len(conversion_line) - 2]
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 

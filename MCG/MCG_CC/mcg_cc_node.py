@@ -5,7 +5,7 @@
 #       activity diagram, i.e. interaction together with its input and output data.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           20 MAR 2023
+#   DATE:           25 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -62,9 +62,9 @@ class Node(object):
         if self.type == Node.OPERATION:
 
             # append input data
-            for node_input in self.input_data_list:
-                line = line + node_input[Node.DATA_NAME_INDEX] + \
-                       "->" + node_input[Node.PIN_NAME_INDEX] + " "
+            for input_data in self.input_data_list:
+                line = line + input_data[Node.DATA_NAME_INDEX] + \
+                       "->" + input_data[Node.PIN_NAME_INDEX] + " "
 
             # append interaction name and uid
             line = line + "$INTERACTION$: " + self.name + "() " + self.uid + " "
@@ -73,9 +73,9 @@ class Node(object):
             line = line + "$OUTPUT$: "
 
             # append output data
-            for node_output in self.output_data_list:
-                line = line + node_output[Node.PIN_NAME_INDEX] + \
-                       "->" + node_output[Node.DATA_NAME_INDEX] + " "
+            for output_data in self.output_data_list:
+                line = line + output_data[Node.PIN_NAME_INDEX] + \
+                       "->" + output_data[Node.DATA_NAME_INDEX] + " "
 
             # remove spare whitespace
             line = line[0:len(line)-1]
@@ -84,8 +84,8 @@ class Node(object):
         elif self.type == Node.ACTION:
 
             # append input data
-            for node_input in self.input_data_list:
-                line = line + node_input[Node.DATA_NAME_INDEX] + " "
+            for input_data in self.input_data_list:
+                line = line + input_data[Node.DATA_NAME_INDEX] + " "
 
             # append interaction name and uid
             line = line + "$INTERACTION$: " + self.name + " " + self.uid + " "
@@ -100,8 +100,8 @@ class Node(object):
         else:
 
             # append input data
-            for node_input in self.input_data_list:
-                line = line + node_input[Node.DATA_NAME_INDEX] + " "
+            for input_data in self.input_data_list:
+                line = line + input_data[Node.DATA_NAME_INDEX] + " "
 
             # append interaction name
             line = line + "$INTERACTION$: ASSIGNMENT "
