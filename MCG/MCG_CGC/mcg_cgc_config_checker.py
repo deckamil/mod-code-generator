@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           28 MAY 2022
+#   DATE:           26 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -41,6 +41,7 @@ class ConfigChecker(object):
     config_file = []
     file_index = 0
     module_name_list = []
+    operation_name_list = []
     number_of_config_file_lines = 0
     number_of_subsection_errors = 0
     NUMBER_OF_REPETITIONS_BEFORE_SKIPPING = 5
@@ -63,9 +64,19 @@ class ConfigChecker(object):
     # possible checker states
     CHECK_HEADER = 10
     FIND_NEW_MODULE = 20
-    SKIP_AND_FIND_MODULE_SECTION = 30
-    CHECK_FOOTER = 40
-    END_CHECKING = 50
+    CHECK_MODULE_NAME = 301
+    CHECK_OPERATION_NAME = 302
+    CHECK_INPUT_INTERFACE_START = 303
+    CHECK_INPUT_INTERFACE = 304
+    CHECK_OUTPUT_INTERFACE_START = 305
+    CHECK_OUTPUT_INTERFACE = 306
+    CHECK_LOCAL_INTERFACE_START = 307
+    CHECK_LOCAL_INTERFACE = 308
+    CHECK_BODY_START = 309
+    CHECK_BODY = 310
+    SKIP_TO_NEXT_SECTION = 40
+    CHECK_FOOTER = 50
+    END_CHECKING = 60
 
     # possible component verification states
     CHECK_COMPONENT_SOURCE = 101
@@ -153,19 +164,22 @@ class ConfigChecker(object):
             elif ConfigChecker.checker_state == ConfigChecker.FIND_NEW_MODULE:
                 ConfigChecker.find_new_module()
 
+            # check module name
+            elif ConfigChecker.checker_state == ConfigChecker.CHECK_MODULE_NAME:
+                ConfigChecker.check_module_name()
+
+            # check operation name
+            elif ConfigChecker.checker_state == ConfigChecker.CHECK_OPERATION_NAME:
+                ConfigChecker.check_operation_name()
+
+            # check input interface
+            elif (ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE_START or
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE):
+                ConfigChecker.skip_to_next_section()
+
             # skip current part of module section and find next one
-            elif ConfigChecker.checker_state == ConfigChecker.SKIP_AND_FIND_MODULE_SECTION:
-                ConfigChecker.skip_and_find_module_section()
-
-            # check component
-            elif (ConfigChecker.checker_state >= ConfigChecker.CHECK_COMPONENT_SOURCE) and \
-                    (ConfigChecker.checker_state <= ConfigChecker.CHECK_COMPONENT_END):
-                ConfigChecker.check_component()
-
-            # check package
-            elif (ConfigChecker.checker_state >= ConfigChecker.CHECK_PACKAGE_SOURCE) and \
-                    (ConfigChecker.checker_state <= ConfigChecker.CHECK_PACKAGE_END):
-                ConfigChecker.check_package()
+            elif ConfigChecker.checker_state == ConfigChecker.SKIP_TO_NEXT_SECTION:
+                ConfigChecker.skip_to_next_section()
 
             # check footer
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_FOOTER:
@@ -213,29 +227,17 @@ class ConfigChecker(object):
         # clear counter of subsection errors
         ConfigChecker.number_of_subsection_errors = 0
 
-        # when component start marker is found
-        if ConfigChecker.config_file[ConfigChecker.file_index] == "COMPONENT START":
+        # when module start marker is found
+        if ConfigChecker.config_file[ConfigChecker.file_index] == "$MODULE START$":
             # record info
             Logger.save_in_log_file("ConfigChecker",
-                                    "Have found new component section in the configuration file at line " +
+                                    "Have found new module section in the configuration file at line " +
                                     str(ConfigChecker.file_index + 1),
                                     False)
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # start component verification
-            ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
-
-        # when package start marker is found
-        elif ConfigChecker.config_file[ConfigChecker.file_index] == "PACKAGE START":
-            # record info
-            Logger.save_in_log_file("ConfigChecker",
-                                    "Have found new package section in the configuration file at line " +
-                                    str(ConfigChecker.file_index + 1),
-                                    False)
-            # increment file index
-            ConfigChecker.file_index = ConfigChecker.file_index + 1
-            # start package verification
-            ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
+            # start module verification
+            ConfigChecker.checker_state = ConfigChecker.CHECK_MODULE_NAME
 
         # when config end marker is found
         elif "MCG CGC CONFIG END" in ConfigChecker.config_file[ConfigChecker.file_index]:
@@ -251,14 +253,100 @@ class ConfigChecker(object):
         else:
             # record error
             ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_START_OR_FOOTER, ConfigChecker.file_index+1, "")
+            # skip part of the configuration file and find next section
+            ConfigChecker.checker_state = ConfigChecker.SKIP_TO_NEXT_SECTION
+
+    # Description:
+    # This method checks correctness of module name section in the configuration file.
+    @staticmethod
+    def check_module_name():
+
+        # record info
+        Logger.save_in_log_file("ConfigChecker",
+                                "Checking module name in the configuration file at line "
+                                + str(ConfigChecker.file_index + 1),
+                                False)
+
+        # if module name start and end marker if found and module name is not empty
+        if (ConfigChecker.config_file[ConfigChecker.file_index] == "$MODULE NAME START$" and
+                len(ConfigChecker.config_file[ConfigChecker.file_index+1]) > 1 and
+                ConfigChecker.config_file[ConfigChecker.file_index+2] == "$MODULE NAME END$"):
+            # get module name
+            module_name = ConfigChecker.config_file[ConfigChecker.file_index+1]
+            # check if module name was already defined in the configuration file
+            ConfigChecker.check_if_same_module_name(module_name)
+            # increment file index
+            ConfigChecker.file_index = ConfigChecker.file_index + 3
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_OPERATION_NAME
+
+        # or if line contains unexpected data
+        else:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_MODULE_NAME, ConfigChecker.file_index + 1, "")
             # skip part of the configuration file and find next module section
-            ConfigChecker.checker_state = ConfigChecker.SKIP_AND_FIND_MODULE_SECTION
+            ConfigChecker.checker_state = ConfigChecker.SKIP_TO_NEXT_SECTION
+
+    # Description:
+    # This method checks correctness of operation name section in the configuration file.
+    @staticmethod
+    def check_operation_name():
+
+        # record info
+        Logger.save_in_log_file("ConfigChecker",
+                                "Checking operation name in the configuration file at line "
+                                + str(ConfigChecker.file_index + 1),
+                                False)
+
+        # if operation name start and end marker if found and operation name is not empty
+        if (ConfigChecker.config_file[ConfigChecker.file_index] == "$OPERATION NAME START$" and
+                len(ConfigChecker.config_file[ConfigChecker.file_index+1]) > 1 and
+                ConfigChecker.config_file[ConfigChecker.file_index+2] == "$OPERATION NAME END$"):
+            # get operation name
+            operation_name = ConfigChecker.config_file[ConfigChecker.file_index+1]
+            # check if operation name was already defined in the configuration file
+            ConfigChecker.check_if_same_operation_name(operation_name)
+            # increment file index
+            ConfigChecker.file_index = ConfigChecker.file_index + 3
+            # move to next state
+            ConfigChecker.checker_state = ConfigChecker.CHECK_INPUT_INTERFACE_START
+
+        # or if line contains unexpected data
+        else:
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_OPERATION_NAME, ConfigChecker.file_index + 1, "")
+            # skip part of the configuration file and find next module section
+            ConfigChecker.checker_state = ConfigChecker.SKIP_TO_NEXT_SECTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # Description:
     # This method looks for next valid module section to continue verification of the configuration file,
     # after error was detected in module section.
     @staticmethod
-    def skip_and_find_module_section():
+    def skip_to_next_section():
 
         # record info
         Logger.save_in_log_file("ConfigChecker",
@@ -1147,7 +1235,7 @@ class ConfigChecker(object):
             ConfigChecker.file_index = ConfigChecker.file_index + 1
 
     # Description:
-    # This method checks if given module name was already declared in the configuration file.
+    # This method checks if given module name was already defined in the configuration file.
     @staticmethod
     def check_if_same_module_name(module_name):
 
@@ -1157,6 +1245,7 @@ class ConfigChecker(object):
             if name == module_name:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SAME_MODULE_NAME, module_name, "")
+                print("yes1")
                 # exit 'for name in' loop
                 break
 
@@ -1165,3 +1254,24 @@ class ConfigChecker(object):
 
         # remove duplicates from module name list
         ConfigChecker.module_name_list = list(set(ConfigChecker.module_name_list))
+
+    # Description:
+    # This method checks if given operation name was already defined in the configuration file.
+    @staticmethod
+    def check_if_same_operation_name(operation_name):
+
+        # for all names from operation name list
+        for name in ConfigChecker.operation_name_list:
+            # check if name is same as given operation name
+            if name == operation_name:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_SAME_OPERATION_NAME, operation_name, "")
+                print("yes2")
+                # exit 'for name in' loop
+                break
+
+        # append name to list of operation names
+        ConfigChecker.operation_name_list.append(operation_name)
+
+        # remove duplicates from operation name list
+        ConfigChecker.operation_name_list = list(set(ConfigChecker.operation_name_list))
