@@ -3,11 +3,11 @@
 #   DESCRIPTION:
 #       This is main module of Mod Code Generator (MCG) Converter Component (CC)
 #       and it contains definition of Main class, which uses other MCG CC classes
-#       to convert component and package content from .exml files into configuration
+#       to convert content of model modules from .exml files into configuration
 #       file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           11 NOV 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           19 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,15 +32,11 @@
 
 from sys import argv
 from mcg_cc_file_finder import FileFinder
-from mcg_cc_converter import Converter
+from mcg_cc_file_reader import FileReader
+from mcg_cc_module_sorter import ModuleSorter
+from mcg_cc_module_converter import ModuleConverter
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
-from mcg_cc_component_reader import ComponentReader
-from mcg_cc_component_sorter import ComponentSorter
-from mcg_cc_component_converter import ComponentConverter
-from mcg_cc_package_reader import PackageReader
-from mcg_cc_package_sorter import PackageSorter
-from mcg_cc_package_converter import PackageConverter
 
 
 # Description:
@@ -58,7 +54,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CC version
-    MCG_CC_VERSION = "v0.1.0-alpha"
+    MCG_CC_VERSION = "v0.2.0-in-dev"
 
     # Description:
     # This is main method, which display short notice and start conversion process.
@@ -68,7 +64,7 @@ class Main(object):
         # display short notice
         print()
         print("Mod Code Generator (MCG)")
-        print("Copyright (C) 2021-2022 Kamil Deć github.com/deckamil")
+        print("Copyright (C) 2021-2023 Kamil Deć github.com/deckamil")
         print("This is Converter Component (CC) of Mod Code Generator (MCG)")
         print(Main.MCG_CC_VERSION)
         print()
@@ -88,7 +84,7 @@ class Main(object):
             # set path to model directory
             FileFinder.set_model_dir_path(model_dir_path)
             # set path to configuration file
-            Converter.set_configuration_file_path(output_dir_path)
+            ModuleConverter.set_configuration_file_path(output_dir_path)
             # set path to log file
             Logger.set_log_file_path(output_dir_path)
 
@@ -114,105 +110,49 @@ class Main(object):
         # saves log file header
         Logger.save_log_file_header()
         # saves configuration file header
-        Converter.save_configuration_file_header()
+        ModuleConverter.save_configuration_file_header()
 
-        # process components content from .exml files into configuration file
-        Main.run_component_conversion()
-        # process packages content from .exml files into configuration file
-        Main.run_package_conversion()
+        # flag to distinguish if set of matching .exml files was found for further conversion
+        files_found = True
+
+        # repeat until all model modules are converted into configuration file
+        while files_found:
+
+            # find module files
+            file_finder_list = FileFinder.find_files()
+            # get files flag
+            files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
+
+            # check errors
+            ErrorHandler.check_errors()
+
+            # if files were found
+            if files_found:
+                # initialize file reader
+                file_reader = FileReader(file_finder_list)
+                # read module content
+                file_reader_list = file_reader.read_files()
+
+                # check errors
+                ErrorHandler.check_errors()
+
+                # initialize sorter
+                module_sorter = ModuleSorter(file_reader_list)
+                # sort module content
+                module_sorter_list = module_sorter.sort_module()
+
+                # check errors
+                ErrorHandler.check_errors()
+
+                # initialize converter
+                module_converter = ModuleConverter(file_finder_list, file_reader_list, module_sorter_list)
+                # convert module content
+                module_converter.convert_module()
 
         # saves configuration file footer
-        Converter.save_configuration_file_footer()
+        ModuleConverter.save_configuration_file_footer()
         # saves log file footer
         Logger.save_log_file_footer()
-
-    # Description:
-    # This method is responsible for processing of component content from .exml file
-    # into configuration file.
-    @staticmethod
-    def run_component_conversion():
-
-        # files marker shows whether desired component files were found or not
-        files_found = True
-
-        # repeat until all components are converted into configuration file
-        while files_found:
-
-            # find component files
-            file_finder_list = FileFinder.find_files("Standard.Component")
-            # get files marker
-            files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
-
-            # check errors
-            ErrorHandler.check_errors()
-
-            # if component files were found
-            if files_found:
-
-                # initialize component reader
-                component_reader = ComponentReader(file_finder_list)
-                # read component content
-                component_reader_list = component_reader.read_component()
-
-                # check errors
-                ErrorHandler.check_errors()
-
-                # initialize component sorter
-                component_sorter = ComponentSorter(component_reader_list)
-                # sort component content
-                component_sorter_list = component_sorter.sort_component()
-
-                # check errors
-                ErrorHandler.check_errors()
-
-                # initialize component converter
-                component_converter = ComponentConverter(file_finder_list, component_reader_list, component_sorter_list)
-                # convert component content
-                component_converter.convert_component()
-
-    # Description:
-    # This method is responsible for processing of package content from .exml file
-    # into configuration file.
-    @staticmethod
-    def run_package_conversion():
-
-        # files marker shows whether desired package files were found or not
-        files_found = True
-
-        # repeat until all packages are converted into configuration file
-        while files_found:
-
-            # find package files
-            file_finder_list = FileFinder.find_files("Standard.Package")
-            # get files marker
-            files_found = file_finder_list[FileFinder.FILES_FOUND_INDEX]
-
-            # check errors
-            ErrorHandler.check_errors()
-
-            # if package files were found
-            if files_found:
-
-                # initialize package reader
-                package_reader = PackageReader(file_finder_list)
-                # read package content
-                package_reader_list = package_reader.read_package()
-
-                # check errors
-                ErrorHandler.check_errors()
-
-                # initialize package sorter
-                package_sorter = PackageSorter(package_reader_list)
-                # sort package content
-                package_sorter_list = package_sorter.sort_package()
-
-                # check errors
-                ErrorHandler.check_errors()
-
-                # initialize package converter
-                package_converter = PackageConverter(file_finder_list, package_reader_list, package_sorter_list)
-                # convert package content
-                package_converter.convert_package()
 
 
 # Mod Code Generator (MCG) Converter Component (CC) entrance

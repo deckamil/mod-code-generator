@@ -2,10 +2,10 @@
 #
 #   DESCRIPTION:
 #       This module contains definition of FileFinder class, which is
-#       responsible for finding .exml files, which describe model content.
+#       responsible for finding .exml files, that describe module content.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           13 JUL 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           21 JAN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,403 +29,279 @@
 
 
 from os import listdir
-from mcg_cc_reader import Reader
-from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
+from mcg_cc_supporter import Supporter
 
 
 # Description:
-# This class allows to find .exml files, which describe model content.
-class FileFinder(Reader):
+# This class allows to find .exml files, which describe module content.
+class FileFinder(object):
 
-    # initialize class data
-    activity_dir_path = ""
-    interface_dir_path = ""
-    activity_source_list = []
-    interface_source_list = []
-    component_index = 0
-    package_index = 0
-    number_of_activity_sources = 0
+    # class data
+    activity_source_path_list = []
+    module_source_path_list = []
+    number_of_activity_files = 0
+    number_of_module_files = 0
+    activity_index = 0
+    module_index = 0
 
-    # initialize file finder list data
-    model_element_name = ""
-    activity_source = ""
+    # module and activity finder state
+    module_finder_state = 0
+    activity_finder_state = 0
+    # possible states
+    NO_MORE_FILES = 10
+    FILE_NOT_FOUND = 20
+    FILE_FOUND = 30
+
+    # return data
+    module_file = []
     activity_file = []
-    input_interface_source = ""
-    input_interface_file = []
-    output_interface_source = ""
-    output_interface_file = []
-    local_data_source = ""
-    local_data_file = []
+    module_name = ""
+    module_uid = ""
+    operation_name = ""
+    operation_uid = ""
+    activity_name = ""
+    activity_uid = ""
 
-    # indexes of file finder list
+    # indexes of return data
     FILES_FOUND_INDEX = 0
-    MODEL_ELEMENT_NAME_INDEX = 1
-    ACTIVITY_SOURCE_INDEX = 2
-    ACTIVITY_FILE_INDEX = 3
-    INPUT_INTERFACE_SOURCE_INDEX = 4
-    INPUT_INTERFACE_FILE_INDEX = 5
-    OUTPUT_INTERFACE_SOURCE_INDEX = 6
-    OUTPUT_INTERFACE_FILE_INDEX = 7
-    LOCAL_DATA_SOURCE_INDEX = 8
-    LOCAL_DATA_FILE_INDEX = 9
+    MODULE_FILE_INDEX = 1
+    ACTIVITY_FILE_INDEX = 2
+    MODULE_NAME_INDEX = 3
+    MODULE_UID_INDEX = 4
+    OPERATION_NAME_INDEX = 5
+    OPERATION_UID_INDEX = 6
+    ACTIVITY_NAME_INDEX = 7
+    ACTIVITY_UID_INDEX = 8
 
     # Description:
-    # This method sets path to model directory with .exml files, which describe model content.
+    # This method sets paths to .exml files, that describe model content.
     @staticmethod
     def set_model_dir_path(model_dir_path):
 
         # get activity directory path
-        FileFinder.activity_dir_path = model_dir_path + str("\\Standard.Activity")
-        # get interface directory path
-        FileFinder.interface_dir_path = model_dir_path + str("\\Standard.Interface")
-
+        activity_dir_path = model_dir_path + str("\\Standard.Activity")
         # get list of activity sources, i.e. names of .exml files
-        FileFinder.activity_source_list = listdir(FileFinder.activity_dir_path)
-        # get list of interface sources, i.e. names of .exml files
-        FileFinder.interface_source_list = listdir(FileFinder.interface_dir_path)
+        activity_source_list = listdir(activity_dir_path)
+        # get list of activity source paths
+        for activity_source in activity_source_list:
+            # get activity source path
+            FileFinder.activity_source_path_list.append(activity_dir_path + str("\\") + str(activity_source))
+
+        # get component directory path
+        component_dir_path = model_dir_path + str("\\Standard.Component")
+        # get list of component sources, i.e. names of .exml files
+        component_source_list = listdir(component_dir_path)
+        # get list of component source paths
+        component_source_path_list = []
+        for component_source in component_source_list:
+            # get component source path
+            component_source_path_list.append(component_dir_path + str("\\") + str(component_source))
+
+        # get package directory path
+        package_dir_path = model_dir_path + str("\\Standard.Package")
+        # get list of package sources, i.e. names of .exml files
+        package_source_list = listdir(package_dir_path)
+        # get list of package source paths
+        package_source_path_list = []
+        for package_source in package_source_list:
+            # get package source path
+            package_source_path_list.append(package_dir_path + str("\\") + str(package_source))
+
+        # get list of module source paths
+        FileFinder.module_source_path_list = component_source_path_list + package_source_path_list
 
         # get number of activity .exml files
-        FileFinder.number_of_activity_sources = len(FileFinder.activity_source_list)
+        FileFinder.number_of_activity_files = len(FileFinder.activity_source_path_list)
+
+        # get number of module .exml files
+        FileFinder.number_of_module_files = len(FileFinder.module_source_path_list)
 
     # Description:
-    # This method clears collected data, which represents either component or package element.
+    # This method clears data, that represents module details.
     @staticmethod
-    def clear_collected_data():
+    def clear_return_data():
 
-        # clear collected data
-        FileFinder.model_element_name = ""
-        FileFinder.activity_source = ""
+        # clear return data
+        FileFinder.module_file = []
         FileFinder.activity_file = []
-        FileFinder.input_interface_source = ""
-        FileFinder.input_interface_file = []
-        FileFinder.output_interface_source = ""
-        FileFinder.output_interface_file = []
-        FileFinder.local_data_source = ""
-        FileFinder.local_data_file = []
+        FileFinder.module_name = "UNKNOWN_MODULE_NAME"
+        FileFinder.module_uid = "UNKNOWN_MODULE_UID"
+        FileFinder.operation_name = "UNKNOWN_OPERATION_NAME"
+        FileFinder.operation_uid = "UNKNOWN_OPERATION_UID"
+        FileFinder.activity_name = "UNKNOWN_ACTIVITY_NAME"
+        FileFinder.activity_uid = "UNKNOWN_ACTIVITY_UID"
 
     # Description:
-    # This method checks if content of given interface file represents desired interface element.
+    # This method looks for .exml files, that represent module element with operation definition
     @staticmethod
-    def check_interface_file(model_element_type, interface_type, interface_file):
-
-        # interface marker shows whether interface was found or not
-        interface_found = False
-
-        # search for interface details in interface file
-        for i in range(0, len(interface_file)):
-
-            # if given line contains definition of desired interface type
-            if (interface_type in interface_file[i]) and ("Standard.Interface" in interface_file[i]) and \
-                    (FileFinder.model_element_name in interface_file[i + 1]) and \
-                    (model_element_type in interface_file[i + 1]):
-
-                # change interface marker
-                interface_found = True
-                # exit "for i in range" loop
-                break
-
-        # return interface marker
-        return interface_found
-
-    # Description:
-    # This method looks for content of .exml files, which represent interface elements of either
-    # component or package element.
-    @staticmethod
-    def find_interface_files(model_element_type):
+    def find_module_file():
 
         # record info
-        Logger.save_in_log_file("FileFinder", "Looking for module interface .exml files", False)
+        Logger.save_in_log_file("FileFinder", "Looking for module .exml file", False)
 
-        # interface markers show whether interface was found or not
-        interface_found = False
-        input_interface_found = False
-        output_interface_found = False
-        local_data_found = False
+        # assume that module with operation definition is not found
+        FileFinder.module_finder_state = FileFinder.FILE_NOT_FOUND
 
-        # find input interface element
-        for interface_source in FileFinder.interface_source_list:
-            # get interface file path
-            interface_file_path = FileFinder.interface_dir_path + str("\\") + str(interface_source)
+        # repeat as long as file is not found
+        while FileFinder.module_finder_state == FileFinder.FILE_NOT_FOUND:
 
-            # open file and read content, then close file
-            interface_file_disk = open(interface_file_path, "r")
-            interface_file = interface_file_disk.readlines()
-            interface_file = [line.strip() for line in interface_file]
-            interface_file_disk.close()
-
-            # check interface file
-            input_interface_found = FileFinder.check_interface_file(model_element_type,
-                                                                    "Input Interface",
-                                                                    interface_file)
-
-            # if input interface element has been found
-            if input_interface_found:
-                # set input interface source
-                FileFinder.input_interface_source = interface_source
-                # set input interface file
-                FileFinder.input_interface_file = interface_file
-                # break "for interface_source in" loop
-                break
-
-        # find output interface element
-        for interface_source in FileFinder.interface_source_list:
-            # get interface file path
-            interface_file_path = FileFinder.interface_dir_path + str("\\") + str(interface_source)
-
-            # open file and read content, then close file
-            interface_file_disk = open(interface_file_path, "r")
-            interface_file = interface_file_disk.readlines()
-            interface_file = [line.strip() for line in interface_file]
-            interface_file_disk.close()
-
-            # check interface file
-            output_interface_found = FileFinder.check_interface_file(model_element_type,
-                                                                     "Output Interface",
-                                                                     interface_file)
-
-            # if output interface element has been found
-            if output_interface_found:
-                # set output interface source
-                FileFinder.output_interface_source = interface_source
-                # set output interface file
-                FileFinder.output_interface_file = interface_file
-                # break "for interface_source in" loop
-                break
-
-        # find local data element
-        for interface_source in FileFinder.interface_source_list:
-            # get interface file path
-            interface_file_path = FileFinder.interface_dir_path + str("\\") + str(interface_source)
-
-            # open file and read content, then close file
-            interface_file_disk = open(interface_file_path, "r")
-            interface_file = interface_file_disk.readlines()
-            interface_file = [line.strip() for line in interface_file]
-            interface_file_disk.close()
-
-            # check interface file
-            local_data_found = FileFinder.check_interface_file(model_element_type,
-                                                               "Local Data",
-                                                               interface_file)
-
-            # if local data element has been found
-            if local_data_found:
-                # set local data source
-                FileFinder.local_data_source = interface_source
-                # set local data file
-                FileFinder.local_data_file = interface_file
-                # break "for interface_source in" loop
-                break
-
-        # check if interface files have been found
-        if "Standard.Component" in model_element_type:
-            # if input interface element has not been found
-            if not input_interface_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_INP_INT_IN_COM, "none", "none")
-            # if output interface element has not been found
-            if not output_interface_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_OUT_INT_IN_COM, "none", "none")
-            # if local data element has not been found
-            if not local_data_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_LOC_DAT_IN_COM, "none", "none")
-        else:
-            # if input interface element has not been found
-            if not input_interface_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_INP_INT_IN_PAC, "none", "none")
-            # if output interface element has not been found
-            if not output_interface_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_OUT_INT_IN_PAC, "none", "none")
-            # if local data element has not been found
-            if not local_data_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_NO_LOC_DAT_IN_PAC, "none", "none")
-
-        # if all interface files have been found
-        if input_interface_found and output_interface_found and local_data_found:
-            # change interface marker
-            interface_found = True
-            # record info
-            Logger.save_in_log_file("FileFinder",
-                                    "Have found module input interface " + FileFinder.input_interface_source
-                                    + " file", False)
-            Logger.save_in_log_file("FileFinder",
-                                    "Have found module output interface " + FileFinder.output_interface_source
-                                    + " file", False)
-            Logger.save_in_log_file("FileFinder",
-                                    "Have found module local data " + FileFinder.local_data_source
-                                    + " file", False)
-
-        # return interface marker
-        return interface_found
-
-    # Description:
-    # This method checks if content of activity file represents desired activity element.
-    @staticmethod
-    def check_activity_file(model_element_type, activity_file):
-
-        # activity marker shows whether activity was found or not
-        activity_found = False
-
-        # model element name
-        model_element_name = ""
-
-        # search for activity details in activity file
-        for i in range(0, len(activity_file)):
-
-            # if given line contains definition of activity diagram
-            if ("Standard.Activity" in activity_file[i]) and (model_element_type in activity_file[i + 1]):
-                # change activity marker
-                activity_found = True
-                # get line
-                line = activity_file[i + 1]
-                # get line number
-                line_number = i + 2
-                # get model element name
-                model_element_name = FileFinder.get_name(line, line_number)
-                # exit "for i in range" loop
-                break
-
-        # return activity marker and model element name
-        return activity_found, model_element_name
-
-    # Description:
-    # This method looks for content of .exml file, which represents activity element of either
-    # component or package element.
-    @staticmethod
-    def find_activity_file(model_element_type):
-
-        # record info
-        Logger.save_in_log_file("FileFinder", "Looking for module activity diagram .exml files", False)
-
-        # get source list index
-        if "Standard.Component" in model_element_type:
-            # set activity index to component index
-            activity_index = FileFinder.component_index
-        else:
-            # set activity index to package index
-            activity_index = FileFinder.package_index
-
-        # activity marker shows whether activity was found or not
-        activity_found = False
-
-        # repeat until activity is not found
-        while not activity_found:
-
-            # if all sources have not been read yet
-            if activity_index < FileFinder.number_of_activity_sources:
-
-                # get activity file path
-                activity_file_path = FileFinder.activity_dir_path + str("\\") + \
-                                     str(FileFinder.activity_source_list[activity_index])
-
-                # get activity source
-                activity_source = FileFinder.activity_source_list[activity_index]
-
-                # increment activity index
-                activity_index = activity_index + 1
+            # if all modules have not been checked yet
+            if FileFinder.module_index < FileFinder.number_of_module_files:
+                # get module source path
+                module_source_path = FileFinder.module_source_path_list[FileFinder.module_index]
 
                 # open file and read content, then close file
-                activity_file_disk = open(activity_file_path, "r")
+                module_file_disk = open(module_source_path, "r")
+                module_file = module_file_disk.readlines()
+                module_file = [line.strip() for line in module_file]
+                module_file_disk.close()
+
+                # increment module index
+                FileFinder.module_index = FileFinder.module_index + 1
+
+                # check if module contains operation definition
+                for i in range(0, len(module_file)):
+
+                    # if module name if found
+                    if ("<ID name=" in module_file[i] and
+                            ("mc=\"Standard.Component\"" in module_file[i] or
+                             "mc=\"Standard.Package\"" in module_file[i]) and
+                            "<PID name=" in module_file[i+1]):
+                        # get module name
+                        FileFinder.module_name = Supporter.get_name(module_file[i])
+                        # get module uid
+                        FileFinder.module_uid = Supporter.get_uid(module_file[i])
+
+                    # if operation is defined in module
+                    if "<COMP relation=\"OwnedOperation\">" in module_file[i]:
+                        # store module file
+                        FileFinder.module_file = module_file
+                        # get operation name
+                        FileFinder.operation_name = Supporter.get_name(module_file[i+2])
+                        # set module finder state
+                        FileFinder.module_finder_state = FileFinder.FILE_FOUND
+                        # record info
+                        Logger.save_in_log_file("FileFinder",
+                                                "Have found module " + FileFinder.module_name + " "
+                                                + FileFinder.module_uid + ".exml file", False)
+                        # exit 'for i in range' loop
+                        break
+
+            else:
+                # all modules have been checked already
+                FileFinder.module_finder_state = FileFinder.NO_MORE_FILES
+                # record info
+                Logger.save_in_log_file("FileFinder", "No further .exml files have been found", False)
+
+    # Description:
+    # This method looks for .exml files, that represent activity element for module operation
+    @staticmethod
+    def find_activity_file():
+
+        # record info
+        Logger.save_in_log_file("FileFinder", "Looking for activity .exml file", False)
+
+        # assume that activity for module operation is not found
+        FileFinder.activity_finder_state = FileFinder.FILE_NOT_FOUND
+
+        # reset activity index
+        FileFinder.activity_index = 0
+
+        # repeat as long as file is not found
+        while FileFinder.activity_finder_state == FileFinder.FILE_NOT_FOUND:
+
+            # if all activities have not been checked yet
+            if FileFinder.activity_index < FileFinder.number_of_activity_files:
+                # get activity source path
+                activity_source_path = FileFinder.activity_source_path_list[FileFinder.activity_index]
+
+                # open file and read content, then close file
+                activity_file_disk = open(activity_source_path, "r")
                 activity_file = activity_file_disk.readlines()
                 activity_file = [line.strip() for line in activity_file]
                 activity_file_disk.close()
 
-                # check activity file
-                activity_found, model_element_name = FileFinder.check_activity_file(model_element_type,
-                                                                                    activity_file)
+                # increment activity index
+                FileFinder.activity_index = FileFinder.activity_index + 1
 
-                # if activity has been found
-                if activity_found:
-                    # set model element name
-                    FileFinder.model_element_name = model_element_name
-                    # set activity source
-                    FileFinder.activity_source = activity_source
-                    # set activity file
-                    FileFinder.activity_file = activity_file
-                    # record info
-                    Logger.save_in_log_file("FileFinder",
-                                            "Have found module " + FileFinder.model_element_name + " "
-                                            + FileFinder.activity_source + " file", False)
+                # check if activity file belongs to module with operation
+                for i in range(0, len(activity_file)):
 
-            # else if end of source list is reached
+                    # if activity name if found
+                    if ("<ID name=" in activity_file[i] and "mc=\"Standard.Activity\"" in activity_file[i] and
+                            "<PID name=" in activity_file[i + 1] and
+                            ("mc=\"Standard.Component\"" in activity_file[i+1] or
+                             "mc=\"Standard.Package\"" in activity_file[i+1])):
+                        # get activity name
+                        FileFinder.activity_name = Supporter.get_name(activity_file[i])
+                        # get activity uid
+                        FileFinder.activity_uid = Supporter.get_uid(activity_file[i])
+                        # get parent module name
+                        parent_module_name = Supporter.get_name(activity_file[i+1])
+                        # get parent module uid
+                        parent_module_uid = Supporter.get_uid(activity_file[i+1])
+                        # if there is name and uid compatibility
+                        if FileFinder.module_name == parent_module_name and FileFinder.module_uid == parent_module_uid:
+                            # store activity file
+                            FileFinder.activity_file = activity_file
+                            # set activity finder state
+                            FileFinder.activity_finder_state = FileFinder.FILE_FOUND
+                            # record info
+                            Logger.save_in_log_file("FileFinder",
+                                                    "Have found activity " + FileFinder.activity_name + " "
+                                                    + FileFinder.activity_uid + ".exml file", False)
+                            # exit 'for i in range' loop
+                            break
             else:
-                # exit "while not activity_found" loop
-                break
-
-        # set source list index
-        if "Standard.Component" in model_element_type:
-            # set component index to activity index
-            FileFinder.component_index = activity_index
-        else:
-            # set package index to activity index
-            FileFinder.package_index = activity_index
-
-        # return activity marker
-        return activity_found
+                # all activities have been checked already
+                FileFinder.activity_finder_state = FileFinder.NO_MORE_FILES
+                # record info
+                Logger.save_in_log_file("FileFinder", "No further .exml files have been found", False)
 
     # Description:
     # This method looks for set of .exml files, which describe entire content of one model element
     # (either component or package element), i.e. activity diagram and related interface elements.
     @staticmethod
-    def find_files(model_element_type):
-
-        # markers shows whether desired elements were found or not
-        files_found = False
-        activity_found = False
-        interface_found = False
-
-        # clear collected data
-        FileFinder.clear_collected_data()
+    def find_files():
 
         # record info
         Logger.save_in_log_file("FileFinder", "Searching for set of .exml files that describe module details", True)
 
-        # if model element type is correct
-        if ("Standard.Component" in model_element_type) or ("Standard.Package" in model_element_type):
+        # clear data before search
+        FileFinder.clear_return_data()
 
+        # find module file
+        FileFinder.find_module_file()
+
+        # only when module file has been found
+        if FileFinder.module_finder_state == FileFinder.FILE_FOUND:
             # find activity file
-            activity_found = FileFinder.find_activity_file(model_element_type)
+            FileFinder.find_activity_file()
 
-            # find interface files
-            if activity_found:
-                interface_found = FileFinder.find_interface_files(model_element_type)
-
-        # else display warning notification
-        else:
-            print()
-            print("Unknown model element type in FileFinder.find_next_file_set() function: " + str(model_element_type))
-            print()
-
-        # check activity and interface markers
-        if activity_found and interface_found:
-            # change files marker
+        # if module and activity files have been found
+        if (FileFinder.module_finder_state == FileFinder.FILE_FOUND and
+                FileFinder.activity_finder_state == FileFinder.FILE_FOUND):
+            # set positive flag
             files_found = True
 
         else:
-            # clear once again collected data before return
-            FileFinder.clear_collected_data()
-
-            # record info
-            Logger.save_in_log_file("FileFinder", "No further .exml files have been found", False)
+            # set negative flag
+            files_found = False
+            # clear again data before return
+            FileFinder.clear_return_data()
 
         # append collected data to file finder list
         file_finder_list = []
         file_finder_list.insert(FileFinder.FILES_FOUND_INDEX, files_found)
-        file_finder_list.insert(FileFinder.MODEL_ELEMENT_NAME_INDEX, FileFinder.model_element_name)
-        file_finder_list.insert(FileFinder.ACTIVITY_SOURCE_INDEX, FileFinder.activity_source)
+        file_finder_list.insert(FileFinder.MODULE_FILE_INDEX, FileFinder.module_file)
         file_finder_list.insert(FileFinder.ACTIVITY_FILE_INDEX, FileFinder.activity_file)
-        file_finder_list.insert(FileFinder.INPUT_INTERFACE_SOURCE_INDEX, FileFinder.input_interface_source)
-        file_finder_list.insert(FileFinder.INPUT_INTERFACE_FILE_INDEX, FileFinder.input_interface_file)
-        file_finder_list.insert(FileFinder.OUTPUT_INTERFACE_SOURCE_INDEX, FileFinder.output_interface_source)
-        file_finder_list.insert(FileFinder.OUTPUT_INTERFACE_FILE_INDEX, FileFinder.output_interface_file)
-        file_finder_list.insert(FileFinder.LOCAL_DATA_SOURCE_INDEX, FileFinder.local_data_source)
-        file_finder_list.insert(FileFinder.LOCAL_DATA_FILE_INDEX, FileFinder.local_data_file)
+        file_finder_list.insert(FileFinder.MODULE_NAME_INDEX, FileFinder.module_name)
+        file_finder_list.insert(FileFinder.MODULE_UID_INDEX, FileFinder.module_uid)
+        file_finder_list.insert(FileFinder.OPERATION_NAME_INDEX, FileFinder.operation_name)
+        file_finder_list.insert(FileFinder.OPERATION_UID_INDEX, FileFinder.operation_uid)
+        file_finder_list.insert(FileFinder.ACTIVITY_NAME_INDEX, FileFinder.activity_name)
+        file_finder_list.insert(FileFinder.ACTIVITY_UID_INDEX, FileFinder.activity_uid)
 
         # return file finder list
         return file_finder_list

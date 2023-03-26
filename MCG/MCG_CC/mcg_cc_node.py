@@ -1,12 +1,11 @@
 #   FILE:           mcg_cc_node.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Node class, which stores together all
-#       details of model node form activity diagram, i.e. node inputs, node
-#       interaction and node output.
+#       This module contains definition of Node class, which represents node on
+#       activity diagram, i.e. interaction together with its input and output data.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 JUL 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           25 MAR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,32 +29,88 @@
 
 
 # Description:
-# This class represents model module node.
+# This class represents node on activity diagram, i.e. interaction together with its input and output data.
 class Node(object):
+
+    # indexes of interface element list
+    DATA_NAME_INDEX = 0
+    PIN_NAME_INDEX = 1
+
+    # interaction types
+    UNKNOWN = 10
+    DATA = 30
+    ACTION = 40
+    OPERATION = 50
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        self.node_input_list = []
-        self.node_interaction = ""
-        self.node_output = ""
+        self.input_data_list = []
+        self.name = "N/A"
+        self.uid = "N/A"
+        self.type = Node.UNKNOWN
+        self.output_data_list = []
 
     # Description:
-    # This method returns string representation of model module node.
+    # This method returns string representation of Node class.
     def __str__(self):
         # append input marker
         line = "$INPUTS$: "
 
-        # append input data
-        for node_input in self.node_input_list:
-            line = line + node_input + " "
+        # if node is operation type
+        if self.type == Node.OPERATION:
 
-        # append interaction marker and data
-        line = line + "$INTERACTION$: " + self.node_interaction + " "
+            # append input data
+            for input_data in self.input_data_list:
+                line = line + input_data[Node.DATA_NAME_INDEX] + \
+                       "->" + input_data[Node.PIN_NAME_INDEX] + " "
 
-        # append output marker and data
-        line = line + "$OUTPUT$: " + self.node_output
+            # append interaction name and uid
+            line = line + "$INTERACTION$: " + self.name + "() " + self.uid + " "
+
+            # append output marker and data
+            line = line + "$OUTPUT$: "
+
+            # append output data
+            for output_data in self.output_data_list:
+                line = line + output_data[Node.PIN_NAME_INDEX] + \
+                       "->" + output_data[Node.DATA_NAME_INDEX] + " "
+
+            # remove spare whitespace
+            line = line[0:len(line)-1]
+
+        # if node is action type
+        elif self.type == Node.ACTION:
+
+            # append input data
+            for input_data in self.input_data_list:
+                line = line + input_data[Node.DATA_NAME_INDEX] + " "
+
+            # append interaction name and uid
+            line = line + "$INTERACTION$: " + self.name + " " + self.uid + " "
+
+            # get output data
+            output_data = self.output_data_list[0]
+
+            # append output marker and data
+            line = line + "$OUTPUT$: " + output_data[Node.DATA_NAME_INDEX]
+
+        # if there is no interaction, but only connection between two data points
+        else:
+
+            # append input data
+            for input_data in self.input_data_list:
+                line = line + input_data[Node.DATA_NAME_INDEX] + " "
+
+            # append interaction name
+            line = line + "$INTERACTION$: ASSIGNMENT "
+
+            # get output data
+            output_data = self.output_data_list[0]
+
+            # append output marker and data
+            line = line + "$OUTPUT$: " + output_data[Node.DATA_NAME_INDEX]
 
         # return string representation
         return line
