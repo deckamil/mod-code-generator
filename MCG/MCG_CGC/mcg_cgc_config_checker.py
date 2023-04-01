@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           26 MAR 2023
+#   DATE:           1 APR 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -72,8 +72,8 @@ class ConfigChecker(object):
     CHECK_OUTPUT_INTERFACE = 306
     CHECK_LOCAL_INTERFACE_START = 307
     CHECK_LOCAL_INTERFACE = 308
-    CHECK_BODY_START = 309
-    CHECK_BODY = 310
+    CHECK_MODULE_BODY_START = 309
+    CHECK_MODULE_BODY = 310
     SKIP_TO_NEXT_SECTION = 40
     CHECK_FOOTER = 50
     END_CHECKING = 60
@@ -172,9 +172,18 @@ class ConfigChecker(object):
             elif ConfigChecker.checker_state == ConfigChecker.CHECK_OPERATION_NAME:
                 ConfigChecker.check_operation_name()
 
-            # check input interface
+            # check interface
             elif (ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE_START or
-                  ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE):
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE or
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_OUTPUT_INTERFACE_START or
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_OUTPUT_INTERFACE or
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_LOCAL_INTERFACE_START or
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_LOCAL_INTERFACE):
+                ConfigChecker.check_interface()
+
+            # check module body
+            elif (ConfigChecker.checker_state == ConfigChecker.CHECK_MODULE_BODY_START or
+                  ConfigChecker.checker_state == ConfigChecker.CHECK_MODULE_BODY):
                 ConfigChecker.skip_to_next_section()
 
             # skip current part of module section and find next one
@@ -318,29 +327,106 @@ class ConfigChecker(object):
             # skip part of the configuration file and find next module section
             ConfigChecker.checker_state = ConfigChecker.SKIP_TO_NEXT_SECTION
 
+    # Description:
+    # This method checks correctness of input, output or local interface section in the configuration file.
+    @staticmethod
+    def check_interface():
 
+        # method setup depending on checker state
+        if ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE_START:
+            marker = "$INPUT "
+            info = "input"
+            error_code = ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE
+            next_state = ConfigChecker.CHECK_INPUT_INTERFACE
 
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE:
+            marker = "$INPUT "
+            info = "input"
+            error_code = ErrorHandler.CHK_ERR_FAULTY_INPUT_INTERFACE
+            next_state = ConfigChecker.CHECK_OUTPUT_INTERFACE_START
 
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_OUTPUT_INTERFACE_START:
+            marker = "$OUTPUT "
+            info = "output"
+            error_code = ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE
+            next_state = ConfigChecker.CHECK_OUTPUT_INTERFACE
 
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_OUTPUT_INTERFACE:
+            marker = "$OUTPUT "
+            info = "output"
+            error_code = ErrorHandler.CHK_ERR_FAULTY_OUTPUT_INTERFACE
+            next_state = ConfigChecker.CHECK_LOCAL_INTERFACE_START
 
+        elif ConfigChecker.checker_state == ConfigChecker.CHECK_LOCAL_INTERFACE_START:
+            marker = "$LOCAL "
+            info = "local"
+            error_code = ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE
+            next_state = ConfigChecker.CHECK_LOCAL_INTERFACE
 
+        else:
+            marker = "$LOCAL "
+            info = "local"
+            error_code = ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE
+            next_state = ConfigChecker.CHECK_MODULE_BODY_START
 
+        # record info
+        Logger.save_in_log_file("ConfigChecker",
+                                "Checking " + info + " interface in the configuration file at line "
+                                + str(ConfigChecker.file_index + 1),
+                                False)
 
+        # for interface start check
+        if (ConfigChecker.checker_state == ConfigChecker.CHECK_INPUT_INTERFACE_START or
+                ConfigChecker.checker_state == ConfigChecker.CHECK_OUTPUT_INTERFACE_START or
+                ConfigChecker.checker_state == ConfigChecker.CHECK_LOCAL_INTERFACE_START):
 
+            # if interface start marker is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == str(marker + "INTERFACE START$"):
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.checker_state = next_state
 
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(error_code, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.checker_state = ConfigChecker.SKIP_TO_NEXT_SECTION
 
+        # otherwise for interface check
+        else:
 
+            # if type and name in input interface is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.INTERFACE_TYPE_MARKER_POSITION_IN_CFG) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.INTERFACE_NAME_MARKER_POSITION_IN_CFG):
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
 
+            # or if interface end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == str(marker + "INTERFACE END$"):
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
+                # move to next state
+                ConfigChecker.checker_state = next_state
 
-
-
-
-
-
-
-
-
-
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(error_code, ConfigChecker.file_index + 1, "")
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.checker_state = ConfigChecker.SKIP_TO_NEXT_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
 
     # Description:
     # This method looks for next valid module section to continue verification of the configuration file,
