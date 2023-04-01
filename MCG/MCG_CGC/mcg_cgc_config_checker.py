@@ -4,7 +4,7 @@
 #       This module contains definition of ConfigChecker class, which is
 #       responsible for verification of the configuration file data.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
+#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
 #   DATE:           1 APR 2023
 #
 #   LICENSE:
@@ -62,8 +62,8 @@ class ConfigChecker(object):
     checker_state = ""
 
     # possible checker states
-    CHECK_HEADER = 10
-    FIND_NEW_MODULE = 20
+    CHECK_HEADER = 100
+    FIND_NEW_MODULE = 200
     CHECK_MODULE_NAME = 301
     CHECK_OPERATION_NAME = 302
     CHECK_INPUT_INTERFACE_START = 303
@@ -74,35 +74,10 @@ class ConfigChecker(object):
     CHECK_LOCAL_INTERFACE = 308
     CHECK_MODULE_BODY_START = 309
     CHECK_MODULE_BODY = 310
-    SKIP_TO_NEXT_SECTION = 40
-    CHECK_FOOTER = 50
-    END_CHECKING = 60
-
-    # possible component verification states
-    CHECK_COMPONENT_SOURCE = 101
-    CHECK_COMPONENT_NAME = 102
-    CHECK_COMPONENT_INPUT_INTERFACE_START = 103
-    CHECK_COMPONENT_INPUT_INTERFACE = 104
-    CHECK_COMPONENT_OUTPUT_INTERFACE_START = 105
-    CHECK_COMPONENT_OUTPUT_INTERFACE = 106
-    CHECK_COMPONENT_LOCAL_DATA_START = 107
-    CHECK_COMPONENT_LOCAL_DATA = 108
-    CHECK_COMPONENT_BODY_START = 109
-    CHECK_COMPONENT_BODY = 110
-    CHECK_COMPONENT_END = 111
-
-    # possible package verification states
-    CHECK_PACKAGE_SOURCE = 201
-    CHECK_PACKAGE_NAME = 202
-    CHECK_PACKAGE_INPUT_INTERFACE_START = 203
-    CHECK_PACKAGE_INPUT_INTERFACE = 204
-    CHECK_PACKAGE_OUTPUT_INTERFACE_START = 205
-    CHECK_PACKAGE_OUTPUT_INTERFACE = 206
-    CHECK_PACKAGE_LOCAL_DATA_START = 207
-    CHECK_PACKAGE_LOCAL_DATA = 208
-    CHECK_PACKAGE_BODY_START = 209
-    CHECK_PACKAGE_BODY = 210
-    CHECK_PACKAGE_END = 211
+    CHECK_MODULE_END = 311
+    SKIP_TO_NEXT_SECTION = 400
+    CHECK_FOOTER = 500
+    END_CHECKING = 600
 
     # Description:
     # This method sets path to the configuration file.
@@ -184,6 +159,12 @@ class ConfigChecker(object):
             # check module body
             elif (ConfigChecker.checker_state == ConfigChecker.CHECK_MODULE_BODY_START or
                   ConfigChecker.checker_state == ConfigChecker.CHECK_MODULE_BODY):
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                ConfigChecker.skip_to_next_section()
+
+            # check module end
+            elif ConfigChecker.checker_state == ConfigChecker.CHECK_MODULE_END:
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
                 ConfigChecker.skip_to_next_section()
 
             # skip current part of module section and find next one
@@ -460,137 +441,35 @@ class ConfigChecker(object):
                 # end configuration check
                 ConfigChecker.checker_state = ConfigChecker.END_CHECKING
 
-            # when component start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT START":
-                # increment file index
-                temporary_file_index = temporary_file_index + 1
+            # when module name is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$MODULE NAME START$":
                 # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
+                ConfigChecker.checker_state = ConfigChecker.CHECK_MODULE_NAME
 
-            # when component source if found
-            elif ConfigChecker.config_file[temporary_file_index].find("COMPONENT SOURCE") == \
-                    ConfigChecker.MODULE_SOURCE_MARKER_POSITION_IN_CFG:
+            # when operation name is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$OPERATION NAME START$":
                 # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_SOURCE
+                ConfigChecker.checker_state = ConfigChecker.CHECK_OPERATION_NAME
 
-            # when component name is found
-            elif (ConfigChecker.config_file[temporary_file_index].find("COMPONENT NAME ") ==
-                  ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
-                    (len(ConfigChecker.config_file[temporary_file_index]) >=
-                     ConfigChecker.MIN_COMPONENT_NAME_LINE_LENGTH_IN_CFG):
+            # when input interface is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$INPUT INTERFACE START$":
                 # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_NAME
+                ConfigChecker.checker_state = ConfigChecker.CHECK_INPUT_INTERFACE_START
 
-            # when component input interface start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT INPUT INTERFACE START":
+            # when output interface is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$OUTPUT INTERFACE START$":
                 # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE_START
+                ConfigChecker.checker_state = ConfigChecker.CHECK_OUTPUT_INTERFACE_START
 
-            # when component input interface end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT INPUT INTERFACE END":
+            # when local interface is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$LOCAL INTERFACE START$":
                 # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_INPUT_INTERFACE
+                ConfigChecker.checker_state = ConfigChecker.CHECK_LOCAL_INTERFACE_START
 
-            # when component output interface start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT OUTPUT INTERFACE START":
+            # when module body is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$MODULE BODY START$":
                 # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE_START
-
-            # when component output interface end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT OUTPUT INTERFACE END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_OUTPUT_INTERFACE
-
-            # when component local data start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT LOCAL DATA START":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA_START
-
-            # when component local data end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT LOCAL DATA END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_LOCAL_DATA
-
-            # when component body start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT BODY START":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_BODY_START
-
-            # when component body end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT BODY END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_BODY
-
-            # when component end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "COMPONENT END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_COMPONENT_END
-
-            # when package start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE START":
-                # increment file index
-                temporary_file_index = temporary_file_index + 1
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
-
-            # when package source if found
-            elif ConfigChecker.config_file[temporary_file_index].find("PACKAGE SOURCE") == \
-                    ConfigChecker.MODULE_SOURCE_MARKER_POSITION_IN_CFG:
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_SOURCE
-
-            # when package name is found
-            elif (ConfigChecker.config_file[temporary_file_index].find("PACKAGE NAME ") ==
-                  ConfigChecker.MODULE_NAME_MARKER_POSITION_IN_CFG) and \
-                    (len(ConfigChecker.config_file[temporary_file_index]) >=
-                     ConfigChecker.MIN_PACKAGE_NAME_LINE_LENGTH_IN_CFG):
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_NAME
-
-            # when package input interface start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE INPUT INTERFACE START":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE_START
-
-            # when package input interface end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE INPUT INTERFACE END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_INPUT_INTERFACE
-
-            # when package output interface start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE OUTPUT INTERFACE START":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE_START
-
-            # when package output interface end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE OUTPUT INTERFACE END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_OUTPUT_INTERFACE
-
-            # when package local data start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE LOCAL DATA START":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_LOCAL_DATA_START
-
-            # when package local data end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE LOCAL DATA END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_LOCAL_DATA
-
-            # when package body start is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE BODY START":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_BODY_START
-
-            # when package body end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE BODY END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_BODY
-
-            # when package end is found
-            elif ConfigChecker.config_file[temporary_file_index] == "PACKAGE END":
-                # move to expected state
-                ConfigChecker.checker_state = ConfigChecker.CHECK_PACKAGE_END
+                ConfigChecker.checker_state = ConfigChecker.CHECK_MODULE_BODY_START
 
             # when config end marker is found
             elif "MCG CGC CONFIG END" in ConfigChecker.config_file[temporary_file_index]:
