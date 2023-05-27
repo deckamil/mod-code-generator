@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           26 MAY 2023
+#   DATE:           27 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -640,7 +640,6 @@ class ConfigChecker(object):
             if name == module_name:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SAME_MODULE_NAME, module_name, "")
-                print("yes1")
                 # exit 'for name in' loop
                 break
 
@@ -661,7 +660,6 @@ class ConfigChecker(object):
             if name == operation_name:
                 # record error
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_SAME_OPERATION_NAME, operation_name, "")
-                print("yes2")
                 # exit 'for name in' loop
                 break
 

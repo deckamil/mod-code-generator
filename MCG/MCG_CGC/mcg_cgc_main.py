@@ -5,8 +5,8 @@
 #       and it contains definition of Main class, which uses other MCG CGC classes
 #       to generate C code from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           26 MAR 2023
+#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
+#   DATE:           27 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -118,11 +118,11 @@ class Main(object):
         ErrorHandler.check_errors()
 
         # get content of the configuration file
-        # config_file = ConfigChecker.get_config_file()
+        config_file = ConfigChecker.get_config_file()
         # generate code from the configuration file
-        # ConfigConverter.generate_code_from_config_file(config_file)
+        ConfigConverter.generate_code_from_config_file(config_file)
         # check errors
-        # ErrorHandler.check_errors()
+        ErrorHandler.check_errors()
 
         # save log file footer
         Logger.save_log_file_footer()

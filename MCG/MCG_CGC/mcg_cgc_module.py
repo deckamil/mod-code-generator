@@ -4,8 +4,8 @@
 #       This module contains definition of Module class, which represents module
 #       source code and module header to be generated from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2022
+#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
+#   DATE:           27 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -46,12 +46,13 @@ class Module(object):
     def __init__(self):
         # initialize object data
         self.module_name = ""
+        self.operation_name = ""
         self.generation_date = ""
         self.header_comment_list = []
         self.include_list = []
         self.input_interface_list = []
         self.output_interface_list = []
-        self.local_data_list = []
+        self.local_interface_list = []
         self.module_body_list = []
 
     # Description:
@@ -84,6 +85,9 @@ class Module(object):
         module = module + "#include \"" + self.module_name + ".h\"\n"
         module = module + "#include \"basic_data_types.h\"\n"
 
+        # remove duplicates from include list
+        self.include_list = list(dict.fromkeys(self.include_list))
+
         # append additional includes
         for include in self.include_list:
             module = module + "#include \"" + include + "\"\n"
@@ -97,66 +101,62 @@ class Module(object):
         module = module + "// This is definition of module function\n"
 
         # set return type
-        module = module + self.module_name + "_output_type "
+        module = module + "void "
         # set function name
-        module = module + self.module_name
+        module = module + self.operation_name
         # set function argument
-        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input) {\n\n"
+        module = module + "(" + \
+                 self.operation_name + "_input_type *" + self.operation_name + "_input," + \
+                 self.operation_name + "_output_type *" + self.operation_name + "_output) {\n\n"
 
         # ********** FUNCTION INTERFACE ********** #
 
         # set input interface comment
-        module = module + self.indent + "// Input Interface\n"
+        module = module + self.indent + "// Input interface\n"
 
         # append input interface
         for input_interface in self.input_interface_list:
             module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
-                     + self.module_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+                     + self.operation_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
         # set local data comment
-        module = module + self.indent + "// Local Data\n"
+        module = module + self.indent + "// Local interface\n"
 
-        # append local data
-        for local_data in self.local_data_list:
-            module = module + self.indent + local_data[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + local_data[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+        # append local interface
+        for local_interface in self.local_interface_list:
+            module = module + self.indent + local_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
+                     + local_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
         # set output interface comment
-        module = module + self.indent + "// Output Interface\n"
+        module = module + self.indent + "// Output interface\n"
 
         # append output interface
         for output_interface in self.output_interface_list:
             module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
-        module = module + self.indent + self.module_name + "_output_type " + self.module_name + "_output;\n"
         module = module + "\n"
 
         # ********** FUNCTION BODY ********** #
 
-        # distinguish if first line of function body was added or not to module content
-        first_body_line_added = False
+        # set operation body comment
+        module = module + self.indent + "// Function body\n"
 
         # append function body
         for module_body in self.module_body_list:
 
-            # if first line was added and current line contains comment
-            if first_body_line_added and "// " in module_body:
-                # add new line separation before comment
-                module = module + "\n" + self.indent + module_body + ";\n"
+            # if new line command is found
+            if module_body == "$NEW_LINE$":
+                # add new line separation
+                module = module + "\n"
             else:
                 # add new body line
                 module = module + self.indent + module_body + ";\n"
-
-            # first body line was added
-            first_body_line_added = True
-
-        module = module + "\n"
 
         # ********** COLLECT OUTPUT DATA ********** #
 
@@ -165,17 +165,11 @@ class Module(object):
 
         # collect output data into output data structure
         for output_interface in self.output_interface_list:
-            module = module + self.indent + self.module_name + "_output." + \
+            module = module + self.indent + self.operation_name + "_output->" + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
-
-        # set comment
-        module = module + self.indent + "// Return output data\n"
-
-        # set return
-        module = module + self.indent + "return " + self.module_name + "_output;\n"
 
         # ********** FUNCTION END ********** #
 
@@ -238,7 +232,7 @@ class Module(object):
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         # set input interface type name
-        module = module + "} " + self.module_name + "_input_type;\n\n"
+        module = module + "} " + self.operation_name + "_input_type;\n\n"
 
         # ********** OUTPUT INTERFACE TYPE ********** #
 
@@ -254,7 +248,7 @@ class Module(object):
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         # set output interface type name
-        module = module + "} " + self.module_name + "_output_type;\n\n"
+        module = module + "} " + self.operation_name + "_output_type;\n\n"
 
         # ********** FUNCTION PROTOTYPE ********** #
 
@@ -262,11 +256,13 @@ class Module(object):
         module = module + "// This is prototype of module function\n"
 
         # set return type
-        module = module + self.module_name + "_output_type "
+        module = module + "void "
         # set function name
-        module = module + self.module_name
+        module = module + self.operation_name
         # set function argument
-        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input);\n\n"
+        module = module + "(" + \
+                 self.operation_name + "_input_type *" + self.operation_name + "_input," + \
+                 self.operation_name + "_output_type *" + self.operation_name + "_output);\n\n"
 
         # ********** HEADER GUARD END ********** #
 
