@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           27 MAY 2023
+#   DATE:           28 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -53,7 +53,7 @@ class Module(object):
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_interface_list = []
-        self.module_body_list = []
+        self.operation_body_list = []
 
     # Description:
     # This method returns string representation of module source file.
@@ -144,19 +144,19 @@ class Module(object):
 
         # ********** FUNCTION BODY ********** #
 
-        # set operation body comment
+        # set function body comment
         module = module + self.indent + "// Function body\n"
 
         # append function body
-        for module_body in self.module_body_list:
+        for operation_body in self.operation_body_list:
 
             # if new line command is found
-            if module_body == "$NEW_LINE$":
+            if operation_body == "$NEW_LINE$":
                 # add new line separation
                 module = module + "\n"
             else:
                 # add new body line
-                module = module + self.indent + module_body + ";\n"
+                module = module + self.indent + operation_body + ";\n"
 
         # ********** COLLECT OUTPUT DATA ********** #
 

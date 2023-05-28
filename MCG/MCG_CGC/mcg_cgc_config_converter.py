@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           27 MAY 2023
+#   DATE:           28 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -134,7 +134,7 @@ class ConfigConverter(object):
                 # set operation name
                 module.operation_name = operation_name
 
-            # when module input interface is found
+            # when operation input interface is found
             elif config_file[file_index] == "$INPUT INTERFACE START$":
 
                 # increment file index to definition of first input interface element
@@ -144,7 +144,7 @@ class ConfigConverter(object):
                 while config_file[file_index] != "$INPUT INTERFACE END$":
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module input interface from line " + str(file_index + 1),
+                                            "Reading operation input interface from line " + str(file_index + 1),
                                             False)
                     # get line
                     line = config_file[file_index]
@@ -155,7 +155,7 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when module output interface is found
+            # when operation output interface is found
             elif config_file[file_index] == "$OUTPUT INTERFACE START$":
 
                 # increment file index to definition of first output interface element
@@ -165,7 +165,7 @@ class ConfigConverter(object):
                 while config_file[file_index] != "$OUTPUT INTERFACE END$":
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module output interface from line " + str(file_index + 1),
+                                            "Reading operation output interface from line " + str(file_index + 1),
                                             False)
                     # get line
                     line = config_file[file_index]
@@ -176,7 +176,7 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when module local interface is found
+            # when operation local interface is found
             elif config_file[file_index] == "$LOCAL INTERFACE START$":
 
                 # increment file index to definition of first local interface element
@@ -186,7 +186,7 @@ class ConfigConverter(object):
                 while config_file[file_index] != "$LOCAL INTERFACE END$":
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module local interface from line " + str(file_index + 1),
+                                            "Reading operation local interface from line " + str(file_index + 1),
                                             False)
                     # get line
                     line = config_file[file_index]
@@ -197,8 +197,8 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when component body is found
-            elif config_file[file_index] == "$MODULE BODY START$":
+            # when operation body is found
+            elif config_file[file_index] == "$OPERATION BODY START$":
 
                 # increment file index to definition of first body element
                 file_index = file_index + 1
@@ -207,11 +207,11 @@ class ConfigConverter(object):
                 operation_name = ""
 
                 # continue reading of body elements until end of body section is reached
-                while config_file[file_index] != "$MODULE BODY END$":
+                while config_file[file_index] != "$OPERATION BODY END$":
 
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module body from line " + str(file_index + 1),
+                                            "Reading operation body from line " + str(file_index + 1),
                                             False)
 
                     # get line
@@ -222,9 +222,9 @@ class ConfigConverter(object):
                         # get instruction
                         instruction = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
                         # append instruction
-                        module.module_body_list.append(instruction)
+                        module.operation_body_list.append(instruction)
                         # append new line command
-                        module.module_body_list.append("$NEW_LINE$")
+                        module.operation_body_list.append("$NEW_LINE$")
 
                     # if body line contains operation call
                     elif "$OPE " in line:
@@ -240,9 +240,9 @@ class ConfigConverter(object):
                                                            ".h")
 
                         # append operation input interface instance to instructions
-                        module.module_body_list.append(operation_name + "_input_type " + operation_name + "_input")
+                        module.operation_body_list.append(operation_name + "_input_type " + operation_name + "_input")
                         # append operation output interface instance to instructions
-                        module.module_body_list.append(operation_name + "_output_type " + operation_name + "_output")
+                        module.operation_body_list.append(operation_name + "_output_type " + operation_name + "_output")
 
                     # if body line contains input interface write
                     elif "$INP " in line:
@@ -252,13 +252,13 @@ class ConfigConverter(object):
                         # split to input data and pin
                         input_data, input_pin = input_interface_link.split("->")
                         # append operation input interface write to instruction
-                        module.module_body_list.append(operation_name + "_input." + input_pin + " = " + input_data)
+                        module.operation_body_list.append(operation_name + "_input." + input_pin + " = " + input_data)
 
                         # if that was last input interface write for given operation call
                         if "$INP " not in config_file[file_index+1]:
                             # append operation instruction to instruction
-                            module.module_body_list.append(operation_name + "(&" + operation_name + "_input,&" +
-                                                           operation_name + "_output)")
+                            module.operation_body_list.append(operation_name + "(&" + operation_name + "_input,&" +
+                                                              operation_name + "_output)")
 
                     # if body line contains output interface read
                     elif "$OUT " in line:
@@ -268,12 +268,12 @@ class ConfigConverter(object):
                         # split to output pin and data
                         output_pin, output_data = output_interface_link.split("->")
                         # append operation output interface read to instruction
-                        module.module_body_list.append(output_data + " = " + operation_name + "_output." + output_pin)
+                        module.operation_body_list.append(output_data + " = " + operation_name + "_output." + output_pin)
 
                         # if that was last output interface read for given operation call
                         if "$OUT " not in config_file[file_index + 1]:
                             # append new line command
-                            module.module_body_list.append("$NEW_LINE$")
+                            module.operation_body_list.append("$NEW_LINE$")
 
                     # increment file index
                     file_index = file_index + 1

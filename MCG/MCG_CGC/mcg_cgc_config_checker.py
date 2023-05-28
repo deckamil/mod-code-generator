@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           27 MAY 2023
+#   DATE:           28 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -63,8 +63,8 @@ class ConfigChecker(object):
     MAIN_CHECK_OUTPUT_INTERFACE = 306
     MAIN_CHECK_LOCAL_INTERFACE_START = 307
     MAIN_CHECK_LOCAL_INTERFACE = 308
-    MAIN_CHECK_MODULE_BODY_START = 309
-    MAIN_CHECK_MODULE_BODY = 310
+    MAIN_CHECK_OPERATION_BODY_START = 309
+    MAIN_CHECK_OPERATION_BODY = 310
     MAIN_CHECK_MODULE_END = 311
     MAIN_SKIP_TO_NEXT_SECTION = 400
     MAIN_CHECK_FOOTER = 500
@@ -156,10 +156,10 @@ class ConfigChecker(object):
                   ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_LOCAL_INTERFACE):
                 ConfigChecker.check_interface()
 
-            # check module body
-            elif (ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_BODY_START or
-                  ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_BODY):
-                ConfigChecker.check_module_body()
+            # check operation body
+            elif (ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_OPERATION_BODY_START or
+                  ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_OPERATION_BODY):
+                ConfigChecker.check_operation_body()
 
             # check module end
             elif ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_END:
@@ -346,7 +346,7 @@ class ConfigChecker(object):
             marker = "$LOCAL "
             info = "local"
             error_code = ErrorHandler.CHK_ERR_FAULTY_LOCAL_INTERFACE
-            next_state = ConfigChecker.MAIN_CHECK_MODULE_BODY_START
+            next_state = ConfigChecker.MAIN_CHECK_OPERATION_BODY_START
 
         # record info
         Logger.save_in_log_file("ConfigChecker",
@@ -408,25 +408,25 @@ class ConfigChecker(object):
                     ConfigChecker.file_index = ConfigChecker.file_index + 1
 
     # Description:
-    # This method checks correctness of module body section in the configuration file.
+    # This method checks correctness of operation body section in the configuration file.
     @staticmethod
-    def check_module_body():
+    def check_operation_body():
 
         # record info
         Logger.save_in_log_file("ConfigChecker",
-                                "Checking module body in the configuration file at line "
+                                "Checking operation body in the configuration file at line "
                                 + str(ConfigChecker.file_index + 1),
                                 False)
 
-        # for module body start check
-        if ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_BODY_START:
+        # for operation body start check
+        if ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_OPERATION_BODY_START:
 
             # if interface start marker is found
-            if ConfigChecker.config_file[ConfigChecker.file_index] == "$MODULE BODY START$":
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "$OPERATION BODY START$":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
-                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_MODULE_BODY
+                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_OPERATION_BODY
 
             # or if line contains unexpected data
             else:
@@ -435,7 +435,7 @@ class ConfigChecker(object):
                 # skip part of the configuration file and find next module section
                 ConfigChecker.main_checker_state = ConfigChecker.MAIN_SKIP_TO_NEXT_SECTION
 
-        # otherwise for module body check
+        # otherwise for operation body check
         else:
 
             # if instruction marker is found
@@ -476,8 +476,8 @@ class ConfigChecker(object):
                     # no further body operation check
                     ConfigChecker.body_checker_state = ConfigChecker.BODY_NO_CHECK
 
-            # or if module body end is found
-            elif ConfigChecker.config_file[ConfigChecker.file_index] == "$MODULE BODY END$":
+            # or if operation body end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "$OPERATION BODY END$":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -607,10 +607,10 @@ class ConfigChecker(object):
                 # move to expected state
                 ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_LOCAL_INTERFACE_START
 
-            # when module body is found
-            elif ConfigChecker.config_file[temporary_file_index] == "$MODULE BODY START$":
+            # when operation body is found
+            elif ConfigChecker.config_file[temporary_file_index] == "$OPERATION BODY START$":
                 # move to expected state
-                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_MODULE_BODY_START
+                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_OPERATION_BODY_START
 
             # when config end marker is found
             elif "MCG CGC CONFIG END" in ConfigChecker.config_file[temporary_file_index]:
