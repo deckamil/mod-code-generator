@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           28 MAY 2023
+#   DATE:           29 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,6 +54,42 @@ class Module(object):
         self.output_interface_list = []
         self.local_interface_list = []
         self.operation_body_list = []
+
+    # Description:
+    # This method removes duplicate elements from interface list.
+    @staticmethod
+    def remove_duplicate_interface_elements(interface_element_list):
+
+        # temporary interface list
+        tmp_interface_element_list = []
+
+        # for each interface element
+        for interface_element in interface_element_list:
+            # merge interface element type and name
+            tmp_interface_element = interface_element[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " + \
+                                    interface_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
+            # append temporary interface element to the list
+            tmp_interface_element_list.append(tmp_interface_element)
+
+        # remove duplicates from the list
+        tmp_interface_element_list = list(dict.fromkeys(tmp_interface_element_list))
+
+        # clear interface element list
+        interface_element_list = []
+
+        # for each temporary interface element
+        for tmp_interface_element in tmp_interface_element_list:
+            # split temporary interface element to interface element type and name
+            interface_element_type, interface_element_name = tmp_interface_element.split(" ")
+            # append collected data to interface element
+            interface_element = []
+            interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
+            interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+            # append interface element to the list
+            interface_element_list.append(interface_element)
+
+        # return interface element list
+        return interface_element_list
 
     # Description:
     # This method returns string representation of module source file.
@@ -114,6 +150,9 @@ class Module(object):
         # set input interface comment
         module = module + self.indent + "// Input interface\n"
 
+        # remove duplicate from interface list
+        self.input_interface_list = Module.remove_duplicate_interface_elements(self.input_interface_list)
+
         # append input interface
         for input_interface in self.input_interface_list:
             module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
@@ -125,6 +164,9 @@ class Module(object):
         # set local data comment
         module = module + self.indent + "// Local interface\n"
 
+        # remove duplicate from interface list
+        self.local_interface_list = Module.remove_duplicate_interface_elements(self.local_interface_list)
+
         # append local interface
         for local_interface in self.local_interface_list:
             module = module + self.indent + local_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
@@ -134,6 +176,9 @@ class Module(object):
 
         # set output interface comment
         module = module + self.indent + "// Output interface\n"
+
+        # remove duplicate from interface list
+        self.output_interface_list = Module.remove_duplicate_interface_elements(self.output_interface_list)
 
         # append output interface
         for output_interface in self.output_interface_list:

@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           28 MAY 2023
+#   DATE:           29 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -239,10 +239,21 @@ class ConfigConverter(object):
                                 module.include_list.append(operation_module_link[ConfigConverter.MODULE_NAME_INDEX] +
                                                            ".h")
 
-                        # append operation input interface instance to instructions
-                        module.operation_body_list.append(operation_name + "_input_type " + operation_name + "_input")
-                        # append operation output interface instance to instructions
-                        module.operation_body_list.append(operation_name + "_output_type " + operation_name + "_output")
+                        # get operation input interface element
+                        interface_element = []
+                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_input_type")
+                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_input")
+
+                        # append interface element to local interface
+                        module.local_interface_list.append(interface_element)
+
+                        # get operation output interface element
+                        interface_element = []
+                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_output_type")
+                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_output")
+
+                        # append interface element to local interface
+                        module.local_interface_list.append(interface_element)
 
                     # if body line contains input interface write
                     elif "$INP " in line:
