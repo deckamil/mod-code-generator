@@ -4,7 +4,7 @@
 #       This module contains definition of ErrorHandler class, which is
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
+#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
 #   DATE:           26 MAR 2023
 #
 #   LICENSE:
