@@ -4,8 +4,8 @@
 #       This module contains definition of Module class, which represents module
 #       source code and module header to be generated from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           26 OCT 2022
+#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
+#   DATE:           29 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -46,13 +46,50 @@ class Module(object):
     def __init__(self):
         # initialize object data
         self.module_name = ""
+        self.operation_name = ""
         self.generation_date = ""
         self.header_comment_list = []
         self.include_list = []
         self.input_interface_list = []
         self.output_interface_list = []
-        self.local_data_list = []
-        self.module_body_list = []
+        self.local_interface_list = []
+        self.operation_body_list = []
+
+    # Description:
+    # This method removes duplicate elements from interface list.
+    @staticmethod
+    def remove_duplicate_interface_elements(interface_element_list):
+
+        # temporary interface list
+        tmp_interface_element_list = []
+
+        # for each interface element
+        for interface_element in interface_element_list:
+            # merge interface element type and name
+            tmp_interface_element = interface_element[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " + \
+                                    interface_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
+            # append temporary interface element to the list
+            tmp_interface_element_list.append(tmp_interface_element)
+
+        # remove duplicates from the list
+        tmp_interface_element_list = list(dict.fromkeys(tmp_interface_element_list))
+
+        # clear interface element list
+        interface_element_list = []
+
+        # for each temporary interface element
+        for tmp_interface_element in tmp_interface_element_list:
+            # split temporary interface element to interface element type and name
+            interface_element_type, interface_element_name = tmp_interface_element.split(" ")
+            # append collected data to interface element
+            interface_element = []
+            interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
+            interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+            # append interface element to the list
+            interface_element_list.append(interface_element)
+
+        # return interface element list
+        return interface_element_list
 
     # Description:
     # This method returns string representation of module source file.
@@ -84,6 +121,9 @@ class Module(object):
         module = module + "#include \"" + self.module_name + ".h\"\n"
         module = module + "#include \"basic_data_types.h\"\n"
 
+        # remove duplicates from include list
+        self.include_list = list(dict.fromkeys(self.include_list))
+
         # append additional includes
         for include in self.include_list:
             module = module + "#include \"" + include + "\"\n"
@@ -97,66 +137,71 @@ class Module(object):
         module = module + "// This is definition of module function\n"
 
         # set return type
-        module = module + self.module_name + "_output_type "
+        module = module + "void "
         # set function name
-        module = module + self.module_name
+        module = module + self.operation_name
         # set function argument
-        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input) {\n\n"
+        module = module + "(" + \
+                 self.operation_name + "_input_type *" + self.operation_name + "_input," + \
+                 self.operation_name + "_output_type *" + self.operation_name + "_output) {\n\n"
 
         # ********** FUNCTION INTERFACE ********** #
 
         # set input interface comment
-        module = module + self.indent + "// Input Interface\n"
+        module = module + self.indent + "// Input interface\n"
+
+        # remove duplicate from interface list
+        self.input_interface_list = Module.remove_duplicate_interface_elements(self.input_interface_list)
 
         # append input interface
         for input_interface in self.input_interface_list:
             module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
-                     + self.module_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+                     + self.operation_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
         # set local data comment
-        module = module + self.indent + "// Local Data\n"
+        module = module + self.indent + "// Local interface\n"
 
-        # append local data
-        for local_data in self.local_data_list:
-            module = module + self.indent + local_data[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + local_data[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+        # remove duplicate from interface list
+        self.local_interface_list = Module.remove_duplicate_interface_elements(self.local_interface_list)
+
+        # append local interface
+        for local_interface in self.local_interface_list:
+            module = module + self.indent + local_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
+                     + local_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
         # set output interface comment
-        module = module + self.indent + "// Output Interface\n"
+        module = module + self.indent + "// Output interface\n"
+
+        # remove duplicate from interface list
+        self.output_interface_list = Module.remove_duplicate_interface_elements(self.output_interface_list)
 
         # append output interface
         for output_interface in self.output_interface_list:
             module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
-        module = module + self.indent + self.module_name + "_output_type " + self.module_name + "_output;\n"
         module = module + "\n"
 
         # ********** FUNCTION BODY ********** #
 
-        # distinguish if first line of function body was added or not to module content
-        first_body_line_added = False
+        # set function body comment
+        module = module + self.indent + "// Function body\n"
 
         # append function body
-        for module_body in self.module_body_list:
+        for operation_body in self.operation_body_list:
 
-            # if first line was added and current line contains comment
-            if first_body_line_added and "// " in module_body:
-                # add new line separation before comment
-                module = module + "\n" + self.indent + module_body + ";\n"
+            # if new line command is found
+            if operation_body == "$NEW_LINE$":
+                # add new line separation
+                module = module + "\n"
             else:
                 # add new body line
-                module = module + self.indent + module_body + ";\n"
-
-            # first body line was added
-            first_body_line_added = True
-
-        module = module + "\n"
+                module = module + self.indent + operation_body + ";\n"
 
         # ********** COLLECT OUTPUT DATA ********** #
 
@@ -165,17 +210,11 @@ class Module(object):
 
         # collect output data into output data structure
         for output_interface in self.output_interface_list:
-            module = module + self.indent + self.module_name + "_output." + \
+            module = module + self.indent + self.operation_name + "_output->" + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " + \
                      output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
-
-        # set comment
-        module = module + self.indent + "// Return output data\n"
-
-        # set return
-        module = module + self.indent + "return " + self.module_name + "_output;\n"
 
         # ********** FUNCTION END ********** #
 
@@ -238,7 +277,7 @@ class Module(object):
                      + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         # set input interface type name
-        module = module + "} " + self.module_name + "_input_type;\n\n"
+        module = module + "} " + self.operation_name + "_input_type;\n\n"
 
         # ********** OUTPUT INTERFACE TYPE ********** #
 
@@ -254,7 +293,7 @@ class Module(object):
                      + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
 
         # set output interface type name
-        module = module + "} " + self.module_name + "_output_type;\n\n"
+        module = module + "} " + self.operation_name + "_output_type;\n\n"
 
         # ********** FUNCTION PROTOTYPE ********** #
 
@@ -262,11 +301,13 @@ class Module(object):
         module = module + "// This is prototype of module function\n"
 
         # set return type
-        module = module + self.module_name + "_output_type "
+        module = module + "void "
         # set function name
-        module = module + self.module_name
+        module = module + self.operation_name
         # set function argument
-        module = module + "(" + self.module_name + "_input_type *" + self.module_name + "_input);\n\n"
+        module = module + "(" + \
+                 self.operation_name + "_input_type *" + self.operation_name + "_input," + \
+                 self.operation_name + "_output_type *" + self.operation_name + "_output);\n\n"
 
         # ********** HEADER GUARD END ********** #
 

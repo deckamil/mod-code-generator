@@ -4,8 +4,8 @@
 #       This module contains definition of ConfigConverter class, which allows to
 #       generate source code modules from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022 Kamil Deć github.com/deckamil
-#   DATE:           22 JUL 2022
+#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
+#   DATE:           29 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -38,13 +38,16 @@ from mcg_cgc_logger import Logger
 class ConfigConverter(object):
 
     # expected data/marker positions or properties of configuration file
-    COMPONENT_NAME_POSITION_IN_CFG = 15
-    PACKAGE_NAME_POSITION_IN_CFG = 13
-    COMPONENT_SOURCE_POSITION_IN_CFG = 17
-    PACKAGE_SOURCE_POSITION_IN_CFG = 15
     INTERFACE_TYPE_POSITION_IN_CFG = 5
     INTERFACE_NAME_POSITION_IN_CFG = 6
-    BODY_DATA_POSITION_IN_CFG = 4
+    BODY_DATA_POSITION_IN_CFG = 5
+
+    # indexes of operation and module names on list
+    OPERATION_NAME_INDEX = 0
+    MODULE_NAME_INDEX = 1
+
+    # contains list of operation and module name links
+    operation_module_name_list = []
 
     # path to source code directory
     code_dir_path = ""
@@ -91,6 +94,9 @@ class ConfigConverter(object):
         # module name
         module_name = ""
 
+        # find list of operation and module name links
+        ConfigConverter.find_operation_module_name_list(config_file)
+
         # set file index
         file_index = 0
         # set number of config file lines
@@ -100,79 +106,45 @@ class ConfigConverter(object):
         while file_index < number_of_config_file_lines:
 
             # when new module definition is found
-            if ("COMPONENT START" in config_file[file_index]) or ("PACKAGE START" in config_file[file_index]):
+            if config_file[file_index] == "$MODULE START$":
                 # get new module
                 module = Module()
                 # set date
                 module.generation_date = date
 
-            # when component name is found
-            elif "COMPONENT NAME" in config_file[file_index]:
+            # when module name is found
+            elif config_file[file_index] == "$MODULE NAME START$":
                 # record info
                 Logger.save_in_log_file("ConfigConverter",
-                                        "Reading component name from line " + str(file_index + 1),
+                                        "Reading module name from line " + str(file_index + 2),
                                         False)
-                # get line
-                line = config_file[file_index]
                 # get module name
-                module_name = line[ConfigConverter.COMPONENT_NAME_POSITION_IN_CFG:len(line)]
+                module_name = config_file[file_index+1]
                 # set module name
                 module.module_name = module_name
 
-            # when package name is found
-            elif "PACKAGE NAME" in config_file[file_index]:
+            # when operation name is found
+            elif config_file[file_index] == "$OPERATION NAME START$":
                 # record info
                 Logger.save_in_log_file("ConfigConverter",
-                                        "Reading package name from line " + str(file_index + 1),
+                                        "Reading operation name from line " + str(file_index + 2),
                                         False)
-                # get line
-                line = config_file[file_index]
-                # get module name
-                module_name = line[ConfigConverter.PACKAGE_NAME_POSITION_IN_CFG:len(line)]
-                # set module name
-                module.module_name = module_name
+                # get operation name
+                operation_name = config_file[file_index+1]
+                # set operation name
+                module.operation_name = operation_name
 
-            # when component comment is found
-            elif "COMPONENT SOURCE" in config_file[file_index]:
-                # record info
-                Logger.save_in_log_file("ConfigConverter",
-                                        "Reading component source from line " + str(file_index + 1),
-                                        False)
-                # get line
-                line = config_file[file_index]
-                # get comment
-                comment = "The module was generated from file " + \
-                          line[ConfigConverter.COMPONENT_SOURCE_POSITION_IN_CFG:len(line)]
-                # append comment
-                module.header_comment_list.append(comment)
-
-            # when package comment is found
-            elif "PACKAGE SOURCE" in config_file[file_index]:
-                # record info
-                Logger.save_in_log_file("ConfigConverter",
-                                        "Reading package source from line " + str(file_index + 1),
-                                        False)
-                # get line
-                line = config_file[file_index]
-                # get comment
-                comment = "The module was generated from file " + \
-                          line[ConfigConverter.PACKAGE_SOURCE_POSITION_IN_CFG:len(line)]
-                # append comment
-                module.header_comment_list.append(comment)
-
-            # when module input interface is found
-            elif ("COMPONENT INPUT INTERFACE START" in config_file[file_index]) or \
-                    ("PACKAGE INPUT INTERFACE START" in config_file[file_index]):
+            # when operation input interface is found
+            elif config_file[file_index] == "$INPUT INTERFACE START$":
 
                 # increment file index to definition of first input interface element
                 file_index = file_index + 1
 
                 # continue reading of input interface definition until end of input interface section is reached
-                while ("COMPONENT INPUT INTERFACE END" not in config_file[file_index]) and \
-                        ("PACKAGE INPUT INTERFACE END" not in config_file[file_index]):
+                while config_file[file_index] != "$INPUT INTERFACE END$":
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module input interface from line " + str(file_index + 1),
+                                            "Reading operation input interface from line " + str(file_index + 1),
                                             False)
                     # get line
                     line = config_file[file_index]
@@ -183,19 +155,17 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when module output interface is found
-            elif ("COMPONENT OUTPUT INTERFACE START" in config_file[file_index]) or \
-                    ("PACKAGE OUTPUT INTERFACE START" in config_file[file_index]):
+            # when operation output interface is found
+            elif config_file[file_index] == "$OUTPUT INTERFACE START$":
 
                 # increment file index to definition of first output interface element
                 file_index = file_index + 1
 
                 # continue reading of output interface definition until end of output interface section is reached
-                while ("COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]) and \
-                        ("PACKAGE OUTPUT INTERFACE END" not in config_file[file_index]):
+                while config_file[file_index] != "$OUTPUT INTERFACE END$":
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module output interface from line " + str(file_index + 1),
+                                            "Reading operation output interface from line " + str(file_index + 1),
                                             False)
                     # get line
                     line = config_file[file_index]
@@ -206,235 +176,121 @@ class ConfigConverter(object):
                     # increment file index
                     file_index = file_index + 1
 
-            # when module local data is found
-            elif ("COMPONENT LOCAL DATA START" in config_file[file_index]) or \
-                    ("PACKAGE LOCAL DATA START" in config_file[file_index]):
+            # when operation local interface is found
+            elif config_file[file_index] == "$LOCAL INTERFACE START$":
 
-                # increment file index to definition of first local data element
+                # increment file index to definition of first local interface element
                 file_index = file_index + 1
 
-                # continue reading of local data definition until end of local data section is reached
-                while ("COMPONENT LOCAL DATA END" not in config_file[file_index]) and \
-                        ("PACKAGE LOCAL DATA END" not in config_file[file_index]):
+                # continue reading of local interface definition until end of local interface section is reached
+                while config_file[file_index] != "$LOCAL INTERFACE END$":
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module local data from line " + str(file_index + 1),
+                                            "Reading operation local interface from line " + str(file_index + 1),
                                             False)
                     # get line
                     line = config_file[file_index]
                     # extract interface element type and name from line of the configuration file
                     interface_element = ConfigConverter.extract_interface_element(line)
                     # append interface element
-                    module.local_data_list.append(interface_element)
+                    module.local_interface_list.append(interface_element)
                     # increment file index
                     file_index = file_index + 1
 
-            # when component body is found
-            elif "COMPONENT BODY START" in config_file[file_index]:
+            # when operation body is found
+            elif config_file[file_index] == "$OPERATION BODY START$":
 
                 # increment file index to definition of first body element
                 file_index = file_index + 1
 
+                # name of invoked operation
+                operation_name = ""
+
                 # continue reading of body elements until end of body section is reached
-                while "COMPONENT BODY END" not in config_file[file_index]:
+                while config_file[file_index] != "$OPERATION BODY END$":
 
                     # record info
                     Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module body from line " + str(file_index + 1),
+                                            "Reading operation body from line " + str(file_index + 1),
                                             False)
 
                     # get line
                     line = config_file[file_index]
 
-                    # if body line contains module comment
-                    if "COM " in line:
-                        # get comment
-                        comment = "// " + line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
-                        # append comment
-                        module.module_body_list.append(comment)
-                    # otherwise when line contains module instruction
-                    else:
+                    # if body line contains instruction
+                    if "$INS " in line:
                         # get instruction
                         instruction = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
                         # append instruction
-                        module.module_body_list.append(instruction)
+                        module.operation_body_list.append(instruction)
+                        # append new line command
+                        module.operation_body_list.append("$NEW_LINE$")
 
-                    # increment file index
-                    file_index = file_index + 1
+                    # if body line contains operation call
+                    elif "$OPE " in line:
 
-            # when package body is found
-            elif "PACKAGE BODY START" in config_file[file_index]:
+                        # get operation name
+                        operation_name = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # find module to include
+                        for operation_module_link in ConfigConverter.operation_module_name_list:
+                            # if matching operation name is found
+                            if operation_module_link[ConfigConverter.OPERATION_NAME_INDEX] == operation_name:
+                                # append header of invoked module
+                                module.include_list.append(operation_module_link[ConfigConverter.MODULE_NAME_INDEX] +
+                                                           ".h")
 
-                # increment file index to definition of first body element
-                file_index = file_index + 1
+                        # get operation input interface element
+                        interface_element = []
+                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_input_type")
+                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_input")
 
-                # append instance of module input data
-                module.module_body_list.append("// Input data")
-                module.module_body_list.append(module_name + "_input_type " + module_name + "_input_local" +
-                                               " = *" + module_name + "_input")
+                        # append interface element to local interface
+                        module.local_interface_list.append(interface_element)
 
-                # continue reading of body elements until end of body section is reached
-                while "PACKAGE BODY END" not in config_file[file_index]:
+                        # get operation output interface element
+                        interface_element = []
+                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_output_type")
+                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_output")
 
-                    # record info
-                    Logger.save_in_log_file("ConfigConverter",
-                                            "Reading module body from line " + str(file_index + 1),
-                                            False)
+                        # append interface element to local interface
+                        module.local_interface_list.append(interface_element)
 
-                    # get line
-                    line = config_file[file_index]
+                    # if body line contains input interface write
+                    elif "$INP " in line:
 
-                    # if body line contains module comment
-                    if "COM " in line:
-                        # get comment
-                        comment = "// " + line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
-                        # append comment
-                        module.module_body_list.append(comment)
+                        # get input interface link
+                        input_interface_link = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # split to input data and pin
+                        input_data, input_pin = input_interface_link.split("->")
+                        # append operation input interface write to instruction
+                        module.operation_body_list.append(operation_name + "_input." + input_pin + " = " + input_data)
 
-                    # otherwise when line contains call of another module
-                    elif "INV " in line:
+                        # if that was last input interface write for given operation call
+                        if "$INP " not in config_file[file_index+1]:
+                            # append operation instruction to instruction
+                            module.operation_body_list.append(operation_name + "(&" + operation_name + "_input,&" +
+                                                              operation_name + "_output)")
 
-                        # get invoked module output data name
-                        invoked_module_output_data_name = line[line.find("INV ")+4:line.find(" = ")]
-                        # get invoked module name
-                        invoked_module_name = line[line.find(" = ")+3:line.find(" (")]
-                        # get invoked module arguments
-                        invoked_module_arguments = line[line.find("(")+1:line.find(")")]
-                        # split string representation of invoked module arguments into list form
-                        invoked_module_argument_list = invoked_module_arguments.split(", ")
-                        # append header of invoked module
-                        module.include_list.append(invoked_module_name + ".h")
+                    # if body line contains output interface read
+                    elif "$OUT " in line:
 
-                        # find input interface of invoked module
-                        invoked_module_input_interface_list = \
-                            ConfigConverter.find_module_input_interface(invoked_module_name, config_file)
-                        # find structure of each argument, i.e. output interface definition of other modules
-                        # which generate input data passed to invoked module
-                        invoked_module_argument_interface_list = \
-                            ConfigConverter.find_argument_interface(invoked_module_argument_list, config_file)
+                        # get output interface link
+                        output_interface_link = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # split to output pin and data
+                        output_pin, output_data = output_interface_link.split("->")
+                        # append operation output interface read to instruction
+                        module.operation_body_list.append(output_data + " = " + operation_name + "_output." + output_pin)
 
-                        # append instance of invoked module input data
-                        module.module_body_list.append(invoked_module_name + "_input_type " +
-                                                       invoked_module_name + "_input")
-
-                        # append instance of invoked module output data
-                        module.module_body_list.append(invoked_module_name + "_output_type " +
-                                                       invoked_module_output_data_name)
-
-                        # set inputs of invoked module
-                        for invoked_module_input_interface in invoked_module_input_interface_list:
-
-                            # get input interface type
-                            input_interface_type = invoked_module_input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX]
-                            # get input interface name
-                            input_interface_name = invoked_module_input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX]
-
-                            # check interface of each argument
-                            for common_index in range(0, len(invoked_module_argument_interface_list)):
-
-                                # get interface of specific argument
-                                invoked_module_argument_interface = invoked_module_argument_interface_list[common_index]
-
-                                # check each interface element of given argument
-                                for invoked_module_argument_element in invoked_module_argument_interface:
-
-                                    # get potential type match
-                                    potential_interface_type_match = \
-                                        invoked_module_argument_element[Module.INTERFACE_ELEMENT_TYPE_INDEX]
-                                    # get potential name match
-                                    potential_interface_name_match = \
-                                        invoked_module_argument_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
-
-                                    # check if there is a match between required input data to invoked module
-                                    # and data generated by another module
-                                    if ((input_interface_type == potential_interface_type_match) and
-                                            (input_interface_name == potential_interface_name_match)):
-
-                                        # get argument passed to invoked module
-                                        invoked_module_argument = invoked_module_argument_list[common_index]
-
-                                        # if input data comes from main Input Interface
-                                        if invoked_module_argument == "Input Interface":
-                                            # replace Input Interface with name of input data structure
-                                            invoked_module_argument = module_name + "_input_local"
-
-                                        # append invoked module input
-                                        module.module_body_list.append(invoked_module_name + "_input." +
-                                                                       input_interface_name + " = " +
-                                                                       invoked_module_argument + "." +
-                                                                       potential_interface_name_match)
-
-                                        # break "for invoked_module_argument_element in" loop
-                                        break
-
-                        # append module invocation
-                        module.module_body_list.append(invoked_module_output_data_name + " = " + invoked_module_name +
-                                                       "(&" + invoked_module_name + "_input)")
-
-                    # otherwise when line contains collection of output data
-                    else:
-
-                        # set output data comment
-                        module.module_body_list.append("// Output data")
-
-                        # get output data arguments
-                        output_data_arguments = line[line.find("(") + 1:line.find(")")]
-                        # split string representation of output data arguments into list form
-                        output_data_arguments_list = output_data_arguments.split(", ")
-
-                        # get copy of output data interface
-                        output_data_interface_list = module.output_interface_list
-                        # find structure of each argument, i.e. output interface definition of other modules
-                        # which generate input data passed to output data interface
-                        output_data_argument_interface_list = \
-                            ConfigConverter.find_argument_interface(output_data_arguments_list, config_file)
-
-                        # collect output data
-                        for output_data_interface in output_data_interface_list:
-
-                            # get output interface type
-                            output_interface_type = output_data_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX]
-                            # get output interface name
-                            output_interface_name = output_data_interface[Module.INTERFACE_ELEMENT_NAME_INDEX]
-
-                            # check interface of each argument
-                            for common_index in range(0, len(output_data_argument_interface_list)):
-
-                                # get interface of specific argument
-                                output_data_argument_interface = output_data_argument_interface_list[common_index]
-
-                                # check each interface element of given argument
-                                for output_data_argument_element in output_data_argument_interface:
-
-                                    # get potential type match
-                                    potential_interface_type_match = \
-                                        output_data_argument_element[Module.INTERFACE_ELEMENT_TYPE_INDEX]
-                                    # get potential name match
-                                    potential_interface_name_match = \
-                                        output_data_argument_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
-
-                                    # check if there is a match between required output data element
-                                    # and data generated by another module
-                                    if ((output_interface_type == potential_interface_type_match) and
-                                            (output_interface_name == potential_interface_name_match)):
-
-                                        # get argument passed to output data interface
-                                        output_data_argument = output_data_arguments_list[common_index]
-
-                                        # collect data
-                                        module.module_body_list.append(module.module_name + "_output." +
-                                                                       output_interface_name + " = " +
-                                                                       output_data_argument + "." +
-                                                                       potential_interface_name_match)
-
-                                        # break "for output_data_argument_element in" loop
-                                        break
+                        # if that was last output interface read for given operation call
+                        if "$OUT " not in config_file[file_index + 1]:
+                            # append new line command
+                            module.operation_body_list.append("$NEW_LINE$")
 
                     # increment file index
                     file_index = file_index + 1
 
             # when module end is found
-            elif "COMPONENT END" in config_file[file_index]:
+            elif config_file[file_index] == "$MODULE END$":
 
                 # record info
                 Logger.save_in_log_file("ConfigConverter",
@@ -458,36 +314,42 @@ class ConfigConverter(object):
                 # save module header to file
                 ConfigConverter.save_module_file(module_header_name, module_header)
 
-            # when module end is found
-            elif "PACKAGE END" in config_file[file_index]:
+            # increment file index
+            file_index = file_index + 1
 
-                # record info
-                Logger.save_in_log_file("ConfigConverter",
-                                        "Generating header code file for " + module_name + " module",
-                                        False)
-                # generate header file code
-                module_header = module.generate_module_header()
-                # set module header name
-                module_header_name = module_name + '.h'
-                # save module header to file
-                ConfigConverter.save_module_file(module_header_name, module_header)
+    # Description:
+    # This method looks for operation and module name links in the configuration file.
+    @staticmethod
+    def find_operation_module_name_list(config_file):
 
-                # record info
-                Logger.save_in_log_file("ConfigConverter",
-                                        "Generating source code file for " + module_name + " module",
-                                        False)
+        # set file index
+        file_index = 0
+        # set number of config file lines
+        number_of_config_file_lines = len(config_file)
 
-                # clear interface details
-                module.input_interface_list = []
-                module.output_interface_list = []
-                module.local_data_list = []
+        # module and operation names
+        module_name = ""
+        operation_name = ""
 
-                # generate source file code
-                module_source = module.generate_module_source()
-                # set module source name
-                module_source_name = module_name + ".c"
-                # save module source to file
-                ConfigConverter.save_module_file(module_source_name, module_source)
+        # continue conversion until end of the configuration file is reached
+        while file_index < number_of_config_file_lines:
+
+            # when module name is found
+            if config_file[file_index] == "$MODULE NAME START$":
+                # get module name
+                module_name = config_file[file_index + 1]
+
+            # when operation name is found
+            elif config_file[file_index] == "$OPERATION NAME START$":
+                # get operation name
+                operation_name = config_file[file_index + 1]
+
+                # set operation - module link
+                operation_module_link = []
+                operation_module_link.insert(ConfigConverter.OPERATION_NAME_INDEX, operation_name)
+                operation_module_link.insert(ConfigConverter.MODULE_NAME_INDEX, module_name)
+                # append link to module operation name list
+                ConfigConverter.operation_module_name_list.append(operation_module_link)
 
             # increment file index
             file_index = file_index + 1
@@ -511,153 +373,3 @@ class ConfigConverter(object):
 
         # return interface element
         return interface_element
-
-    # Description
-    # This method looks for definition of module input interface in the configuration file.
-    @staticmethod
-    def find_module_input_interface(module_name, config_file):
-
-        # module input interface list
-        module_input_interface_list = []
-        # module definition found in the configuration file
-        found_module_definition = False
-
-        # search for input interface definition of given module in the configuration file
-        for file_index in range(0, len(config_file)):
-
-            # if given module was found
-            if (("COMPONENT NAME " in config_file[file_index]) or
-                ("PACKAGE NAME " in config_file[file_index])) and \
-                    (module_name in config_file[file_index]):
-                # change flag
-                found_module_definition = True
-
-            # if input interface definition of given module was found
-            elif (("COMPONENT INPUT INTERFACE START" in config_file[file_index]) or
-                  ("PACKAGE INPUT INTERFACE START" in config_file[file_index])) and \
-                    found_module_definition:
-
-                # increment file index to definition of first input interface element
-                file_index = file_index + 1
-
-                # continue reading of input interface definition until end of input interface section is reached
-                while ("COMPONENT INPUT INTERFACE END" not in config_file[file_index]) and \
-                        ("PACKAGE INPUT INTERFACE END" not in config_file[file_index]):
-
-                    # get line
-                    line = config_file[file_index]
-                    # extract interface element type and name from line of the configuration file
-                    interface_element = ConfigConverter.extract_interface_element(line)
-                    # append interface element
-                    module_input_interface_list.append(interface_element)
-                    # increment file index
-                    file_index = file_index + 1
-
-                # break "for file_index in" loop
-                break
-
-        # return module input interface list
-        return module_input_interface_list
-
-    # Description
-    # This method looks for definition of module output interface in the configuration file.
-    @staticmethod
-    def find_module_output_interface(module_name, config_file):
-
-        # module output interface list
-        module_output_interface_list = []
-        # module definition found in the configuration file
-        found_module_definition = False
-
-        # search for output interface definition of given module in the configuration file
-        for file_index in range(0, len(config_file)):
-
-            # if given module was found
-            if (("COMPONENT NAME " in config_file[file_index]) or
-                ("PACKAGE NAME " in config_file[file_index])) and \
-                    (module_name in config_file[file_index]):
-                # change flag
-                found_module_definition = True
-
-            # if output interface definition of given module was found
-            elif (("COMPONENT OUTPUT INTERFACE START" in config_file[file_index]) or
-                  ("PACKAGE OUTPUT INTERFACE START" in config_file[file_index])) and \
-                    found_module_definition:
-
-                # increment file index to definition of first output interface element
-                file_index = file_index + 1
-
-                # continue reading of output interface definition until end of output interface section is reached
-                while ("COMPONENT OUTPUT INTERFACE END" not in config_file[file_index]) and \
-                        ("PACKAGE OUTPUT INTERFACE END" not in config_file[file_index]):
-                    # get line
-                    line = config_file[file_index]
-                    # extract interface element type and name from line of the configuration file
-                    interface_element = ConfigConverter.extract_interface_element(line)
-                    # append interface element
-                    module_output_interface_list.append(interface_element)
-                    # increment file index
-                    file_index = file_index + 1
-
-                # break "for file_index in" loop
-                break
-
-        # return module output interface list
-        return module_output_interface_list
-
-    # Description
-    # This method looks for interface details of each argument element from the given list.
-    @staticmethod
-    def find_argument_interface(argument_list, config_file):
-
-        # argument interface list
-        argument_interface_list = []
-
-        # for given argument element find its interface details
-        for argument in argument_list:
-
-            # if Input Interface is argument
-            if argument == "Input Interface":
-
-                # check the configuration file for package name
-                for file_index in range(0, len(config_file)):
-
-                    # when package name is found
-                    if "PACKAGE NAME " in config_file[file_index]:
-
-                        # get line
-                        line = config_file[file_index]
-                        # get module name
-                        module_name = line[ConfigConverter.PACKAGE_NAME_POSITION_IN_CFG:len(line)]
-                        # find interface details
-                        module_interface_list = ConfigConverter.find_module_input_interface(module_name, config_file)
-                        # append interface to argument interface list
-                        argument_interface_list.append(module_interface_list)
-                        # break "for file_index in" loop
-                        break
-
-            # otherwise look for data generated by other modules
-            else:
-
-                # look for specific string where argument is output of another module
-                keyword = "INV " + argument + " = "
-
-                # check the configuration file for above keyword
-                for file_index in range(0, len(config_file)):
-
-                    # if given keyword is found in the configuration file
-                    if keyword in config_file[file_index]:
-
-                        # get line
-                        line = config_file[file_index]
-                        # get module name
-                        module_name = line[line.find(" = ") + 3:line.find(" (")]
-                        # find interface details
-                        module_interface_list = ConfigConverter.find_module_output_interface(module_name, config_file)
-                        # append interface to argument interface list
-                        argument_interface_list.append(module_interface_list)
-                        # break "for file_index in" loop
-                        break
-
-        # return argument interface list
-        return argument_interface_list

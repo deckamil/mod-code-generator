@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           25 MAR 2023
+#   DATE:           28 MAY 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -317,7 +317,7 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting module body into configuration file", False)
 
         # append start marker of module name section to configuration file
-        self.configuration_file.append(str("$MODULE BODY START$"))
+        self.configuration_file.append(str("$OPERATION BODY START$"))
 
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
@@ -335,7 +335,7 @@ class ModuleConverter(object):
                 # convert data node
                 self.convert_data_node(sorted_node)
 
-        self.configuration_file.append(str("$MODULE BODY END$"))
+        self.configuration_file.append(str("$OPERATION BODY END$"))
 
     # Description:
     # This method is responsible for conversion of module content into configuration file format.

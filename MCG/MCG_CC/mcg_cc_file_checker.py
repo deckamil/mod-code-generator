@@ -4,8 +4,8 @@
 #       This module contains definition of FileChecker class, which is
 #       responsible for checking of model module content from .exml file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           7 DEC 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           7 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,7 +30,6 @@
 
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
-from mcg_cc_supporter import Supporter
 from mcg_cc_logger import Logger
 from mcg_cc_connection import Connection
 
@@ -42,13 +41,10 @@ class FileChecker(object):
     # list of actions types
     action_type_list = ["ADD", "SUB", "MUL", "DIV"]
 
-    # list of non-commutative actions types (where inputs order does matter)
-    non_commutative_action_type_list = ["SUB", "DIV"]
-
-    # list of data types
-    data_type_list = ["INT8", "INT16", "INT32", "INT64",
-                      "UINT8", "UINT16", "UINT32", "UINT64",
-                      "FLOAT32", "FLOAT64"]
+    # list of interface element types
+    interface_element_type_list = ["INT8", "INT16", "INT32", "INT64",
+                                   "UINT8", "UINT16", "UINT32", "UINT64",
+                                   "FLOAT32", "FLOAT64"]
 
     # Description:
     # This is class constructor.
@@ -61,231 +57,115 @@ class FileChecker(object):
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
 
     # Description:
-    # This method checks any signal-related errors and issues.
-    def check_signal_errors(self):
+    # This method checks any connection-related errors and issues.
+    def check_connection_errors(self):
 
-        # *******************************************************************
-        # check if any signal on data list has more than one input connection
-        for signal_name in self.data_list:
-            # input counter shows how many inputs (sources) are connected to given signal
-            input_counter = 0
+        # record info
+        Logger.save_in_log_file("FileChecker", "Looking for connection errors in .exml file", False)
 
-            # go through all connections for each signal
-            for connection in self.connection_list:
-                # if connection target is same as signal name, then it means that
-                # signal has input connection (source)
-                if connection.connection_target == signal_name:
-                    # increment input counter
-                    input_counter = input_counter + 1
+        # check action types in connections
+        for connection in self.connection_list:
+            # if action is connection source
+            if connection.source_type == Connection.ACTION:
 
-            # if signal has more than one input connection
-            if input_counter > 1:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.SIG_ERR_MORE_INPUTS, signal_name, "none")
+                # check if action type is valid
+                action_type_valid = FileChecker.check_action_type(connection.source_name)
+
+                # if action type is not valid
+                if not action_type_valid:
+                    # record error
+                    ErrorHandler.record_error(ErrorHandler.CON_ERR_INVALID_ACTION_TYPE, connection, "none")
+
+            # if action is connection target
+            if connection.target_type == Connection.ACTION:
+                # check if action type is valid
+                action_type_valid = FileChecker.check_action_type(connection.target_name)
+
+                # if action type is not valid
+                if not action_type_valid:
+                    # record error
+                    ErrorHandler.record_error(ErrorHandler.CON_ERR_INVALID_ACTION_TYPE, connection, "none")
 
     # Description:
-    # This method checks any action-related errors and issues.
-    def check_action_errors(self):
+    # This method checks if action type is valid.
+    @staticmethod
+    def check_action_type(action_type_ref):
+        # result flag
+        action_type_valid = False
 
-        # ******************************************************
-        # check if any action type is not valid
-        for interaction in self.interaction_list:
-            # get action type
-            action_type = interaction[0:len(interaction) + Supporter.UID_OFFSET]
+        # for all possible action types
+        for action_type in FileChecker.action_type_list:
+            # if action type is the same as in reference
+            if action_type == action_type_ref[0:3]:
+                # set flag
+                action_type_valid = True
+                # exit loop
+                break
 
-            # check if action type is valid
-            action_type_found = ComponentReader.check_if_action_type(action_type)
-
-            # if action type is not valid
-            if not action_type_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.ACT_ERR_ACT_NOT_ALLOWED, interaction, "none")
+        # return flag
+        return action_type_valid
 
     # Description:
     # This method checks any interface-related errors and issues.
     def check_interface_errors(self):
 
-        # ************************************************************************
-        # check if any signal used on diagram does not come from interface element
-        for signal_name in self.data_list:
-            # signal marker shows whether signal was found or not within interface element
-            signal_found = False
+        # record info
+        Logger.save_in_log_file("FileChecker", "Looking for interface errors in .exml file", False)
 
-            # if signal has not been found, search in input interface
-            if not signal_found:
-                # go through all input interface elements
-                for interface_element in self.input_interface_list:
-
-                    # get interface element name
-                    interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-
-                    # if diagram signal is identified as interface element
-                    if signal_name == interface_element_name:
-                        # change signal marker
-                        signal_found = True
-                        # break "for interface_element in" loop
-                        break
-
-            # if signal has not been found, search in output interface
-            if not signal_found:
-                # go through all output interface elements
-                for interface_element in self.output_interface_list:
-
-                    # get interface element name
-                    interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-
-                    # if diagram signal is identified as interface element
-                    if signal_name == interface_element_name:
-                        # change signal marker
-                        signal_found = True
-                        # break "for interface_element in" loop
-                        break
-
-            # if signal has not been found, search in local data interface
-            if not signal_found:
-                # go through all local data interface elements
-                for interface_element in self.local_data_list:
-
-                    # get interface element name
-                    interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-
-                    # if diagram signal is identified as interface element
-                    if signal_name == interface_element_name:
-                        # change signal marker
-                        signal_found = True
-                        # break "for interface_element in" loop
-                        break
-
-            # if diagram signal is not found in interface element
-            if not signal_found:
-                # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_SIG_NOT_IN_INT, signal_name, "none")
-
-        # *****************************************************************************
-        # check if any input interface signal type in not valid
+        # check interface element types in input interface
         for interface_element in self.input_interface_list:
-            # get interface element name
-            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
             # get interface element type
-            interface_element_type = interface_element[ComponentReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            # check interface element type
+            interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
-            # check if interface element type is valid
-            interface_element_type_found = ComponentReader.check_if_interface_element_type(interface_element_type,
-                                                                                           "signal")
-
-            # if interface element type is not valid
-            if not interface_element_type_found:
+            # if data type not valid
+            if not interface_element_type_valid:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_INP_INT_TYPE_IN_COM, interface_element_name,
-                                          interface_element_type)
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INVALID_INTERFACE_ELEMENT_TYPE, interface_element, "none")
 
-        # *****************************************************************************
-        # check if any output interface signal type in not valid
+        # check interface element types in output interface
         for interface_element in self.output_interface_list:
-            # get interface element name
-            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
             # get interface element type
-            interface_element_type = interface_element[ComponentReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            # check interface element type
+            interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
-            # check if interface element type is valid
-            interface_element_type_found = ComponentReader.check_if_interface_element_type(interface_element_type,
-                                                                                           "signal")
-
-            # if interface element type is not valid
-            if not interface_element_type_found:
+            # if data type not valid
+            if not interface_element_type_valid:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_OUT_INT_TYPE_IN_COM, interface_element_name,
-                                          interface_element_type)
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INVALID_INTERFACE_ELEMENT_TYPE, interface_element, "none")
 
-        # *****************************************************************************
-        # check if any local data signal type in not valid
-        for interface_element in self.local_data_list:
-            # get interface element name
-            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
+        # check interface element types in local interface
+        for interface_element in self.local_interface_list:
             # get interface element type
-            interface_element_type = interface_element[ComponentReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            # check interface element type
+            interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
-            # check if interface element type is valid
-            interface_element_type_found = ComponentReader.check_if_interface_element_type(interface_element_type,
-                                                                                           "signal")
-
-            # if interface element type is not valid
-            if not interface_element_type_found:
+            # if data type not valid
+            if not interface_element_type_valid:
                 # record error
-                ErrorHandler.record_error(ErrorHandler.INT_ERR_INC_LOC_DAT_TYPE_IN_COM, interface_element_name,
-                                          interface_element_type)
-
-        # *****************************************************************************
-        # check if any input interface signal is connected as output (target) of other element
-        for interface_element in self.input_interface_list:
-            # get interface element name
-            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-
-            # go through all connections for each interface element
-            for connection in self.connection_list:
-                # if connection target is same as interface element name, then it means that
-                # input interface element is connected as output (target) of another element
-                if connection.connection_target == interface_element_name:
-                    # record error
-                    ErrorHandler.record_error(ErrorHandler.INT_ERR_INP_INT_SIG_IS_TAR_IN_COM,
-                                              interface_element_name,
-                                              connection.connection_source)
-
-        # *****************************************************************************
-        # check if any output interface signal is connected as input (source) of other element
-        for interface_element in self.output_interface_list:
-            # get interface element name
-            interface_element_name = interface_element[ComponentReader.INTERFACE_ELEMENT_NAME_INDEX]
-
-            # go through all connections for each interface element
-            for connection in self.connection_list:
-                # if connection source is same as interface element name, then it means that
-                # output interface element is connected as input (source) of another element
-                if (connection.connection_source == interface_element_name) and \
-                        (connection.connection_target != "$EMPTY$"):
-                    # record error
-                    ErrorHandler.record_error(ErrorHandler.INT_ERR_OUT_INT_SIG_IS_SRC_IN_COM,
-                                              interface_element_name,
-                                              connection.connection_target)
+                ErrorHandler.record_error(ErrorHandler.INT_ERR_INVALID_INTERFACE_ELEMENT_TYPE, interface_element, "none")
 
     # Description:
-    # This method checks if reference contains valid action type.
+    # This method checks if interface element type is valid.
     @staticmethod
-    def check_if_action_type(ref_action_type):
-        # action type marker shows whether valid acton type was found or not within reference
-        action_type_found = False
+    def check_interface_element_type(interface_element_type_ref):
+        # result flag
+        interface_element_type_valid = False
 
-        # for all allowed action types
-        for action_type in ComponentReader.action_type_list:
-            # if action type is the same as in reference
-            if action_type == ref_action_type:
-                # change action type marker
-                action_type_found = True
+        # for all possible interface element types
+        for interface_element_type in FileChecker.interface_element_type_list:
+            # if interface element type is the same as in reference
+            if interface_element_type == interface_element_type_ref:
+                # set flag
+                interface_element_type_valid = True
                 # exit loop
                 break
 
-        # return action type marker
-        return action_type_found
-
-    # Description:
-    # This method checks if reference contains valid action type, which requires in addition first input signal marker.
-    @staticmethod
-    def check_if_action_type_with_first_input_signal(ref_action_type_with_first_input_signal):
-        # action type marker shows whether valid action type, which requires in addition first input signal marker,
-        # was found or not within reference
-        action_type_with_first_input_signal_found = False
-
-        # for all allowed action types, which require in addition first input signal marker
-        for action_type_with_first_input_signal in ComponentReader.action_type_with_first_input_signal_list:
-            # if action type is the same as in reference
-            if action_type_with_first_input_signal == ref_action_type_with_first_input_signal:
-                # change action type marker
-                action_type_with_first_input_signal_found = True
-                # exit loop
-                break
-
-        # return action type marker
-        return action_type_with_first_input_signal_found
+        # return flag
+        return interface_element_type_valid
 
     # Description:
     # This method is responsible for checking of module details.
@@ -293,4 +173,11 @@ class FileChecker(object):
 
         # record info
         Logger.save_in_log_file("FileChecker", "Checking module details from set of .exml files", True)
+
+        # search for connection errors
+        self.check_connection_errors()
+
+        # search for interface errors
+        self.check_interface_errors()
+
 

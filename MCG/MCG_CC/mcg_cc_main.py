@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           19 MAR 2023
+#   DATE:           10 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -33,6 +33,7 @@
 from sys import argv
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_file_reader import FileReader
+from mcg_cc_file_checker import FileChecker
 from mcg_cc_module_sorter import ModuleSorter
 from mcg_cc_module_converter import ModuleConverter
 from mcg_cc_error_handler import ErrorHandler
@@ -54,7 +55,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CC version
-    MCG_CC_VERSION = "v0.2.0-in-dev"
+    MCG_CC_VERSION = "v0.2.0-alpha"
 
     # Description:
     # This is main method, which display short notice and start conversion process.
@@ -132,6 +133,11 @@ class Main(object):
                 file_reader = FileReader(file_finder_list)
                 # read module content
                 file_reader_list = file_reader.read_files()
+
+                # initialize file checker
+                file_checker = FileChecker(file_reader_list)
+                # check module content
+                file_checker.check_files()
 
                 # check errors
                 ErrorHandler.check_errors()
