@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           10 JUN 2023
+#   DATE:           13 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -142,7 +142,7 @@ class Main(object):
                 # check errors
                 ErrorHandler.check_errors()
 
-                # initialize sorter
+                # initialize module sorter
                 module_sorter = ModuleSorter(file_reader_list)
                 # sort module content
                 module_sorter_list = module_sorter.sort_module()
@@ -150,7 +150,7 @@ class Main(object):
                 # check errors
                 ErrorHandler.check_errors()
 
-                # initialize converter
+                # initialize module converter
                 module_converter = ModuleConverter(file_finder_list, file_reader_list, module_sorter_list)
                 # convert module content
                 module_converter.convert_module()

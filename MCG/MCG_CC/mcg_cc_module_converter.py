@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           28 MAY 2023
+#   DATE:           13 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -240,8 +240,8 @@ class ModuleConverter(object):
             Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
 
     # Description:
-    # This method converts module specific action node into configuration file.
-    def convert_specific_action_node(self, sorted_node, math_symbol):
+    # This method converts module specific action node with n-argument operator into configuration file.
+    def convert_specific_action_node_arity_n(self, sorted_node, operator):
 
         # get output link
         output_link = sorted_node.output_data_list[0]
@@ -254,11 +254,29 @@ class ModuleConverter(object):
             input_data_name = input_link[Node.DATA_NAME_INDEX]
             # append input data element to conversion line
             conversion_line = conversion_line + str(input_data_name)
-            # append math symbol to conversion line
-            conversion_line = conversion_line + str(" ") + str(math_symbol) + str(" ")
+            # append operator to conversion line
+            conversion_line = conversion_line + str(" ") + str(operator) + str(" ")
 
-        # remove spare math symbol and whitespace
+        # remove spare operator and whitespace
         conversion_line = conversion_line[0:len(conversion_line) - 3]
+        # append conversion line to configuration file
+        self.configuration_file.append(conversion_line)
+
+        # record info
+        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+
+    # Description:
+    # This method converts module specific action node with 1-argument operator into configuration file.
+    def convert_specific_action_node_arity_1(self, sorted_node, operator):
+
+        # get input link
+        input_link = sorted_node.input_data_list[0]
+        # get output link
+        output_link = sorted_node.output_data_list[0]
+        # set beginning of action interaction to conversion line
+        conversion_line = str("$INS ") + str(output_link[Node.DATA_NAME_INDEX]) + str(" = ") + \
+                          str(operator) + str(input_link[Node.DATA_NAME_INDEX])
+
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
 
@@ -272,22 +290,37 @@ class ModuleConverter(object):
         # if sorted node contains ADD action
         if sorted_node.name[0:3] == "ADD":
             # convert ADD action
-            self.convert_specific_action_node(sorted_node, "+")
+            self.convert_specific_action_node_arity_n(sorted_node, "+")
 
         # if sorted node contains SUB action
         elif sorted_node.name[0:3] == "SUB":
             # convert SUB action
-            self.convert_specific_action_node(sorted_node, "-")
+            self.convert_specific_action_node_arity_n(sorted_node, "-")
 
         # if sorted node contains MUL action
         elif sorted_node.name[0:3] == "MUL":
             # convert MUL action
-            self.convert_specific_action_node(sorted_node, "*")
+            self.convert_specific_action_node_arity_n(sorted_node, "*")
 
         # if sorted node contains DIV action
         elif sorted_node.name[0:3] == "DIV":
             # convert DIV action
-            self.convert_specific_action_node(sorted_node, "/")
+            self.convert_specific_action_node_arity_n(sorted_node, "/")
+
+        # if sorted node contains AND action
+        elif sorted_node.name[0:3] == "AND":
+            # convert DIV action
+            self.convert_specific_action_node_arity_n(sorted_node, "&&")
+
+        # if sorted node contains OR action
+        elif sorted_node.name[0:2] == "OR":
+            # convert DIV action
+            self.convert_specific_action_node_arity_n(sorted_node, "||")
+
+        # if sorted node contains NOT action
+        elif sorted_node.name[0:3] == "NOT":
+            # convert DIV action
+            self.convert_specific_action_node_arity_1(sorted_node, "!")
 
     # Description:
     # This method converts module data node into configuration file.
