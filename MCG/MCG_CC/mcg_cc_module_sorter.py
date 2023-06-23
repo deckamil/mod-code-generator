@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           25 MAR 2023
+#   DATE:           23 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,7 +42,7 @@ class ModuleSorter(object):
     SORTED_NODE_LIST_INDEX = 0
 
     # list of action interaction that require to distinguish main data input
-    input_sensitivity_action_list = ["SUB", "DIV"]
+    input_sensitive_action_list = ["SUB", "DIV", "GT", "LT", "GE", "LE"]
 
     # Description:
     # This is class constructor.
@@ -311,8 +311,9 @@ class ModuleSorter(object):
             if sorted_node.type == Node.ACTION:
 
                 # and if action is input sensitive, i.e. requires to distinguish main input data
-                for input_sensitivity_action in ModuleSorter.input_sensitivity_action_list:
-                    if sorted_node.name[0:3] == input_sensitivity_action:
+                for input_sensitive_action in ModuleSorter.input_sensitive_action_list:
+                    if (sorted_node.name[0:3] == input_sensitive_action) or \
+                            (sorted_node.name[0:2] == input_sensitive_action):
 
                         # get marker position
                         marker_position = sorted_node.name.find("+")

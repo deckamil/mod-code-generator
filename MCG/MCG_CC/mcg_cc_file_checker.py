@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           13 JUN 2023
+#   DATE:           23 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,8 +40,7 @@ class FileChecker(object):
 
     # list of actions types
     action_3letter_type_list = ["ADD", "SUB", "MUL", "DIV", "AND", "NOT"]
-
-    action_2letter_type_list = ["OR"]
+    action_2letter_type_list = ["OR", "EQ", "NE", "GT", "LT", "GE", "LE"]
 
     # list of interface element types
     interface_element_type_list = ["INT8", "INT16", "INT32", "INT64",
@@ -96,10 +95,9 @@ class FileChecker(object):
         # result flag
         action_type_valid = False
 
-        # check 3-letter action types
-        if len(action_type_ref) > 2:
-
-            # for all possible action types
+        # is valid type is not found
+        if not action_type_valid:
+            # check all possible 3-letter action types
             for action_type in FileChecker.action_3letter_type_list:
                 # if action type is the same as in reference
                 if action_type == action_type_ref[0:3]:
@@ -108,10 +106,9 @@ class FileChecker(object):
                     # exit loop
                     break
 
-        # check 2-letter action types
-        elif len(action_type_ref) < 3:
-
-            # for all possible action types
+        # is valid types is not found
+        if not action_type_valid:
+            # check 2-letter action types
             for action_type in FileChecker.action_2letter_type_list:
                 # if action type is the same as in reference
                 if action_type == action_type_ref[0:2]:

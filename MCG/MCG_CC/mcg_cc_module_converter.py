@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           13 JUN 2023
+#   DATE:           23 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -287,40 +287,45 @@ class ModuleConverter(object):
     # This method converts module action node into configuration file.
     def convert_action_node(self, sorted_node):
 
-        # if sorted node contains ADD action
+        # depending on the type of action, covert module node into configuration file.
         if sorted_node.name[0:3] == "ADD":
-            # convert ADD action
             self.convert_specific_action_node_arity_n(sorted_node, "+")
 
-        # if sorted node contains SUB action
         elif sorted_node.name[0:3] == "SUB":
-            # convert SUB action
             self.convert_specific_action_node_arity_n(sorted_node, "-")
 
-        # if sorted node contains MUL action
         elif sorted_node.name[0:3] == "MUL":
-            # convert MUL action
             self.convert_specific_action_node_arity_n(sorted_node, "*")
 
-        # if sorted node contains DIV action
         elif sorted_node.name[0:3] == "DIV":
-            # convert DIV action
             self.convert_specific_action_node_arity_n(sorted_node, "/")
 
-        # if sorted node contains AND action
         elif sorted_node.name[0:3] == "AND":
-            # convert DIV action
             self.convert_specific_action_node_arity_n(sorted_node, "&&")
 
-        # if sorted node contains OR action
+        elif sorted_node.name[0:3] == "NOT":
+            self.convert_specific_action_node_arity_1(sorted_node, "!")
+
         elif sorted_node.name[0:2] == "OR":
-            # convert DIV action
             self.convert_specific_action_node_arity_n(sorted_node, "||")
 
-        # if sorted node contains NOT action
-        elif sorted_node.name[0:3] == "NOT":
-            # convert DIV action
-            self.convert_specific_action_node_arity_1(sorted_node, "!")
+        elif sorted_node.name[0:2] == "EQ":
+            self.convert_specific_action_node_arity_n(sorted_node, "==")
+
+        elif sorted_node.name[0:2] == "NE":
+            self.convert_specific_action_node_arity_n(sorted_node, "!=")
+
+        elif sorted_node.name[0:2] == "GT":
+            self.convert_specific_action_node_arity_n(sorted_node, ">")
+
+        elif sorted_node.name[0:2] == "LT":
+            self.convert_specific_action_node_arity_n(sorted_node, "LT")
+
+        elif sorted_node.name[0:2] == "GE":
+            self.convert_specific_action_node_arity_n(sorted_node, ">=")
+
+        elif sorted_node.name[0:2] == "LE":
+            self.convert_specific_action_node_arity_n(sorted_node, "<=")
 
     # Description:
     # This method converts module data node into configuration file.
