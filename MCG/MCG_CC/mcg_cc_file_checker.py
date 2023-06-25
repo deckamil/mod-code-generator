@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 JUN 2023
+#   DATE:           23 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,12 +39,14 @@ from mcg_cc_connection import Connection
 class FileChecker(object):
 
     # list of actions types
-    action_type_list = ["ADD", "SUB", "MUL", "DIV"]
+    action_3letter_type_list = ["ADD", "SUB", "MUL", "DIV", "AND", "NOT"]
+    action_2letter_type_list = ["OR", "EQ", "NE", "GT", "LT", "GE", "LE"]
 
     # list of interface element types
     interface_element_type_list = ["INT8", "INT16", "INT32", "INT64",
                                    "UINT8", "UINT16", "UINT32", "UINT64",
-                                   "FLOAT32", "FLOAT64"]
+                                   "FLOAT32", "FLOAT64",
+                                   "BOOL"]
 
     # Description:
     # This is class constructor.
@@ -93,14 +95,27 @@ class FileChecker(object):
         # result flag
         action_type_valid = False
 
-        # for all possible action types
-        for action_type in FileChecker.action_type_list:
-            # if action type is the same as in reference
-            if action_type == action_type_ref[0:3]:
-                # set flag
-                action_type_valid = True
-                # exit loop
-                break
+        # is valid type is not found
+        if not action_type_valid:
+            # check all possible 3-letter action types
+            for action_type in FileChecker.action_3letter_type_list:
+                # if action type is the same as in reference
+                if action_type == action_type_ref[0:3]:
+                    # set flag
+                    action_type_valid = True
+                    # exit loop
+                    break
+
+        # is valid types is not found
+        if not action_type_valid:
+            # check 2-letter action types
+            for action_type in FileChecker.action_2letter_type_list:
+                # if action type is the same as in reference
+                if action_type == action_type_ref[0:2]:
+                    # set flag
+                    action_type_valid = True
+                    # exit loop
+                    break
 
         # return flag
         return action_type_valid

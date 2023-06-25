@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           25 MAR 2023
+#   DATE:           24 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,7 +42,7 @@ class ModuleSorter(object):
     SORTED_NODE_LIST_INDEX = 0
 
     # list of action interaction that require to distinguish main data input
-    input_sensitivity_action_list = ["SUB", "DIV"]
+    input_sensitive_action_list = ["SUB", "DIV", "GT", "LT", "GE", "LE"]
 
     # Description:
     # This is class constructor.
@@ -248,10 +248,8 @@ class ModuleSorter(object):
                     self.sorted_node_list.append(dependency[0])
                     # remove dependency sublist from dependency list
                     self.dependency_list.remove(dependency)
-                    # get output link
-                    output_link = dependency[0].output_data_list[0]
-                    # get output data name
-                    output_data_name = output_link[Node.DATA_NAME_INDEX]
+                    # get output data list
+                    output_data_list = dependency[0].output_data_list
                     # recalculate number of nodes to sort, i.e. length of dependency list
                     dependency_list_length = len(self.dependency_list)
 
@@ -267,15 +265,18 @@ class ModuleSorter(object):
                             for k in range(index, len(dependency)):
                                 # if given node consumes local data elements, which comes from node, which
                                 # was appended above to sorted node list
-                                if output_data_name == dependency[index]:
-                                    # remove local data element from dependency sublist
-                                    dependency.remove(dependency[index])
-                                    # decrement index for next iteration, as one dependence was removed
-                                    # therefore all next dependencies in dependency sublist were pushed by
-                                    # one position towards beginning of the sublist, e.g. [...,A,B,C] -> [...,B,C];
-                                    # A was removed and now B is under previous position of A so at next
-                                    # iteration the same index need to be checked to examine B;
-                                    index = index - 1
+                                for output_link in output_data_list:
+                                    if output_link[Node.DATA_NAME_INDEX] == dependency[index]:
+                                        # remove local data element from dependency sublist
+                                        dependency.remove(dependency[index])
+                                        # decrement index for next iteration, as one dependence was removed
+                                        # therefore all next dependencies in dependency sublist were pushed by
+                                        # one position towards beginning of the sublist, e.g. [...,A,B,C] -> [...,B,C];
+                                        # A was removed and now B is under previous position of A so at next
+                                        # iteration the same index need to be checked to examine B;
+                                        index = index - 1
+                                        # exit "for output_link in" loop
+                                        break
                                 index = index + 1
 
                     # exit "for i in range" loop
@@ -311,8 +312,9 @@ class ModuleSorter(object):
             if sorted_node.type == Node.ACTION:
 
                 # and if action is input sensitive, i.e. requires to distinguish main input data
-                for input_sensitivity_action in ModuleSorter.input_sensitivity_action_list:
-                    if sorted_node.name[0:3] == input_sensitivity_action:
+                for input_sensitive_action in ModuleSorter.input_sensitive_action_list:
+                    if (sorted_node.name[0:3] == input_sensitive_action) or \
+                            (sorted_node.name[0:2] == input_sensitive_action):
 
                         # get marker position
                         marker_position = sorted_node.name.find("+")
@@ -335,7 +337,7 @@ class ModuleSorter(object):
                                 # record info
                                 Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",
                                                         False)
-                                # exit "for input_data in" loop
+                                # exit "for input_link in" loop
                                 break
 
     # Description:

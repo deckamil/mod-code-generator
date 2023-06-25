@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2023
+#   DATE:           24 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -388,8 +388,18 @@ class FileReader(object):
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
 
-                    # if end of target section if found
-                    if "</COMP>" in self.activity_file[j]:
+                    # if end of action target section is found
+                    if "</COMP>" in self.activity_file[j] and \
+                            source_interaction_type == Connection.ACTION:
+                        # exit "for j in range" loop
+                        break
+
+                    # if end of operation target section is found
+                    if "</COMP>" in self.activity_file[j] and \
+                            "</DEPENDENCIES>" in self.activity_file[j+1] and \
+                            "</OBJECT>" in self.activity_file[j+2] and \
+                            "</COMP>" in self.activity_file[j+3] and \
+                            source_interaction_type == Connection.OPERATION:
                         # exit "for j in range" loop
                         break
 
