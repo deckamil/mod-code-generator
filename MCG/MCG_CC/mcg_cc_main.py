@@ -7,7 +7,7 @@
 #       file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           13 JUN 2023
+#   DATE:           25 JUN 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -55,7 +55,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CC version
-    MCG_CC_VERSION = "v0.3.0-in-dev"
+    MCG_CC_VERSION = "v0.3.0-alpha"
 
     # Description:
     # This is main method, which display short notice and start conversion process.
