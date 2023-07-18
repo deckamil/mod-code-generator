@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           23 JUN 2023
+#   DATE:           18 JUL 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -39,8 +39,10 @@ from mcg_cc_connection import Connection
 class FileChecker(object):
 
     # list of actions types
-    action_3letter_type_list = ["ADD", "SUB", "MUL", "DIV", "AND", "NOT"]
-    action_2letter_type_list = ["OR", "EQ", "NE", "GT", "LT", "GE", "LE"]
+    action_type_list = ["ADD", "SUB", "MUL", "DIV",
+                        "AND", "OR", "NOT",
+                        "BAND", "BOR", "BXOR", "BNOT", "BLS", "BRS",
+                        "EQ", "NE", "GT", "LT", "GE", "LE"]
 
     # list of interface element types
     interface_element_type_list = ["INT8", "INT16", "INT32", "INT64",
@@ -97,21 +99,12 @@ class FileChecker(object):
 
         # is valid type is not found
         if not action_type_valid:
-            # check all possible 3-letter action types
-            for action_type in FileChecker.action_3letter_type_list:
+            # check all possible action types
+            for action_type in FileChecker.action_type_list:
+                # get length of action type
+                action_type_length = len(action_type)
                 # if action type is the same as in reference
-                if action_type == action_type_ref[0:3]:
-                    # set flag
-                    action_type_valid = True
-                    # exit loop
-                    break
-
-        # is valid types is not found
-        if not action_type_valid:
-            # check 2-letter action types
-            for action_type in FileChecker.action_2letter_type_list:
-                # if action type is the same as in reference
-                if action_type == action_type_ref[0:2]:
+                if action_type == action_type_ref[0:action_type_length]:
                     # set flag
                     action_type_valid = True
                     # exit loop

@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           23 JUN 2023
+#   DATE:           18 JUL 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -288,6 +288,8 @@ class ModuleConverter(object):
     def convert_action_node(self, sorted_node):
 
         # depending on the type of action, covert module node into configuration file.
+
+        # arithmetic operators
         if sorted_node.name[0:3] == "ADD":
             self.convert_specific_action_node_arity_n(sorted_node, "+")
 
@@ -300,15 +302,36 @@ class ModuleConverter(object):
         elif sorted_node.name[0:3] == "DIV":
             self.convert_specific_action_node_arity_n(sorted_node, "/")
 
+        # logical operators
         elif sorted_node.name[0:3] == "AND":
             self.convert_specific_action_node_arity_n(sorted_node, "&&")
-
-        elif sorted_node.name[0:3] == "NOT":
-            self.convert_specific_action_node_arity_1(sorted_node, "!")
 
         elif sorted_node.name[0:2] == "OR":
             self.convert_specific_action_node_arity_n(sorted_node, "||")
 
+        elif sorted_node.name[0:3] == "NOT":
+            self.convert_specific_action_node_arity_1(sorted_node, "!")
+
+        # bitwise operators
+        elif sorted_node.name[0:4] == "BAND":
+            self.convert_specific_action_node_arity_n(sorted_node, "&")
+
+        elif sorted_node.name[0:3] == "BOR":
+            self.convert_specific_action_node_arity_n(sorted_node, "|")
+
+        elif sorted_node.name[0:4] == "BXOR":
+            self.convert_specific_action_node_arity_n(sorted_node, "^")
+
+        elif sorted_node.name[0:4] == "BNOT":
+            self.convert_specific_action_node_arity_1(sorted_node, "~")
+
+        elif sorted_node.name[0:3] == "BLS":
+            self.convert_specific_action_node_arity_n(sorted_node, "<<")
+
+        elif sorted_node.name[0:3] == "BRS":
+            self.convert_specific_action_node_arity_n(sorted_node, ">>")
+
+        # relational operators
         elif sorted_node.name[0:2] == "EQ":
             self.convert_specific_action_node_arity_n(sorted_node, "==")
 
@@ -319,7 +342,7 @@ class ModuleConverter(object):
             self.convert_specific_action_node_arity_n(sorted_node, ">")
 
         elif sorted_node.name[0:2] == "LT":
-            self.convert_specific_action_node_arity_n(sorted_node, "LT")
+            self.convert_specific_action_node_arity_n(sorted_node, "<")
 
         elif sorted_node.name[0:2] == "GE":
             self.convert_specific_action_node_arity_n(sorted_node, ">=")

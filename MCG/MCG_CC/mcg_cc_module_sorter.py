@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           24 JUN 2023
+#   DATE:           18 JUL 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -42,7 +42,7 @@ class ModuleSorter(object):
     SORTED_NODE_LIST_INDEX = 0
 
     # list of action interaction that require to distinguish main data input
-    input_sensitive_action_list = ["SUB", "DIV", "GT", "LT", "GE", "LE"]
+    input_sensitive_action_list = ["SUB", "DIV", "BLS", "BRS", "GT", "LT", "GE", "LE"]
 
     # Description:
     # This is class constructor.
