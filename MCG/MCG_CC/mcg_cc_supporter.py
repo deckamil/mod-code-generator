@@ -4,8 +4,8 @@
 #       This module contains definition of Supporter class, which provides additional
 #       supporting methods and parameters reused by other classes.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2022 Kamil Deć github.com/deckamil
-#   DATE:           29 NOV 2022
+#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
+#   DATE:           22 JUL 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -34,24 +34,6 @@ from mcg_cc_error_handler import ErrorHandler
 # Description:
 # This class provides additional methods and parameters reused by other classes.
 class Supporter(object):
-
-    # This parameter defines offset of signal or structure name after "$TARGET$" marker in merged node,
-    # i.e. number of characters after occurrence of "$TARGET$" marker, where beginning of signal or
-    # structure name occurs, an example:
-    # eng_gain1 $TARGET$ eng_gain2 $TARGET$ ADD a084fca5-1c0a-4dfd-881b-21c3f83284e7 $TARGET$ eng_gain_total
-    TARGET_OFFSET = 9
-
-    # This parameter defines offset of signal name after "$FIRST$" marker in merged node or line of .exml file,
-    # i.e. number of characters after occurrence of "$FIRST$" marker, where beginning of signal name occurs, an example:
-    # $FIRST$ some_signal
-    FIRST_INPUT_SIGNAL_OFFSET = 8
-
-    # This parameter defines offset of action or component uid before end of action or component definition,
-    # i.e. number of characters before occurrence of action or component definition end, where beginning of action
-    # or component uid occurs, plus one additional character to accommodate space between action type or component
-    # name and uid, an example:
-    # ADD fd5be3ed-0d38-42d0-ab56-d1058657eee8
-    UID_OFFSET = -37
 
     # This parameter defines start offset of name element after "name" marker in line of .exml file, i.e.
     # number of characters after occurrence of "name" marker, where beginning of name element occurs, an example:
