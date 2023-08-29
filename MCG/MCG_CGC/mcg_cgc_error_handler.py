@@ -5,7 +5,7 @@
 #       responsible for error recording, which may occur during run of MCG CGC.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           26 MAR 2023
+#   DATE:           29 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -44,13 +44,14 @@ class ErrorHandler(object):
     CHK_ERR_FAULTY_HEADER = 10
     CHK_ERR_FAULTY_START_OR_FOOTER = 20
     CHK_ERR_FAULTY_MODULE_NAME = 21
-    CHK_ERR_FAULTY_OPERATION_NAME = 22
-    CHK_ERR_FAULTY_SOURCE = 23
-    CHK_ERR_FAULTY_INPUT_INTERFACE = 24
-    CHK_ERR_FAULTY_OUTPUT_INTERFACE = 25
-    CHK_ERR_FAULTY_LOCAL_INTERFACE = 26
-    CHK_ERR_FAULTY_BODY = 27
-    CHK_ERR_FAULTY_END = 28
+    CHK_ERR_FAULTY_MODULE_CONSTANT = 22
+    CHK_ERR_FAULTY_OPERATION_NAME = 23
+    CHK_ERR_FAULTY_SOURCE = 24
+    CHK_ERR_FAULTY_INPUT_INTERFACE = 25
+    CHK_ERR_FAULTY_OUTPUT_INTERFACE = 26
+    CHK_ERR_FAULTY_LOCAL_INTERFACE = 27
+    CHK_ERR_FAULTY_BODY = 28
+    CHK_ERR_FAULTY_END = 29
     CHK_ERR_DATA_AFTER_FOOTER = 30
     CHK_ERR_SAME_MODULE_NAME = 40
     CHK_ERR_SAME_OPERATION_NAME = 41
@@ -89,10 +90,10 @@ class ErrorHandler(object):
             # append error to error list
             ErrorHandler.error_list.append(error)
 
-        elif error_code == ErrorHandler.CHK_ERR_FAULTY_MODULE_NAME:
+        elif error_code == ErrorHandler.CHK_ERR_FAULTY_MODULE_CONSTANT:
             # set error notification
             error = "ERROR " + str(error_code) + ": Line " + str(error_info1) + " in the configuration file has " \
-                    "unexpected content instead of correct module name or marker"
+                    "unexpected content instead of correct module constant or marker"
             # append error to error list
             ErrorHandler.error_list.append(error)
 

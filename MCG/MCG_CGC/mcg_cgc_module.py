@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 MAY 2023
+#   DATE:           29 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -38,6 +38,9 @@ class Module(object):
     # This parameter defines index of interface element name in list which defines interface element
     INTERFACE_ELEMENT_NAME_INDEX = 1
 
+    # This parameter defines index of interface element value in list which defines interface element
+    INTERFACE_ELEMENT_VALUE_INDEX = 2
+
     # Indent used in module definition
     indent = "    "
 
@@ -46,6 +49,8 @@ class Module(object):
     def __init__(self):
         # initialize object data
         self.module_name = ""
+        self.module_appendix_name = ""
+        self.constant_list = []
         self.operation_name = ""
         self.generation_date = ""
         self.header_comment_list = []
@@ -106,7 +111,7 @@ class Module(object):
         module = module + " *\n"
 
         # set generic comment
-        module = module + " *   " + "This is source file of " + self.module_name + " module.\n"
+        module = module + " *   This is source file of " + self.module_name + " module.\n"
 
         # append header comments
         for header_comment in self.header_comment_list:
@@ -119,7 +124,7 @@ class Module(object):
 
         # set includes
         module = module + "#include \"" + self.module_name + ".h\"\n"
-        module = module + "#include \"basic_data_types.h\"\n"
+        module = module + "#include \"" + self.module_appendix_name + ".h\"\n"
 
         # remove duplicates from include list
         self.include_list = list(dict.fromkeys(self.include_list))
@@ -130,6 +135,23 @@ class Module(object):
 
         # set separator line
         module = module + "\n"
+
+        # ********** CONSTANT DATA DEFINITION ********** #
+
+        # if any constant was appended
+        if len(self.constant_list) > 0:
+
+            # set constant data comment
+            module = module + "// Definition of constant data\n"
+
+            # append constant data
+            for constant_element in self.constant_list:
+                module = module + "const " + constant_element[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
+                         + constant_element[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
+                         + constant_element[Module.INTERFACE_ELEMENT_VALUE_INDEX] + ";\n"
+
+            # set separator line
+            module = module + "\n"
 
         # ********** FUNCTION HEADER ********** #
 
@@ -243,7 +265,7 @@ class Module(object):
         module = module + " *\n"
 
         # set generic comment
-        module = module + " *   " + "This is header file of " + self.module_name + " module.\n"
+        module = module + " *   This is header file of " + self.module_name + " module.\n"
 
         # append header comments
         for header_comment in self.header_comment_list:
@@ -261,7 +283,7 @@ class Module(object):
         # ********** MODULE INCLUDES ********** #
 
         # set includes
-        module = module + "#include \"basic_data_types.h\"\n\n"
+        module = module + "#include \"" + self.module_appendix_name + ".h\"\n\n"
 
         # ********** INPUT INTERFACE TYPE ********** #
 

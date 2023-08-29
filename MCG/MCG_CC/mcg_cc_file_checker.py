@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           18 JUL 2023
+#   DATE:           29 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -97,18 +97,16 @@ class FileChecker(object):
         # result flag
         action_type_valid = False
 
-        # is valid type is not found
-        if not action_type_valid:
-            # check all possible action types
-            for action_type in FileChecker.action_type_list:
-                # get length of action type
-                action_type_length = len(action_type)
-                # if action type is the same as in reference
-                if action_type == action_type_ref[0:action_type_length]:
-                    # set flag
-                    action_type_valid = True
-                    # exit loop
-                    break
+        # check all possible action types
+        for action_type in FileChecker.action_type_list:
+            # get length of action type
+            action_type_length = len(action_type)
+            # if action type is the same as in reference
+            if action_type == action_type_ref[0:action_type_length]:
+                # set positive flag
+                action_type_valid = True
+                # exit loop
+                break
 
         # return flag
         return action_type_valid

@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 MAY 2023
+#   DATE:           29 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,6 +30,7 @@
 
 from datetime import datetime
 from mcg_cgc_module import Module
+from mcg_cgc_module_appendix import ModuleAppendix
 from mcg_cgc_logger import Logger
 
 
@@ -40,6 +41,7 @@ class ConfigConverter(object):
     # expected data/marker positions or properties of configuration file
     INTERFACE_TYPE_POSITION_IN_CFG = 5
     INTERFACE_NAME_POSITION_IN_CFG = 6
+    INTERFACE_VALUE_POSITION_IN_CFG = 7
     BODY_DATA_POSITION_IN_CFG = 5
 
     # indexes of operation and module names on list
@@ -51,6 +53,9 @@ class ConfigConverter(object):
 
     # path to source code directory
     code_dir_path = ""
+
+    # definition of module appendix name
+    module_appendix_name = "mcg_appendix"
 
     # Description:
     # This method sets path to output directory where source code will be generated.
@@ -91,8 +96,12 @@ class ConfigConverter(object):
 
         # get new module
         module = Module()
-        # module name
         module_name = ""
+
+        # get new module appendix
+        module_appendix = ModuleAppendix()
+        module_appendix.module_name = ConfigConverter.module_appendix_name
+        module_appendix.generation_date = date
 
         # find list of operation and module name links
         ConfigConverter.find_operation_module_name_list(config_file)
@@ -111,6 +120,8 @@ class ConfigConverter(object):
                 module = Module()
                 # set date
                 module.generation_date = date
+                # set module appendix name
+                module.module_appendix_name = ConfigConverter.module_appendix_name
 
             # when module name is found
             elif config_file[file_index] == "$MODULE NAME START$":
@@ -122,6 +133,29 @@ class ConfigConverter(object):
                 module_name = config_file[file_index+1]
                 # set module name
                 module.module_name = module_name
+
+            # when module constants are found
+            elif config_file[file_index] == "$MODULE CONSTANTS START$":
+
+                # increment file index to definition of first constant element
+                file_index = file_index + 1
+
+                # continue reading of constants definition until end of constant section is reached
+                while config_file[file_index] != "$MODULE CONSTANTS END$":
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module constant from line " + str(file_index + 1),
+                                            False)
+                    # get line
+                    line = config_file[file_index]
+                    # extract constant element type, name and value from line of the configuration file
+                    constant_element = ConfigConverter.extract_constant_element(line)
+                    # append constant element to module
+                    module.constant_list.append((constant_element))
+                    # append constant element to module appendix
+                    module_appendix.constant_list.append(constant_element)
+                    # increment file index
+                    file_index = file_index + 1
 
             # when operation name is found
             elif config_file[file_index] == "$OPERATION NAME START$":
@@ -317,6 +351,17 @@ class ConfigConverter(object):
             # increment file index
             file_index = file_index + 1
 
+        # record info
+        Logger.save_in_log_file("ConfigConverter",
+                                "Generating header code file for " + module_appendix.module_name + " module",
+                                False)
+        # generate header file code
+        module_header = module_appendix.generate_module_appendix()
+        # set module header name
+        module_header_name = module_appendix.module_name + '.h'
+        # save module header to file
+        ConfigConverter.save_module_file(module_header_name, module_header)
+
     # Description:
     # This method looks for operation and module name links in the configuration file.
     @staticmethod
@@ -355,7 +400,32 @@ class ConfigConverter(object):
             file_index = file_index + 1
 
     # Description:
-    # This method extracts interface element type and interface element name from line of the configuration file.
+    # This method extracts constant element type, name and value from line of the configuration file.
+    @staticmethod
+    def extract_constant_element(line):
+
+        # get name position within line
+        name_position = line.find(" name ")
+        # get value position within line
+        value_position = line.find(" value ")
+        # get constant element type
+        constant_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
+        # get constant element name
+        constant_element_name = line[name_position + ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:value_position]
+        # get constant element value
+        constant_element_value = line[value_position + ConfigConverter.INTERFACE_VALUE_POSITION_IN_CFG:len(line)]
+
+        # append collected data to constant element
+        constant_element = []
+        constant_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, constant_element_type)
+        constant_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, constant_element_name)
+        constant_element.insert(Module.INTERFACE_ELEMENT_VALUE_INDEX, constant_element_value)
+
+        # return constant element
+        return constant_element
+
+    # Description:
+    # This method extracts interface element type and name from line of the configuration file.
     @staticmethod
     def extract_interface_element(line):
 

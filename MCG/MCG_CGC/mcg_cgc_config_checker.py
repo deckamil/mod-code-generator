@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           28 MAY 2023
+#   DATE:           29 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -56,16 +56,18 @@ class ConfigChecker(object):
     MAIN_CHECK_HEADER = 100
     MAIN_FIND_NEW_MODULE = 200
     MAIN_CHECK_MODULE_NAME = 301
-    MAIN_CHECK_OPERATION_NAME = 302
-    MAIN_CHECK_INPUT_INTERFACE_START = 303
-    MAIN_CHECK_INPUT_INTERFACE = 304
-    MAIN_CHECK_OUTPUT_INTERFACE_START = 305
-    MAIN_CHECK_OUTPUT_INTERFACE = 306
-    MAIN_CHECK_LOCAL_INTERFACE_START = 307
-    MAIN_CHECK_LOCAL_INTERFACE = 308
-    MAIN_CHECK_OPERATION_BODY_START = 309
-    MAIN_CHECK_OPERATION_BODY = 310
-    MAIN_CHECK_MODULE_END = 311
+    MAIN_CHECK_MODULE_CONSTANT_START = 302
+    MAIN_CHECK_MODULE_CONSTANT = 303
+    MAIN_CHECK_OPERATION_NAME = 304
+    MAIN_CHECK_INPUT_INTERFACE_START = 305
+    MAIN_CHECK_INPUT_INTERFACE = 306
+    MAIN_CHECK_OUTPUT_INTERFACE_START = 307
+    MAIN_CHECK_OUTPUT_INTERFACE = 308
+    MAIN_CHECK_LOCAL_INTERFACE_START = 309
+    MAIN_CHECK_LOCAL_INTERFACE = 310
+    MAIN_CHECK_OPERATION_BODY_START = 311
+    MAIN_CHECK_OPERATION_BODY = 312
+    MAIN_CHECK_MODULE_END = 313
     MAIN_SKIP_TO_NEXT_SECTION = 400
     MAIN_CHECK_FOOTER = 500
     MAIN_END_CHECKING = 600
@@ -142,6 +144,11 @@ class ConfigChecker(object):
             # check module name
             elif ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_NAME:
                 ConfigChecker.check_module_name()
+
+            # check module constants
+            elif (ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_CONSTANT_START or
+                  ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_CONSTANT):
+                ConfigChecker.check_module_constants()
 
             # check operation name
             elif ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_OPERATION_NAME:
@@ -266,7 +273,7 @@ class ConfigChecker(object):
             # increment file index
             ConfigChecker.file_index = ConfigChecker.file_index + 3
             # move to next state
-            ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_OPERATION_NAME
+            ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_MODULE_CONSTANT_START
 
         # or if line contains unexpected data
         else:
@@ -274,6 +281,70 @@ class ConfigChecker(object):
             ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_MODULE_NAME, ConfigChecker.file_index + 1, "")
             # skip part of the configuration file and find next module section
             ConfigChecker.main_checker_state = ConfigChecker.MAIN_SKIP_TO_NEXT_SECTION
+
+    # Description:
+    # This method checks correctness of module constants section in the configuration file.
+    @staticmethod
+    def check_module_constants():
+
+        # record info
+        Logger.save_in_log_file("ConfigChecker",
+                                "Checking module constants in the configuration file at line "
+                                + str(ConfigChecker.file_index + 1),
+                                False)
+
+        # for constants start check
+        if ConfigChecker.main_checker_state == ConfigChecker.MAIN_CHECK_MODULE_CONSTANT_START:
+
+            # if constants start marker is found
+            if ConfigChecker.config_file[ConfigChecker.file_index] == "$MODULE CONSTANTS START$":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # move to next state
+                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_MODULE_CONSTANT
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_MODULE_CONSTANT, ConfigChecker.file_index + 1, "")
+                # skip part of the configuration file and find next module section
+                ConfigChecker.main_checker_state = ConfigChecker.MAIN_SKIP_TO_NEXT_SECTION
+
+        # otherwise for constant check
+        else:
+
+            # if type, name and value in constant definition is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
+                ConfigChecker.BASE_MARKER_POSITION) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
+                     ConfigChecker.BASE_MARKER_POSITION) and \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find(" value ") >
+                     ConfigChecker.BASE_MARKER_POSITION):
+                # increment file index and repeat same state process
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+
+            # or if constants end is found
+            elif ConfigChecker.config_file[ConfigChecker.file_index] == "$MODULE CONSTANTS END$":
+                # increment file index
+                ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # clear counter of subsection errors
+                ConfigChecker.number_of_subsection_errors = 0
+                # move to next state
+                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_OPERATION_NAME
+
+            # or if line contains unexpected data
+            else:
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_MODULE_CONSTANT, ConfigChecker.file_index + 1, "")
+                # increment number of subsection errors
+                ConfigChecker.number_of_subsection_errors = ConfigChecker.number_of_subsection_errors + 1
+                # if number of subsection errors is greater than skipping threshold
+                if ConfigChecker.number_of_subsection_errors >= ConfigChecker.NUMBER_OF_REPETITIONS_BEFORE_SKIPPING:
+                    # skip part of the configuration file and find next module section
+                    ConfigChecker.main_checker_state = ConfigChecker.MAIN_SKIP_TO_NEXT_SECTION
+                else:
+                    # increment file index and repeat same state
+                    ConfigChecker.file_index = ConfigChecker.file_index + 1
 
     # Description:
     # This method checks correctness of operation name section in the configuration file.
@@ -376,7 +447,7 @@ class ConfigChecker(object):
         # otherwise for interface check
         else:
 
-            # if type and name in input interface is found
+            # if type and name in interface is found
             if (ConfigChecker.config_file[ConfigChecker.file_index].find("type ") ==
                 ConfigChecker.BASE_MARKER_POSITION) and \
                     (ConfigChecker.config_file[ConfigChecker.file_index].find(" name ") >
@@ -586,6 +657,11 @@ class ConfigChecker(object):
             elif ConfigChecker.config_file[temporary_file_index] == "$MODULE NAME START$":
                 # move to expected state
                 ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_MODULE_NAME
+
+            # when module constants are found
+            elif ConfigChecker.config_file[temporary_file_index] == "$MODULE CONSTANTS START$":
+                # move to expected state
+                ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_MODULE_CONSTANT_START
 
             # when operation name is found
             elif ConfigChecker.config_file[temporary_file_index] == "$OPERATION NAME START$":
