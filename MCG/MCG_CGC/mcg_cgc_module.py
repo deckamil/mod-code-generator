@@ -37,19 +37,24 @@ class Module(object):
     DATA_ELEMENT_NAME_INDEX = 1
     DATA_ELEMENT_VALUE_INDEX = 2
 
-    # Indent used in module definition
+    # indent used in module definition
     indent = "    "
+
+    # class data used to generate additional module appendix
+    module_appendix_name = "mcg_appendix"
+    module_appendix_constant_list = []
+
+    # generation data to be placed in generated files
+    generation_date = ""
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
         self.module_name = ""
-        self.module_appendix_name = ""
-        self.constant_list = []
-        self.operation_name = ""
-        self.generation_date = ""
         self.header_comment_list = []
+        self.module_constant_list = []
+        self.operation_name = ""
         self.include_list = []
         self.input_interface_list = []
         self.output_interface_list = []
@@ -101,7 +106,7 @@ class Module(object):
         # set module header
         module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
         # set module date
-        module = module + self.generation_date + "\n"
+        module = module + Module.generation_date + "\n"
 
         # set module comment
         module = module + " *\n"
@@ -120,7 +125,7 @@ class Module(object):
 
         # set includes
         module = module + "#include \"" + self.module_name + ".h\"\n"
-        module = module + "#include \"" + self.module_appendix_name + ".h\"\n"
+        module = module + "#include \"" + Module.module_appendix_name + ".h\"\n"
 
         # remove duplicates from include list
         self.include_list = list(dict.fromkeys(self.include_list))
@@ -135,13 +140,13 @@ class Module(object):
         # ********** CONSTANT DATA DEFINITION ********** #
 
         # if any constant was appended
-        if len(self.constant_list) > 0:
+        if len(self.module_constant_list) > 0:
 
             # set constant data comment
             module = module + "// Definition of constant data\n"
 
             # append constant data
-            for constant_element in self.constant_list:
+            for constant_element in self.module_constant_list:
                 module = module + "const " + constant_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
                          + constant_element[Module.DATA_ELEMENT_NAME_INDEX] + " = " \
                          + constant_element[Module.DATA_ELEMENT_VALUE_INDEX] + ";\n"
@@ -255,7 +260,7 @@ class Module(object):
         # set module header
         module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
         # set module date
-        module = module + self.generation_date + "\n"
+        module = module + Module.generation_date + "\n"
 
         # set module comment
         module = module + " *\n"
@@ -279,7 +284,7 @@ class Module(object):
         # ********** MODULE INCLUDES ********** #
 
         # set includes
-        module = module + "#include \"" + self.module_appendix_name + ".h\"\n\n"
+        module = module + "#include \"" + Module.module_appendix_name + ".h\"\n\n"
 
         # ********** INPUT INTERFACE TYPE ********** #
 
@@ -331,6 +336,89 @@ class Module(object):
 
         # set header guard end
         module = module + "#endif " + "// " + self.module_name + "_H_\n\n"
+
+        # ********** MODULE END ********** #
+
+        # set module footer
+        module = module + "/*\n" + " * END OF MODULE\n" + " */\n"
+
+        # return string representation
+        return module
+
+    # Description
+    # This method returns string representation of module appendix file.
+    @staticmethod
+    def generate_module_appendix():
+
+        # ********** MODULE HEADER ********** #
+
+        # set module header
+        module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
+        # set module date
+        module = module + Module.generation_date + "\n"
+
+        # set module comment
+        module = module + " *\n"
+
+        # set generic comment
+        module = module + " *   This is header file of " + Module.module_appendix_name + " module.\n"
+
+        # set end of module header
+        module = module + " */\n\n"
+
+        # ********** HEADER GUARD ********** #
+
+        # set header guard
+        module = module + "#ifndef " + Module.module_appendix_name + "_H_\n"
+        module = module + "#define " + Module.module_appendix_name + "_H_\n\n"
+
+        # ********** DATA TYPES DEFINITION ********** #
+
+        # set data types comment
+        module = module + "// Definition of data types\n"
+
+        # append data types
+        module = module + "typedef signed char INT8;\n"
+        module = module + "typedef signed short INT16;\n"
+        module = module + "typedef signed int INT32;\n"
+        module = module + "typedef signed long long INT64;\n"
+        module = module + "typedef unsigned char UINT8;\n"
+        module = module + "typedef unsigned short UINT16;\n"
+        module = module + "typedef unsigned int UINT32;\n"
+        module = module + "typedef unsigned long long UINT64;\n"
+        module = module + "typedef float FLOAT32;\n"
+        module = module + "typedef double FLOAT64;\n"
+        module = module + "typedef UINT8 BOOL;\n\n"
+
+        # ********** BOOL DATA STATES DEFINITION ********** #
+
+        # set BOOL data states comment
+        module = module + "// Definition of BOOL data states\n"
+
+        # append BOOL data states
+        module = module + "#define TRUE 1\n"
+        module = module + "#define FALSE 0\n\n"
+
+        # ********** CONSTANT DATA DEFINITION ********** #
+
+        # if any constant was appended
+        if len(Module.module_appendix_constant_list) > 0:
+
+            # set constant data comment
+            module = module + "// Declaration of extern constant data\n"
+
+            # append constant data
+            for constant_element in Module.module_appendix_constant_list:
+                module = module + "extern const " + constant_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                         + constant_element[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
+
+            # set separator line
+            module = module + "\n"
+
+        # ********** HEADER GUARD END ********** #
+
+        # set header guard end
+        module = module + "#endif " + "// " + Module.module_appendix_name + "_H_\n\n"
 
         # ********** MODULE END ********** #
 

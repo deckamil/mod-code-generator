@@ -30,7 +30,6 @@
 
 from datetime import datetime
 from mcg_cgc_module import Module
-from mcg_cgc_module_appendix import ModuleAppendix
 from mcg_cgc_logger import Logger
 
 
@@ -53,9 +52,6 @@ class ConfigConverter(object):
 
     # path to source code directory
     code_dir_path = ""
-
-    # definition of module appendix name
-    module_appendix_name = "mcg_appendix"
 
     # Description:
     # This method sets path to output directory where source code will be generated.
@@ -93,15 +89,12 @@ class ConfigConverter(object):
         date = datetime.now()
         # format date
         date = date.strftime("%d %b %Y, %H:%M:%S")
+        # set date
+        Module.generation_date = date
 
-        # get new module
+        # get new Module
         module = Module()
         module_name = ""
-
-        # get new module appendix
-        module_appendix = ModuleAppendix()
-        module_appendix.module_name = ConfigConverter.module_appendix_name
-        module_appendix.generation_date = date
 
         # find list of operation and module name links
         ConfigConverter.find_operation_module_name_list(config_file)
@@ -118,10 +111,6 @@ class ConfigConverter(object):
             if config_file[file_index] == "$MODULE START$":
                 # get new module
                 module = Module()
-                # set date
-                module.generation_date = date
-                # set module appendix name
-                module.module_appendix_name = ConfigConverter.module_appendix_name
 
             # when module name is found
             elif config_file[file_index] == "$MODULE NAME START$":
@@ -150,10 +139,10 @@ class ConfigConverter(object):
                     line = config_file[file_index]
                     # extract constant element type, name and value from line of the configuration file
                     constant_element = ConfigConverter.extract_constant_element(line)
-                    # append constant element to module
-                    module.constant_list.append((constant_element))
-                    # append constant element to module appendix
-                    module_appendix.constant_list.append(constant_element)
+                    # append constant element to module constant list
+                    module.module_constant_list.append(constant_element)
+                    # append constant element to module appendix constant list
+                    Module.module_appendix_constant_list.append(constant_element)
                     # increment file index
                     file_index = file_index + 1
 
@@ -353,12 +342,12 @@ class ConfigConverter(object):
 
         # record info
         Logger.save_in_log_file("ConfigConverter",
-                                "Generating header code file for " + module_appendix.module_name + " module",
+                                "Generating header code file for " + Module.module_appendix_name + " module",
                                 False)
         # generate header file code
-        module_header = module_appendix.generate_module_appendix()
+        module_header = Module.generate_module_appendix()
         # set module header name
-        module_header_name = module_appendix.module_name + '.h'
+        module_header_name = Module.module_appendix_name + '.h'
         # save module header to file
         ConfigConverter.save_module_file(module_header_name, module_header)
 
