@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           18 JUL 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -199,7 +199,7 @@ class ModuleSorter(object):
             # go through all local data elements for each node
             for local_interface in self.local_interface_list:
                 # get local data name
-                local_data_name = local_interface[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
+                local_data_name = local_interface[FileReader.DATA_ELEMENT_NAME_INDEX]
                 # go through all input links
                 for input_link in node.input_data_list:
                     # if local data element is input to node

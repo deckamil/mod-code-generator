@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -275,16 +275,16 @@ class ConfigConverter(object):
 
                         # get operation input interface element
                         interface_element = []
-                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_input_type")
-                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_input")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_input_type")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_input")
 
                         # append interface element to local interface
                         module.local_interface_list.append(interface_element)
 
                         # get operation output interface element
                         interface_element = []
-                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_output_type")
-                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_output")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_output_type")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_output")
 
                         # append interface element to local interface
                         module.local_interface_list.append(interface_element)
@@ -417,9 +417,9 @@ class ConfigConverter(object):
 
         # append collected data to constant element
         constant_element = []
-        constant_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, constant_element_type)
-        constant_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, constant_element_name)
-        constant_element.insert(Module.INTERFACE_ELEMENT_VALUE_INDEX, constant_element_value)
+        constant_element.insert(Module.DATA_ELEMENT_NAME_INDEX, constant_element_type)
+        constant_element.insert(Module.DATA_ELEMENT_NAME_INDEX, constant_element_name)
+        constant_element.insert(Module.DATA_ELEMENT_VALUE_INDEX, constant_element_value)
 
         # return constant element
         return constant_element
@@ -438,8 +438,8 @@ class ConfigConverter(object):
 
         # append collected data to interface element
         interface_element = []
-        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
-        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, interface_element_type)
+        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, interface_element_name)
 
         # return interface element
         return interface_element

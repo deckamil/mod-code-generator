@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -38,10 +38,10 @@ from mcg_cc_connection import Connection
 # This class allows to read module content from .exml files.
 class FileReader(object):
 
-    # indexes of interface element list
-    INTERFACE_ELEMENT_NAME_INDEX = 0
-    INTERFACE_ELEMENT_TYPE_INDEX = 1
-    INTERFACE_ELEMENT_VALUE_INDEX = 2
+    # indexes of data element list
+    DATA_ELEMENT_TYPE_INDEX = 0
+    DATA_ELEMENT_NAME_INDEX = 1
+    DATA_ELEMENT_VALUE_INDEX = 2
 
     # indexes of return data
     OPERATION_NAME_INDEX = 0
@@ -122,12 +122,12 @@ class FileReader(object):
                         # constant element
                         constant_element = []
 
-                        # append constant name to constant element
-                        constant_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, constant_name)
                         # append constant type to constant element
-                        constant_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, constant_type)
+                        constant_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, constant_type)
+                        # append constant name to constant element
+                        constant_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, constant_name)
                         # append constant value to constant element
-                        constant_element.insert(FileReader.INTERFACE_ELEMENT_VALUE_INDEX, constant_value)
+                        constant_element.insert(FileReader.DATA_ELEMENT_VALUE_INDEX, constant_value)
                         # append constant element to constant list
                         self.constant_list.append(constant_element)
                         # record info
@@ -178,10 +178,10 @@ class FileReader(object):
                         # interface element
                         interface_element = []
 
-                        # append parameter name to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, parameter_name)
                         # append parameter type to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, parameter_type)
+                        interface_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, parameter_type)
+                        # append parameter name to interface element
+                        interface_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, parameter_name)
 
                         # if it is input parameter
                         if parameter_direction == "INPUT":
@@ -222,10 +222,10 @@ class FileReader(object):
                         # interface element
                         interface_element = []
 
-                        # append local name to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, local_name)
                         # append local type to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, local_type)
+                        interface_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, local_type)
+                        # append local name to interface element
+                        interface_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, local_name)
                         # append interface element to interface list
                         if interface_element not in self.local_interface_list:
                             self.local_interface_list.append(interface_element)

@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -153,12 +153,12 @@ class ModuleConverter(object):
 
         # append constant details to configuration file
         for constant_element in self.constant_list:
-            # get constant element name
-            constant_element_name = constant_element[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
             # get constant element type
-            constant_element_type = constant_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            constant_element_type = constant_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
+            # get constant element name
+            constant_element_name = constant_element[FileReader.DATA_ELEMENT_NAME_INDEX]
             # get constant element value
-            constant_element_value = constant_element[FileReader.INTERFACE_ELEMENT_VALUE_INDEX]
+            constant_element_value = constant_element[FileReader.DATA_ELEMENT_VALUE_INDEX]
             # get configuration file line
             configuration_file_line = "type " + str(constant_element_type) + " name " + str(constant_element_name) + \
                                       " value " + str(constant_element_value)
@@ -197,10 +197,10 @@ class ModuleConverter(object):
 
         # append interface details to configuration file
         for interface_element in interface_element_list:
-            # get interface element name
-            interface_element_name = interface_element[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
+            # get interface element name
+            interface_element_name = interface_element[FileReader.DATA_ELEMENT_NAME_INDEX]
             # get configuration file line
             configuration_file_line = "type " + str(interface_element_type) + " name " + str(interface_element_name)
             # append configuration file line to configuration file

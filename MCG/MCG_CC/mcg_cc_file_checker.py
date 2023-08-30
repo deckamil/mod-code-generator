@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -121,7 +121,7 @@ class FileChecker(object):
         # check interface element types in input interface
         for interface_element in self.input_interface_list:
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
             # check interface element type
             interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
@@ -133,7 +133,7 @@ class FileChecker(object):
         # check interface element types in output interface
         for interface_element in self.output_interface_list:
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
             # check interface element type
             interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
@@ -145,7 +145,7 @@ class FileChecker(object):
         # check interface element types in local interface
         for interface_element in self.local_interface_list:
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
             # check interface element type
             interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 

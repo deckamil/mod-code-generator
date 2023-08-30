@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,14 +32,10 @@
 # This class represents module source code and module header to be generated from the configuration file.
 class Module(object):
 
-    # This parameter defines index of interface element type in list which defines interface element
-    INTERFACE_ELEMENT_TYPE_INDEX = 0
-
-    # This parameter defines index of interface element name in list which defines interface element
-    INTERFACE_ELEMENT_NAME_INDEX = 1
-
-    # This parameter defines index of interface element value in list which defines interface element
-    INTERFACE_ELEMENT_VALUE_INDEX = 2
+    # indexes of data element list
+    DATA_ELEMENT_TYPE_INDEX = 0
+    DATA_ELEMENT_NAME_INDEX = 1
+    DATA_ELEMENT_VALUE_INDEX = 2
 
     # Indent used in module definition
     indent = "    "
@@ -71,8 +67,8 @@ class Module(object):
         # for each interface element
         for interface_element in interface_element_list:
             # merge interface element type and name
-            tmp_interface_element = interface_element[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " + \
-                                    interface_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
+            tmp_interface_element = interface_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " + \
+                                    interface_element[Module.DATA_ELEMENT_NAME_INDEX]
             # append temporary interface element to the list
             tmp_interface_element_list.append(tmp_interface_element)
 
@@ -88,8 +84,8 @@ class Module(object):
             interface_element_type, interface_element_name = tmp_interface_element.split(" ")
             # append collected data to interface element
             interface_element = []
-            interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
-            interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+            interface_element.insert(Module.DATA_ELEMENT_TYPE_INDEX, interface_element_type)
+            interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, interface_element_name)
             # append interface element to the list
             interface_element_list.append(interface_element)
 
@@ -146,9 +142,9 @@ class Module(object):
 
             # append constant data
             for constant_element in self.constant_list:
-                module = module + "const " + constant_element[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                         + constant_element[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
-                         + constant_element[Module.INTERFACE_ELEMENT_VALUE_INDEX] + ";\n"
+                module = module + "const " + constant_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                         + constant_element[Module.DATA_ELEMENT_NAME_INDEX] + " = " \
+                         + constant_element[Module.DATA_ELEMENT_VALUE_INDEX] + ";\n"
 
             # set separator line
             module = module + "\n"
@@ -177,9 +173,9 @@ class Module(object):
 
         # append input interface
         for input_interface in self.input_interface_list:
-            module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
-                     + self.operation_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + input_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + input_interface[Module.DATA_ELEMENT_NAME_INDEX] + " = " \
+                     + self.operation_name + "_input->" + input_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -191,8 +187,8 @@ class Module(object):
 
         # append local interface
         for local_interface in self.local_interface_list:
-            module = module + self.indent + local_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + local_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + local_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + local_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -204,8 +200,8 @@ class Module(object):
 
         # append output interface
         for output_interface in self.output_interface_list:
-            module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + output_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + output_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -233,8 +229,8 @@ class Module(object):
         # collect output data into output data structure
         for output_interface in self.output_interface_list:
             module = module + self.indent + self.operation_name + "_output->" + \
-                     output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " + \
-                     output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+                     output_interface[Module.DATA_ELEMENT_NAME_INDEX] + " = " + \
+                     output_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -295,8 +291,8 @@ class Module(object):
 
         # append input interface
         for input_interface in self.input_interface_list:
-            module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + input_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + input_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         # set input interface type name
         module = module + "} " + self.operation_name + "_input_type;\n\n"
@@ -311,8 +307,8 @@ class Module(object):
 
         # append output interface
         for output_interface in self.output_interface_list:
-            module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + output_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + output_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         # set output interface type name
         module = module + "} " + self.operation_name + "_output_type;\n\n"
