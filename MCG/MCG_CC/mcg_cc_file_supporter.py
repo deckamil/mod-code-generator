@@ -1,11 +1,11 @@
-#   FILE:           mcg_cc_supporter.py
+#   FILE:           mcg_cc_file_supporter.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Supporter class, which provides additional
+#       This module contains definition of FileSupporter class, which provides additional
 #       supporting methods and parameters reused by other classes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           22 JUL 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,12 +28,9 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-from mcg_cc_error_handler import ErrorHandler
-
-
 # Description:
 # This class provides additional methods and parameters reused by other classes.
-class Supporter(object):
+class FileSupporter(object):
 
     # This parameter defines start offset of name element after "name" marker in line of .exml file, i.e.
     # number of characters after occurrence of "name" marker, where beginning of name element occurs, an example:
@@ -67,7 +64,7 @@ class Supporter(object):
         mc_position = line.find("mc")
 
         # get name
-        name = line[name_position + Supporter.NAME_START_OFFSET:mc_position + Supporter.NAME_END_OFFSET]
+        name = line[name_position + FileSupporter.NAME_START_OFFSET:mc_position + FileSupporter.NAME_END_OFFSET]
 
         # return name
         return name
@@ -82,7 +79,7 @@ class Supporter(object):
         uid_position = line.find("uid")
 
         # get uid
-        uid = line[uid_position + Supporter.UID_START_OFFSET:len(line) + Supporter.UID_END_OFFSET]
+        uid = line[uid_position + FileSupporter.UID_START_OFFSET:len(line) + FileSupporter.UID_END_OFFSET]
 
         # return uid
         return uid

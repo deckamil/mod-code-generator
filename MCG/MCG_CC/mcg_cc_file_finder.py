@@ -5,7 +5,7 @@
 #       responsible for finding .exml files, that describe module content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,8 +29,8 @@
 
 
 from os import listdir
+from mcg_cc_file_supporter import FileSupporter
 from mcg_cc_logger import Logger
-from mcg_cc_supporter import Supporter
 
 
 # Description:
@@ -163,9 +163,9 @@ class FileFinder(object):
                              "mc=\"Standard.Package\"" in module_file[i]) and
                             "<PID name=" in module_file[i+1]):
                         # get module name
-                        FileFinder.module_name = Supporter.get_name(module_file[i])
+                        FileFinder.module_name = FileSupporter.get_name(module_file[i])
                         # get module uid
-                        FileFinder.module_uid = Supporter.get_uid(module_file[i])
+                        FileFinder.module_uid = FileSupporter.get_uid(module_file[i])
 
                     # if operation is defined in module
                     if "<COMP relation=\"OwnedOperation\">" in module_file[i]:
@@ -226,13 +226,13 @@ class FileFinder(object):
                             ("mc=\"Standard.Component\"" in activity_file[i+1] or
                              "mc=\"Standard.Package\"" in activity_file[i+1])):
                         # get activity name
-                        FileFinder.activity_name = Supporter.get_name(activity_file[i])
+                        FileFinder.activity_name = FileSupporter.get_name(activity_file[i])
                         # get activity uid
-                        FileFinder.activity_uid = Supporter.get_uid(activity_file[i])
+                        FileFinder.activity_uid = FileSupporter.get_uid(activity_file[i])
                         # get parent module name
-                        parent_module_name = Supporter.get_name(activity_file[i+1])
+                        parent_module_name = FileSupporter.get_name(activity_file[i+1])
                         # get parent module uid
-                        parent_module_uid = Supporter.get_uid(activity_file[i+1])
+                        parent_module_uid = FileSupporter.get_uid(activity_file[i+1])
                         # if there is name and uid compatibility
                         if FileFinder.module_name == parent_module_name and FileFinder.module_uid == parent_module_uid:
                             # store activity file
