@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,10 +28,10 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from mcg_cc_activity_connection import ActivityConnection
+from mcg_cc_activity_node import ActivityNode
 from mcg_cc_file_reader import FileReader
 from mcg_cc_logger import Logger
-from mcg_cc_connection import Connection
-from mcg_cc_node import Node
 
 
 # Description:
@@ -67,7 +67,7 @@ class ModuleSorter(object):
         for connection in self.connection_list:
 
             # if action or operation is connection source
-            if connection.source_type == Connection.ACTION or connection.source_type == Connection.OPERATION:
+            if connection.source_type == ActivityConnection.ACTION or connection.source_type == ActivityConnection.OPERATION:
 
                 # if new integration is found in connection
                 if connection.source_uid not in self.interaction_uid_list:
@@ -75,7 +75,7 @@ class ModuleSorter(object):
                     self.interaction_uid_list.append(connection.source_uid)
 
             # if action or operation is connection target
-            if connection.target_type == Connection.ACTION or connection.target_type == Connection.OPERATION:
+            if connection.target_type == ActivityConnection.ACTION or connection.target_type == ActivityConnection.OPERATION:
 
                 # if new integration is found in connection
                 if connection.target_uid not in self.interaction_uid_list:
@@ -97,7 +97,7 @@ class ModuleSorter(object):
         for interaction_uid in self.interaction_uid_list:
 
             # create new node instance
-            node = Node()
+            node = ActivityNode()
 
             # check source and target uid of each connection
             for connection in self.connection_list:
@@ -120,13 +120,13 @@ class ModuleSorter(object):
                     node.uid = connection.target_uid
 
                     # if action is connection target
-                    if connection.target_type == Connection.ACTION:
+                    if connection.target_type == ActivityConnection.ACTION:
                         # set node type
-                        node.type = Node.ACTION
+                        node.type = ActivityNode.ACTION
                     # if operation is connection target
-                    elif connection.target_type == Connection.OPERATION:
+                    elif connection.target_type == ActivityConnection.OPERATION:
                         # set node type
-                        node.type = Node.OPERATION
+                        node.type = ActivityNode.OPERATION
 
                 # if interaction is connection source then
                 # connection target is node output data
@@ -147,11 +147,13 @@ class ModuleSorter(object):
         for connection in self.connection_list:
 
             # if connection is between two data points
-            if (connection.source_type == Connection.LOCAL or connection.source_type == Connection.PARAMETER) and \
-                    (connection.target_type == Connection.LOCAL or connection.target_type == Connection.PARAMETER):
+            if (connection.source_type == ActivityConnection.LOCAL or
+                connection.source_type == ActivityConnection.PARAMETER) and \
+                    (connection.target_type == ActivityConnection.LOCAL or
+                     connection.target_type == ActivityConnection.PARAMETER):
 
                 # create new node instance
-                node = Node()
+                node = ActivityNode()
                 # get input data name
                 input_data_name = connection.source_name
                 # get input pin name
@@ -161,7 +163,7 @@ class ModuleSorter(object):
                 # append input link to node
                 node.input_data_list.append(input_link)
                 # set node type
-                node.type = Node.DATA
+                node.type = ActivityNode.DATA
                 # get output data name
                 output_data_name = connection.target_name
                 # get output pin name
@@ -203,7 +205,7 @@ class ModuleSorter(object):
                 # go through all input links
                 for input_link in node.input_data_list:
                     # if local data element is input to node
-                    if local_data_name == input_link[Node.DATA_NAME_INDEX]:
+                    if local_data_name == input_link[ActivityNode.DATA_NAME_INDEX]:
                         # append name of local data element to dependency sublist
                         dependency.append(local_data_name)
 
@@ -266,7 +268,7 @@ class ModuleSorter(object):
                                 # if given node consumes local data elements, which comes from node, which
                                 # was appended above to sorted node list
                                 for output_link in output_data_list:
-                                    if output_link[Node.DATA_NAME_INDEX] == dependency[index]:
+                                    if output_link[ActivityNode.DATA_NAME_INDEX] == dependency[index]:
                                         # remove local data element from dependency sublist
                                         dependency.remove(dependency[index])
                                         # decrement index for next iteration, as one dependence was removed
@@ -309,7 +311,7 @@ class ModuleSorter(object):
         for sorted_node in self.sorted_node_list:
 
             # if node is action type
-            if sorted_node.type == Node.ACTION:
+            if sorted_node.type == ActivityNode.ACTION:
 
                 # and if action is input sensitive, i.e. requires to distinguish main input data
                 for input_sensitive_action in ModuleSorter.input_sensitive_action_list:
@@ -325,7 +327,7 @@ class ModuleSorter(object):
                         for input_link in sorted_node.input_data_list:
 
                             # if input link contains main input data
-                            if input_link[Node.DATA_NAME_INDEX] == main_input_data_name:
+                            if input_link[ActivityNode.DATA_NAME_INDEX] == main_input_data_name:
 
                                 # get input link index
                                 input_link_index = sorted_node.input_data_list.index(input_link)

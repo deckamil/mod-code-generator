@@ -1,11 +1,11 @@
-#   FILE:           mcg_cc_connection.py
+#   FILE:           mcg_cc_activity_connection.py
 #
 #   DESCRIPTION:
-#       This module contains definition of Connection class, which represents connection
+#       This module contains definition of ActivityConnection class, which represents connection
 #       between two model elements on activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,7 +30,7 @@
 
 # Description:
 # This class represents connection between two model elements on activity diagram.
-class Connection(object):
+class ActivityConnection(object):
 
     # Connections types
     UNKNOWN = 10
@@ -46,24 +46,24 @@ class Connection(object):
         self.source_pin = "N/A"
         self.source_name = "N/A"
         self.source_uid = "N/A"
-        self.source_type = Connection.UNKNOWN
+        self.source_type = ActivityConnection.UNKNOWN
         self.target_pin = "N/A"
         self.target_name = "N/A"
         self.target_uid = "N/A"
-        self.target_type = Connection.UNKNOWN
+        self.target_type = ActivityConnection.UNKNOWN
 
     # Description:
-    # This method returns string representation of Connection class.
+    # This method returns string representation of ActivityConnection class.
     def __str__(self):
 
         # source
         line = "$SOURCE$: "
 
         # if operation is source
-        if self.source_type == Connection.OPERATION:
+        if self.source_type == ActivityConnection.OPERATION:
             line = line + self.source_pin + " " + self.source_name + "() " + self.source_uid + " "
         # if action is source
-        elif self.source_type == Connection.ACTION:
+        elif self.source_type == ActivityConnection.ACTION:
             line = line + self.source_name + " " + self.source_uid + " "
         # if local data or other parameter is source
         else:
@@ -73,10 +73,10 @@ class Connection(object):
         line = line + "$TARGET$: "
 
         # if operation is target
-        if self.target_type == Connection.OPERATION:
+        if self.target_type == ActivityConnection.OPERATION:
             line = line + self.target_pin + " " + self.target_name + "() " + self.target_uid
         # if action is target
-        elif self.target_type == Connection.ACTION:
+        elif self.target_type == ActivityConnection.ACTION:
             line = line + self.target_name + " " + self.target_uid
         # if local data or other parameter is target
         else:

@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,10 +28,10 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from mcg_cc_activity_connection import ActivityConnection
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
-from mcg_cc_connection import Connection
 
 
 # Description:
@@ -70,7 +70,7 @@ class FileChecker(object):
         # check action types in connections
         for connection in self.connection_list:
             # if action is connection source
-            if connection.source_type == Connection.ACTION:
+            if connection.source_type == ActivityConnection.ACTION:
 
                 # check if action type is valid
                 action_type_valid = FileChecker.check_action_type(connection.source_name)
@@ -81,7 +81,7 @@ class FileChecker(object):
                     ErrorHandler.record_error(ErrorHandler.CON_ERR_INVALID_ACTION_TYPE, connection, "none")
 
             # if action is connection target
-            if connection.target_type == Connection.ACTION:
+            if connection.target_type == ActivityConnection.ACTION:
                 # check if action type is valid
                 action_type_valid = FileChecker.check_action_type(connection.target_name)
 

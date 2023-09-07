@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,9 +29,9 @@
 
 
 import datetime
-from mcg_cc_node import Node
-from mcg_cc_file_reader import FileReader
+from mcg_cc_activity_node import ActivityNode
 from mcg_cc_file_finder import FileFinder
+from mcg_cc_file_reader import FileReader
 from mcg_cc_module_sorter import ModuleSorter
 from mcg_cc_logger import Logger
 
@@ -258,8 +258,8 @@ class ModuleConverter(object):
         # append input data links
         for input_link in sorted_node.input_data_list:
             # set input link to conversion line
-            conversion_line = str("$INP ") + str(input_link[Node.DATA_NAME_INDEX]) + str("->") + \
-                              str(input_link[Node.PIN_NAME_INDEX])
+            conversion_line = str("$INP ") + str(input_link[ActivityNode.DATA_NAME_INDEX]) + str("->") + \
+                              str(input_link[ActivityNode.PIN_NAME_INDEX])
             # append conversion line to configuration file
             self.configuration_file.append(conversion_line)
             # record info
@@ -268,8 +268,8 @@ class ModuleConverter(object):
         # append output data links
         for output_link in sorted_node.output_data_list:
             # set output link to conversion line
-            conversion_line = str("$OUT ") + str(output_link[Node.PIN_NAME_INDEX]) + str("->") + \
-                              str(output_link[Node.DATA_NAME_INDEX])
+            conversion_line = str("$OUT ") + str(output_link[ActivityNode.PIN_NAME_INDEX]) + str("->") + \
+                              str(output_link[ActivityNode.DATA_NAME_INDEX])
             # append conversion line to configuration file
             self.configuration_file.append(conversion_line)
             # record info
@@ -282,12 +282,12 @@ class ModuleConverter(object):
         # get output link
         output_link = sorted_node.output_data_list[0]
         # set beginning of action interaction to conversion line
-        conversion_line = str("$INS ") + str(output_link[Node.DATA_NAME_INDEX]) + str(" = ")
+        conversion_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ")
 
         # search for all input data elements of sorted node and put them into conversion line
         for input_link in sorted_node.input_data_list:
             # get input data name
-            input_data_name = input_link[Node.DATA_NAME_INDEX]
+            input_data_name = input_link[ActivityNode.DATA_NAME_INDEX]
             # append input data element to conversion line
             conversion_line = conversion_line + str(input_data_name)
             # append operator to conversion line
@@ -310,8 +310,8 @@ class ModuleConverter(object):
         # get output link
         output_link = sorted_node.output_data_list[0]
         # set beginning of action interaction to conversion line
-        conversion_line = str("$INS ") + str(output_link[Node.DATA_NAME_INDEX]) + str(" = ") + \
-                          str(operator) + str(input_link[Node.DATA_NAME_INDEX])
+        conversion_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ") + \
+                          str(operator) + str(input_link[ActivityNode.DATA_NAME_INDEX])
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
@@ -393,11 +393,11 @@ class ModuleConverter(object):
         # get input link
         input_link = sorted_node.input_data_list[0]
         # get input data name
-        input_data_name = input_link[Node.DATA_NAME_INDEX]
+        input_data_name = input_link[ActivityNode.DATA_NAME_INDEX]
         # get output link
         output_link = sorted_node.output_data_list[0]
         # get output data name
-        output_data_name = output_link[Node.DATA_NAME_INDEX]
+        output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
         # get configuration file line
         configuration_file_line = str("$INS ") + str(output_data_name) + " = " + str(input_data_name)
         # append configuration file line to configuration file
@@ -420,15 +420,15 @@ class ModuleConverter(object):
         for sorted_node in self.sorted_node_list:
 
             # if node is operation type
-            if sorted_node.type == Node.OPERATION:
+            if sorted_node.type == ActivityNode.OPERATION:
                 # convert operation node
                 self.convert_operation_node(sorted_node)
             # if node is action type
-            elif sorted_node.type == Node.ACTION:
+            elif sorted_node.type == ActivityNode.ACTION:
                 # convert action node
                 self.convert_action_node(sorted_node)
             # if node is data type
-            elif sorted_node.type == Node.DATA:
+            elif sorted_node.type == ActivityNode.DATA:
                 # convert data node
                 self.convert_data_node(sorted_node)
 

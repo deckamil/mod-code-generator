@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,10 +28,10 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from mcg_cc_activity_connection import ActivityConnection
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
 from mcg_cc_supporter import Supporter
-from mcg_cc_connection import Connection
 
 
 # Description:
@@ -271,10 +271,10 @@ class FileReader(object):
                 # set data type depending on data section type
                 if "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]:
                     # set parameter data type
-                    source_data_type = Connection.PARAMETER
+                    source_data_type = ActivityConnection.PARAMETER
                 else:
                     # set local data type
-                    source_data_type = Connection.LOCAL
+                    source_data_type = ActivityConnection.LOCAL
 
                 # assume that data element does not have target section
                 target_section_found = False
@@ -291,7 +291,7 @@ class FileReader(object):
                     if "<LINK relation=\"Target\">" in self.activity_file[j]:
 
                         # new connection instance
-                        connection = Connection()
+                        connection = ActivityConnection()
                         connection.source_name = source_data_name
                         connection.source_type = source_data_type
 
@@ -303,7 +303,7 @@ class FileReader(object):
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.LOCAL
+                            connection.target_type = ActivityConnection.LOCAL
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -318,7 +318,7 @@ class FileReader(object):
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.PARAMETER
+                            connection.target_type = ActivityConnection.PARAMETER
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -337,7 +337,7 @@ class FileReader(object):
                             # set connection target uid
                             connection.target_uid = target_action_uid
                             # set connection target type
-                            connection.target_type = Connection.ACTION
+                            connection.target_type = ActivityConnection.ACTION
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -360,7 +360,7 @@ class FileReader(object):
                             # set connection uid
                             connection.target_uid = target_operation_uid
                             # set connection type
-                            connection.target_type = Connection.OPERATION
+                            connection.target_type = ActivityConnection.OPERATION
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -401,11 +401,11 @@ class FileReader(object):
                 # if interaction is action type
                 if "mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]:
                     # set action type
-                    source_interaction_type = Connection.ACTION
+                    source_interaction_type = ActivityConnection.ACTION
                 # if interaction is operation type
                 else:
                     # set operation type
-                    source_interaction_type = Connection.OPERATION
+                    source_interaction_type = ActivityConnection.OPERATION
 
                 # unknown output pin from operation
                 source_pin_name = "N/A"
@@ -431,13 +431,13 @@ class FileReader(object):
                     if "<LINK relation=\"Target\">" in self.activity_file[j]:
 
                         # new connection instance
-                        connection = Connection()
+                        connection = ActivityConnection()
                         connection.source_name = source_interaction_name
                         connection.source_uid = source_interaction_uid
                         connection.source_type = source_interaction_type
 
                         # if operation
-                        if connection.source_type == Connection.OPERATION:
+                        if connection.source_type == ActivityConnection.OPERATION:
                             # set connection source pin
                             connection.source_pin = source_pin_name
 
@@ -449,7 +449,7 @@ class FileReader(object):
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.LOCAL
+                            connection.target_type = ActivityConnection.LOCAL
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -464,7 +464,7 @@ class FileReader(object):
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.PARAMETER
+                            connection.target_type = ActivityConnection.PARAMETER
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -473,7 +473,7 @@ class FileReader(object):
 
                     # if end of action target section is found
                     if "</COMP>" in self.activity_file[j] and \
-                            source_interaction_type == Connection.ACTION:
+                            source_interaction_type == ActivityConnection.ACTION:
                         # exit "for j in range" loop
                         break
 
@@ -482,7 +482,7 @@ class FileReader(object):
                             "</DEPENDENCIES>" in self.activity_file[j+1] and \
                             "</OBJECT>" in self.activity_file[j+2] and \
                             "</COMP>" in self.activity_file[j+3] and \
-                            source_interaction_type == Connection.OPERATION:
+                            source_interaction_type == ActivityConnection.OPERATION:
                         # exit "for j in range" loop
                         break
 
