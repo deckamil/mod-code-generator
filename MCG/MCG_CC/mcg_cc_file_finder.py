@@ -5,7 +5,7 @@
 #       responsible for finding .exml files, that describe module content.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           21 JAN 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,8 +29,8 @@
 
 
 from os import listdir
+from mcg_cc_file_supporter import FileSupporter
 from mcg_cc_logger import Logger
-from mcg_cc_supporter import Supporter
 
 
 # Description:
@@ -55,24 +55,20 @@ class FileFinder(object):
 
     # return data
     module_file = []
-    activity_file = []
     module_name = ""
     module_uid = ""
-    operation_name = ""
-    operation_uid = ""
+    activity_file = []
     activity_name = ""
     activity_uid = ""
 
     # indexes of return data
     FILES_FOUND_INDEX = 0
     MODULE_FILE_INDEX = 1
-    ACTIVITY_FILE_INDEX = 2
-    MODULE_NAME_INDEX = 3
-    MODULE_UID_INDEX = 4
-    OPERATION_NAME_INDEX = 5
-    OPERATION_UID_INDEX = 6
-    ACTIVITY_NAME_INDEX = 7
-    ACTIVITY_UID_INDEX = 8
+    MODULE_NAME_INDEX = 2
+    MODULE_UID_INDEX = 3
+    ACTIVITY_FILE_INDEX = 4
+    ACTIVITY_NAME_INDEX = 5
+    ACTIVITY_UID_INDEX = 6
 
     # Description:
     # This method sets paths to .exml files, that describe model content.
@@ -124,11 +120,9 @@ class FileFinder(object):
 
         # clear return data
         FileFinder.module_file = []
-        FileFinder.activity_file = []
         FileFinder.module_name = "UNKNOWN_MODULE_NAME"
         FileFinder.module_uid = "UNKNOWN_MODULE_UID"
-        FileFinder.operation_name = "UNKNOWN_OPERATION_NAME"
-        FileFinder.operation_uid = "UNKNOWN_OPERATION_UID"
+        FileFinder.activity_file = []
         FileFinder.activity_name = "UNKNOWN_ACTIVITY_NAME"
         FileFinder.activity_uid = "UNKNOWN_ACTIVITY_UID"
 
@@ -169,16 +163,14 @@ class FileFinder(object):
                              "mc=\"Standard.Package\"" in module_file[i]) and
                             "<PID name=" in module_file[i+1]):
                         # get module name
-                        FileFinder.module_name = Supporter.get_name(module_file[i])
+                        FileFinder.module_name = FileSupporter.get_name(module_file[i])
                         # get module uid
-                        FileFinder.module_uid = Supporter.get_uid(module_file[i])
+                        FileFinder.module_uid = FileSupporter.get_uid(module_file[i])
 
                     # if operation is defined in module
                     if "<COMP relation=\"OwnedOperation\">" in module_file[i]:
                         # store module file
                         FileFinder.module_file = module_file
-                        # get operation name
-                        FileFinder.operation_name = Supporter.get_name(module_file[i+2])
                         # set module finder state
                         FileFinder.module_finder_state = FileFinder.FILE_FOUND
                         # record info
@@ -234,13 +226,13 @@ class FileFinder(object):
                             ("mc=\"Standard.Component\"" in activity_file[i+1] or
                              "mc=\"Standard.Package\"" in activity_file[i+1])):
                         # get activity name
-                        FileFinder.activity_name = Supporter.get_name(activity_file[i])
+                        FileFinder.activity_name = FileSupporter.get_name(activity_file[i])
                         # get activity uid
-                        FileFinder.activity_uid = Supporter.get_uid(activity_file[i])
+                        FileFinder.activity_uid = FileSupporter.get_uid(activity_file[i])
                         # get parent module name
-                        parent_module_name = Supporter.get_name(activity_file[i+1])
+                        parent_module_name = FileSupporter.get_name(activity_file[i+1])
                         # get parent module uid
-                        parent_module_uid = Supporter.get_uid(activity_file[i+1])
+                        parent_module_uid = FileSupporter.get_uid(activity_file[i+1])
                         # if there is name and uid compatibility
                         if FileFinder.module_name == parent_module_name and FileFinder.module_uid == parent_module_uid:
                             # store activity file
@@ -295,11 +287,9 @@ class FileFinder(object):
         file_finder_list = []
         file_finder_list.insert(FileFinder.FILES_FOUND_INDEX, files_found)
         file_finder_list.insert(FileFinder.MODULE_FILE_INDEX, FileFinder.module_file)
-        file_finder_list.insert(FileFinder.ACTIVITY_FILE_INDEX, FileFinder.activity_file)
         file_finder_list.insert(FileFinder.MODULE_NAME_INDEX, FileFinder.module_name)
         file_finder_list.insert(FileFinder.MODULE_UID_INDEX, FileFinder.module_uid)
-        file_finder_list.insert(FileFinder.OPERATION_NAME_INDEX, FileFinder.operation_name)
-        file_finder_list.insert(FileFinder.OPERATION_UID_INDEX, FileFinder.operation_uid)
+        file_finder_list.insert(FileFinder.ACTIVITY_FILE_INDEX, FileFinder.activity_file)
         file_finder_list.insert(FileFinder.ACTIVITY_NAME_INDEX, FileFinder.activity_name)
         file_finder_list.insert(FileFinder.ACTIVITY_UID_INDEX, FileFinder.activity_uid)
 

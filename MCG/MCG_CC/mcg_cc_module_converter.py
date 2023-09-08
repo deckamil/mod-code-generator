@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           23 JUN 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,9 +29,9 @@
 
 
 import datetime
-from mcg_cc_node import Node
-from mcg_cc_file_reader import FileReader
+from mcg_cc_activity_node import ActivityNode
 from mcg_cc_file_finder import FileFinder
+from mcg_cc_file_reader import FileReader
 from mcg_cc_module_sorter import ModuleSorter
 from mcg_cc_logger import Logger
 
@@ -50,7 +50,8 @@ class ModuleConverter(object):
 
         # initialize object data
         self.module_name = file_finder_list[FileFinder.MODULE_NAME_INDEX]
-        self.operation_name = file_finder_list[FileFinder.OPERATION_NAME_INDEX]
+        self.operation_name = file_reader_list[FileReader.OPERATION_NAME_INDEX]
+        self.constant_list = file_reader_list[FileReader.CONSTANT_LIST_INDEX]
         self.input_interface_list = file_reader_list[FileReader.INPUT_INTERFACE_LIST_INDEX]
         self.output_interface_list = file_reader_list[FileReader.OUTPUT_INTERFACE_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
@@ -122,8 +123,8 @@ class ModuleConverter(object):
         ModuleConverter.configuration_file_disk.close()
 
     # Description:
-    # This method converts module header details into configuration file.
-    def convert_header(self):
+    # This method converts module name into configuration file.
+    def convert_module_name(self):
 
         # record info
         Logger.save_in_log_file("ModuleConverter", "Converting module name into configuration file", False)
@@ -139,6 +140,41 @@ class ModuleConverter(object):
 
         # record info
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+
+    # Description
+    # This method converts module constants into configuration file.
+    def convert_module_constants(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleConverter", "Converting module constants into configuration file", False)
+
+        # append start marker of module constant section to configuration file
+        self.configuration_file.append(str("$MODULE CONSTANTS START$"))
+
+        # append constant details to configuration file
+        for constant_element in self.constant_list:
+            # get constant element type
+            constant_element_type = constant_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
+            # get constant element name
+            constant_element_name = constant_element[FileReader.DATA_ELEMENT_NAME_INDEX]
+            # get constant element value
+            constant_element_value = constant_element[FileReader.DATA_ELEMENT_VALUE_INDEX]
+            # get configuration file line
+            configuration_file_line = "type " + str(constant_element_type) + " name " + str(constant_element_name) + \
+                                      " value " + str(constant_element_value)
+            # append configuration file line to configuration file
+            self.configuration_file.append(configuration_file_line)
+
+            # record info
+            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line",
+                                    False)
+
+        # append end marker of module constant section to configuration file
+        self.configuration_file.append(str("$MODULE CONSTANTS END$"))
+
+    # Description:
+    # This method converts operation name into configuration file.
+    def convert_operation_name(self):
 
         # record info
         Logger.save_in_log_file("ModuleConverter", "Converting operation name into configuration file", False)
@@ -156,15 +192,15 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
 
     # Description:
-    # This method converts module specific interface type into configuration file.
+    # This method converts specific interface type into configuration file.
     def convert_specific_interface(self, interface_element_list):
 
         # append interface details to configuration file
         for interface_element in interface_element_list:
-            # get interface element name
-            interface_element_name = interface_element[FileReader.INTERFACE_ELEMENT_NAME_INDEX]
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
+            # get interface element name
+            interface_element_name = interface_element[FileReader.DATA_ELEMENT_NAME_INDEX]
             # get configuration file line
             configuration_file_line = "type " + str(interface_element_type) + " name " + str(interface_element_name)
             # append configuration file line to configuration file
@@ -174,12 +210,12 @@ class ModuleConverter(object):
             Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
 
     # Description:
-    # This method converts module input interface, output interface and local interface elements
+    # This method converts operation input interface, output interface and local interface elements
     # into configuration file.
-    def convert_interfaces(self):
+    def convert_operation_interfaces(self):
 
         # record info
-        Logger.save_in_log_file("ModuleConverter", "Converting module input interface into configuration file", False)
+        Logger.save_in_log_file("ModuleConverter", "Converting operation input interface into configuration file", False)
 
         # append start marker of input interface section to configuration file
         self.configuration_file.append(str("$INPUT INTERFACE START$"))
@@ -189,7 +225,7 @@ class ModuleConverter(object):
         self.configuration_file.append(str("$INPUT INTERFACE END$"))
 
         # record info
-        Logger.save_in_log_file("ModuleConverter", "Converting module output interface into configuration file", False)
+        Logger.save_in_log_file("ModuleConverter", "Converting operation output interface into configuration file", False)
 
         # append start marker of output interface section to configuration file
         self.configuration_file.append(str("$OUTPUT INTERFACE START$"))
@@ -199,7 +235,7 @@ class ModuleConverter(object):
         self.configuration_file.append(str("$OUTPUT INTERFACE END$"))
 
         # record info
-        Logger.save_in_log_file("ModuleConverter", "Converting module local interface into configuration file", False)
+        Logger.save_in_log_file("ModuleConverter", "Converting operation local interface into configuration file", False)
 
         # append start marker of local interface section to configuration file
         self.configuration_file.append(str("$LOCAL INTERFACE START$"))
@@ -209,7 +245,7 @@ class ModuleConverter(object):
         self.configuration_file.append(str("$LOCAL INTERFACE END$"))
 
     # Description:
-    # This method converts module operation node into configuration file.
+    # This method converts operation node from activity diagram into configuration file.
     def convert_operation_node(self, sorted_node):
 
         # set operation invocation to conversion line
@@ -222,8 +258,8 @@ class ModuleConverter(object):
         # append input data links
         for input_link in sorted_node.input_data_list:
             # set input link to conversion line
-            conversion_line = str("$INP ") + str(input_link[Node.DATA_NAME_INDEX]) + str("->") + \
-                              str(input_link[Node.PIN_NAME_INDEX])
+            conversion_line = str("$INP ") + str(input_link[ActivityNode.DATA_NAME_INDEX]) + str("->") + \
+                              str(input_link[ActivityNode.PIN_NAME_INDEX])
             # append conversion line to configuration file
             self.configuration_file.append(conversion_line)
             # record info
@@ -232,26 +268,26 @@ class ModuleConverter(object):
         # append output data links
         for output_link in sorted_node.output_data_list:
             # set output link to conversion line
-            conversion_line = str("$OUT ") + str(output_link[Node.PIN_NAME_INDEX]) + str("->") + \
-                              str(output_link[Node.DATA_NAME_INDEX])
+            conversion_line = str("$OUT ") + str(output_link[ActivityNode.PIN_NAME_INDEX]) + str("->") + \
+                              str(output_link[ActivityNode.DATA_NAME_INDEX])
             # append conversion line to configuration file
             self.configuration_file.append(conversion_line)
             # record info
             Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
 
     # Description:
-    # This method converts module specific action node with n-argument operator into configuration file.
+    # This method converts specific action node from activity diagram with n-argument operator into configuration file.
     def convert_specific_action_node_arity_n(self, sorted_node, operator):
 
         # get output link
         output_link = sorted_node.output_data_list[0]
         # set beginning of action interaction to conversion line
-        conversion_line = str("$INS ") + str(output_link[Node.DATA_NAME_INDEX]) + str(" = ")
+        conversion_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ")
 
         # search for all input data elements of sorted node and put them into conversion line
         for input_link in sorted_node.input_data_list:
             # get input data name
-            input_data_name = input_link[Node.DATA_NAME_INDEX]
+            input_data_name = input_link[ActivityNode.DATA_NAME_INDEX]
             # append input data element to conversion line
             conversion_line = conversion_line + str(input_data_name)
             # append operator to conversion line
@@ -266,7 +302,7 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
 
     # Description:
-    # This method converts module specific action node with 1-argument operator into configuration file.
+    # This method converts specific action node from activity diagram with 1-argument operator into configuration file.
     def convert_specific_action_node_arity_1(self, sorted_node, operator):
 
         # get input link
@@ -274,8 +310,8 @@ class ModuleConverter(object):
         # get output link
         output_link = sorted_node.output_data_list[0]
         # set beginning of action interaction to conversion line
-        conversion_line = str("$INS ") + str(output_link[Node.DATA_NAME_INDEX]) + str(" = ") + \
-                          str(operator) + str(input_link[Node.DATA_NAME_INDEX])
+        conversion_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ") + \
+                          str(operator) + str(input_link[ActivityNode.DATA_NAME_INDEX])
 
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
@@ -284,10 +320,12 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
 
     # Description:
-    # This method converts module action node into configuration file.
+    # This method converts action node from activity diagram into configuration file.
     def convert_action_node(self, sorted_node):
 
-        # depending on the type of action, covert module node into configuration file.
+        # depending on the type of action, covert node into configuration file.
+
+        # arithmetic operators
         if sorted_node.name[0:3] == "ADD":
             self.convert_specific_action_node_arity_n(sorted_node, "+")
 
@@ -300,15 +338,36 @@ class ModuleConverter(object):
         elif sorted_node.name[0:3] == "DIV":
             self.convert_specific_action_node_arity_n(sorted_node, "/")
 
+        # logical operators
         elif sorted_node.name[0:3] == "AND":
             self.convert_specific_action_node_arity_n(sorted_node, "&&")
-
-        elif sorted_node.name[0:3] == "NOT":
-            self.convert_specific_action_node_arity_1(sorted_node, "!")
 
         elif sorted_node.name[0:2] == "OR":
             self.convert_specific_action_node_arity_n(sorted_node, "||")
 
+        elif sorted_node.name[0:3] == "NOT":
+            self.convert_specific_action_node_arity_1(sorted_node, "!")
+
+        # bitwise operators
+        elif sorted_node.name[0:4] == "BAND":
+            self.convert_specific_action_node_arity_n(sorted_node, "&")
+
+        elif sorted_node.name[0:3] == "BOR":
+            self.convert_specific_action_node_arity_n(sorted_node, "|")
+
+        elif sorted_node.name[0:4] == "BXOR":
+            self.convert_specific_action_node_arity_n(sorted_node, "^")
+
+        elif sorted_node.name[0:4] == "BNOT":
+            self.convert_specific_action_node_arity_1(sorted_node, "~")
+
+        elif sorted_node.name[0:3] == "BLS":
+            self.convert_specific_action_node_arity_n(sorted_node, "<<")
+
+        elif sorted_node.name[0:3] == "BRS":
+            self.convert_specific_action_node_arity_n(sorted_node, ">>")
+
+        # relational operators
         elif sorted_node.name[0:2] == "EQ":
             self.convert_specific_action_node_arity_n(sorted_node, "==")
 
@@ -319,7 +378,7 @@ class ModuleConverter(object):
             self.convert_specific_action_node_arity_n(sorted_node, ">")
 
         elif sorted_node.name[0:2] == "LT":
-            self.convert_specific_action_node_arity_n(sorted_node, "LT")
+            self.convert_specific_action_node_arity_n(sorted_node, "<")
 
         elif sorted_node.name[0:2] == "GE":
             self.convert_specific_action_node_arity_n(sorted_node, ">=")
@@ -328,17 +387,17 @@ class ModuleConverter(object):
             self.convert_specific_action_node_arity_n(sorted_node, "<=")
 
     # Description:
-    # This method converts module data node into configuration file.
+    # This method converts data node into configuration file.
     def convert_data_node(self, sorted_node):
 
         # get input link
         input_link = sorted_node.input_data_list[0]
         # get input data name
-        input_data_name = input_link[Node.DATA_NAME_INDEX]
+        input_data_name = input_link[ActivityNode.DATA_NAME_INDEX]
         # get output link
         output_link = sorted_node.output_data_list[0]
         # get output data name
-        output_data_name = output_link[Node.DATA_NAME_INDEX]
+        output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
         # get configuration file line
         configuration_file_line = str("$INS ") + str(output_data_name) + " = " + str(input_data_name)
         # append configuration file line to configuration file
@@ -348,31 +407,32 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
 
     # Description:
-    # This method converts module body into configuration file.
-    def convert_body(self):
+    # This method converts operation body into configuration file.
+    def convert_operation_body(self):
 
         # record info
-        Logger.save_in_log_file("ModuleConverter", "Converting module body into configuration file", False)
+        Logger.save_in_log_file("ModuleConverter", "Converting operation body into configuration file", False)
 
-        # append start marker of module name section to configuration file
+        # append start marker of module body section to configuration file
         self.configuration_file.append(str("$OPERATION BODY START$"))
 
         # repeat for all nodes from sorted node list
         for sorted_node in self.sorted_node_list:
 
             # if node is operation type
-            if sorted_node.type == Node.OPERATION:
+            if sorted_node.type == ActivityNode.OPERATION:
                 # convert operation node
                 self.convert_operation_node(sorted_node)
             # if node is action type
-            elif sorted_node.type == Node.ACTION:
+            elif sorted_node.type == ActivityNode.ACTION:
                 # convert action node
                 self.convert_action_node(sorted_node)
             # if node is data type
-            elif sorted_node.type == Node.DATA:
+            elif sorted_node.type == ActivityNode.DATA:
                 # convert data node
                 self.convert_data_node(sorted_node)
 
+        # append end marker of module body section to configuration file
         self.configuration_file.append(str("$OPERATION BODY END$"))
 
     # Description:
@@ -385,14 +445,20 @@ class ModuleConverter(object):
         # append start marker of new module section to configuration file
         self.configuration_file.append(str("$MODULE START$"))
 
-        # convert header details
-        self.convert_header()
+        # convert module name into configuration file.
+        self.convert_module_name()
 
-        # convert interfaces
-        self.convert_interfaces()
+        # convert module constants into configuration file.
+        self.convert_module_constants()
 
-        # convert body
-        self.convert_body()
+        # convert operation name into configuration file.
+        self.convert_operation_name()
+
+        # convert operation interfaces into configuration file
+        self.convert_operation_interfaces()
+
+        # convert operation body into configuration file.
+        self.convert_operation_body()
 
         # append end marker of new module section to configuration file
         self.configuration_file.append(str("$MODULE END$"))

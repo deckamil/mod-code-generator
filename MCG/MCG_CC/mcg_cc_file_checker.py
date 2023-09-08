@@ -5,7 +5,7 @@
 #       responsible for checking of model module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           23 JUN 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,10 +28,10 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from mcg_cc_activity_connection import ActivityConnection
 from mcg_cc_file_reader import FileReader
 from mcg_cc_error_handler import ErrorHandler
 from mcg_cc_logger import Logger
-from mcg_cc_connection import Connection
 
 
 # Description:
@@ -39,8 +39,10 @@ from mcg_cc_connection import Connection
 class FileChecker(object):
 
     # list of actions types
-    action_3letter_type_list = ["ADD", "SUB", "MUL", "DIV", "AND", "NOT"]
-    action_2letter_type_list = ["OR", "EQ", "NE", "GT", "LT", "GE", "LE"]
+    action_type_list = ["ADD", "SUB", "MUL", "DIV",
+                        "AND", "OR", "NOT",
+                        "BAND", "BOR", "BXOR", "BNOT", "BLS", "BRS",
+                        "EQ", "NE", "GT", "LT", "GE", "LE"]
 
     # list of interface element types
     interface_element_type_list = ["INT8", "INT16", "INT32", "INT64",
@@ -68,7 +70,7 @@ class FileChecker(object):
         # check action types in connections
         for connection in self.connection_list:
             # if action is connection source
-            if connection.source_type == Connection.ACTION:
+            if connection.source_type == ActivityConnection.ACTION:
 
                 # check if action type is valid
                 action_type_valid = FileChecker.check_action_type(connection.source_name)
@@ -79,7 +81,7 @@ class FileChecker(object):
                     ErrorHandler.record_error(ErrorHandler.CON_ERR_INVALID_ACTION_TYPE, connection, "none")
 
             # if action is connection target
-            if connection.target_type == Connection.ACTION:
+            if connection.target_type == ActivityConnection.ACTION:
                 # check if action type is valid
                 action_type_valid = FileChecker.check_action_type(connection.target_name)
 
@@ -95,27 +97,16 @@ class FileChecker(object):
         # result flag
         action_type_valid = False
 
-        # is valid type is not found
-        if not action_type_valid:
-            # check all possible 3-letter action types
-            for action_type in FileChecker.action_3letter_type_list:
-                # if action type is the same as in reference
-                if action_type == action_type_ref[0:3]:
-                    # set flag
-                    action_type_valid = True
-                    # exit loop
-                    break
-
-        # is valid types is not found
-        if not action_type_valid:
-            # check 2-letter action types
-            for action_type in FileChecker.action_2letter_type_list:
-                # if action type is the same as in reference
-                if action_type == action_type_ref[0:2]:
-                    # set flag
-                    action_type_valid = True
-                    # exit loop
-                    break
+        # check all possible action types
+        for action_type in FileChecker.action_type_list:
+            # get length of action type
+            action_type_length = len(action_type)
+            # if action type is the same as in reference
+            if action_type == action_type_ref[0:action_type_length]:
+                # set positive flag
+                action_type_valid = True
+                # exit loop
+                break
 
         # return flag
         return action_type_valid
@@ -130,7 +121,7 @@ class FileChecker(object):
         # check interface element types in input interface
         for interface_element in self.input_interface_list:
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
             # check interface element type
             interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
@@ -142,7 +133,7 @@ class FileChecker(object):
         # check interface element types in output interface
         for interface_element in self.output_interface_list:
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
             # check interface element type
             interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 
@@ -154,7 +145,7 @@ class FileChecker(object):
         # check interface element types in local interface
         for interface_element in self.local_interface_list:
             # get interface element type
-            interface_element_type = interface_element[FileReader.INTERFACE_ELEMENT_TYPE_INDEX]
+            interface_element_type = interface_element[FileReader.DATA_ELEMENT_TYPE_INDEX]
             # check interface element type
             interface_element_type_valid = FileChecker.check_interface_element_type(interface_element_type)
 

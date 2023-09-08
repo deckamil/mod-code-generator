@@ -3,11 +3,10 @@
 #   DESCRIPTION:
 #       This is main module of Mod Code Generator (MCG) Converter Component (CC)
 #       and it contains definition of Main class, which uses other MCG CC classes
-#       to convert content of model modules from .exml files into configuration
-#       file.
+#       to convert model content from set of .exml files into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           25 JUN 2023
+#   DATE:           8 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -55,7 +54,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CC version
-    MCG_CC_VERSION = "v0.3.0-alpha"
+    MCG_CC_VERSION = "v0.4.0-alpha"
 
     # Description:
     # This is main method, which display short notice and start conversion process.
@@ -113,10 +112,10 @@ class Main(object):
         # saves configuration file header
         ModuleConverter.save_configuration_file_header()
 
-        # flag to distinguish if set of matching .exml files was found for further conversion
+        # flag to distinguish if set of matching .exml files has been found for further conversion
         files_found = True
 
-        # repeat until all model modules are converted into configuration file
+        # repeat until all modules are converted into configuration file
         while files_found:
 
             # find module files
@@ -127,7 +126,7 @@ class Main(object):
             # check errors
             ErrorHandler.check_errors()
 
-            # if files were found
+            # if files have been found
             if files_found:
                 # initialize file reader
                 file_reader = FileReader(file_finder_list)

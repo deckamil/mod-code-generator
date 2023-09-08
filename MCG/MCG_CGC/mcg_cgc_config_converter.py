@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 MAY 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -40,6 +40,7 @@ class ConfigConverter(object):
     # expected data/marker positions or properties of configuration file
     INTERFACE_TYPE_POSITION_IN_CFG = 5
     INTERFACE_NAME_POSITION_IN_CFG = 6
+    INTERFACE_VALUE_POSITION_IN_CFG = 7
     BODY_DATA_POSITION_IN_CFG = 5
 
     # indexes of operation and module names on list
@@ -88,10 +89,11 @@ class ConfigConverter(object):
         date = datetime.now()
         # format date
         date = date.strftime("%d %b %Y, %H:%M:%S")
+        # set date
+        Module.generation_date = date
 
-        # get new module
+        # get new Module
         module = Module()
-        # module name
         module_name = ""
 
         # find list of operation and module name links
@@ -109,8 +111,6 @@ class ConfigConverter(object):
             if config_file[file_index] == "$MODULE START$":
                 # get new module
                 module = Module()
-                # set date
-                module.generation_date = date
 
             # when module name is found
             elif config_file[file_index] == "$MODULE NAME START$":
@@ -122,6 +122,29 @@ class ConfigConverter(object):
                 module_name = config_file[file_index+1]
                 # set module name
                 module.module_name = module_name
+
+            # when module constants are found
+            elif config_file[file_index] == "$MODULE CONSTANTS START$":
+
+                # increment file index to definition of first constant element
+                file_index = file_index + 1
+
+                # continue reading of constants definition until end of constant section is reached
+                while config_file[file_index] != "$MODULE CONSTANTS END$":
+                    # record info
+                    Logger.save_in_log_file("ConfigConverter",
+                                            "Reading module constant from line " + str(file_index + 1),
+                                            False)
+                    # get line
+                    line = config_file[file_index]
+                    # extract constant element type, name and value from line of the configuration file
+                    constant_element = ConfigConverter.extract_constant_element(line)
+                    # append constant element to module constant list
+                    module.module_constant_list.append(constant_element)
+                    # append constant element to module appendix constant list
+                    Module.module_appendix_constant_list.append(constant_element)
+                    # increment file index
+                    file_index = file_index + 1
 
             # when operation name is found
             elif config_file[file_index] == "$OPERATION NAME START$":
@@ -241,16 +264,16 @@ class ConfigConverter(object):
 
                         # get operation input interface element
                         interface_element = []
-                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_input_type")
-                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_input")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_input_type")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_input")
 
                         # append interface element to local interface
                         module.local_interface_list.append(interface_element)
 
                         # get operation output interface element
                         interface_element = []
-                        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, operation_name + "_output_type")
-                        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, operation_name + "_output")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_output_type")
+                        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, operation_name + "_output")
 
                         # append interface element to local interface
                         module.local_interface_list.append(interface_element)
@@ -317,6 +340,17 @@ class ConfigConverter(object):
             # increment file index
             file_index = file_index + 1
 
+        # record info
+        Logger.save_in_log_file("ConfigConverter",
+                                "Generating header code file for " + Module.module_appendix_name + " module",
+                                False)
+        # generate header file code
+        module_header = Module.generate_module_appendix()
+        # set module header name
+        module_header_name = Module.module_appendix_name + '.h'
+        # save module header to file
+        ConfigConverter.save_module_file(module_header_name, module_header)
+
     # Description:
     # This method looks for operation and module name links in the configuration file.
     @staticmethod
@@ -355,7 +389,32 @@ class ConfigConverter(object):
             file_index = file_index + 1
 
     # Description:
-    # This method extracts interface element type and interface element name from line of the configuration file.
+    # This method extracts constant element type, name and value from line of the configuration file.
+    @staticmethod
+    def extract_constant_element(line):
+
+        # get name position within line
+        name_position = line.find(" name ")
+        # get value position within line
+        value_position = line.find(" value ")
+        # get constant element type
+        constant_element_type = line[ConfigConverter.INTERFACE_TYPE_POSITION_IN_CFG:name_position]
+        # get constant element name
+        constant_element_name = line[name_position + ConfigConverter.INTERFACE_NAME_POSITION_IN_CFG:value_position]
+        # get constant element value
+        constant_element_value = line[value_position + ConfigConverter.INTERFACE_VALUE_POSITION_IN_CFG:len(line)]
+
+        # append collected data to constant element
+        constant_element = []
+        constant_element.insert(Module.DATA_ELEMENT_NAME_INDEX, constant_element_type)
+        constant_element.insert(Module.DATA_ELEMENT_NAME_INDEX, constant_element_name)
+        constant_element.insert(Module.DATA_ELEMENT_VALUE_INDEX, constant_element_value)
+
+        # return constant element
+        return constant_element
+
+    # Description:
+    # This method extracts interface element type and name from line of the configuration file.
     @staticmethod
     def extract_interface_element(line):
 
@@ -368,8 +427,8 @@ class ConfigConverter(object):
 
         # append collected data to interface element
         interface_element = []
-        interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
-        interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, interface_element_type)
+        interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, interface_element_name)
 
         # return interface element
         return interface_element

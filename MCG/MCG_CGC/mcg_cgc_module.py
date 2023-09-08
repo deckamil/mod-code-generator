@@ -5,7 +5,7 @@
 #       source code and module header to be generated from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 MAY 2023
+#   DATE:           30 AUG 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,23 +32,29 @@
 # This class represents module source code and module header to be generated from the configuration file.
 class Module(object):
 
-    # This parameter defines index of interface element type in list which defines interface element
-    INTERFACE_ELEMENT_TYPE_INDEX = 0
+    # indexes of data element list
+    DATA_ELEMENT_TYPE_INDEX = 0
+    DATA_ELEMENT_NAME_INDEX = 1
+    DATA_ELEMENT_VALUE_INDEX = 2
 
-    # This parameter defines index of interface element name in list which defines interface element
-    INTERFACE_ELEMENT_NAME_INDEX = 1
-
-    # Indent used in module definition
+    # indent used in module definition
     indent = "    "
+
+    # class data used to generate additional module appendix
+    module_appendix_name = "mcg_appendix"
+    module_appendix_constant_list = []
+
+    # generation data to be placed in generated files
+    generation_date = ""
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
         self.module_name = ""
-        self.operation_name = ""
-        self.generation_date = ""
         self.header_comment_list = []
+        self.module_constant_list = []
+        self.operation_name = ""
         self.include_list = []
         self.input_interface_list = []
         self.output_interface_list = []
@@ -66,8 +72,8 @@ class Module(object):
         # for each interface element
         for interface_element in interface_element_list:
             # merge interface element type and name
-            tmp_interface_element = interface_element[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " + \
-                                    interface_element[Module.INTERFACE_ELEMENT_NAME_INDEX]
+            tmp_interface_element = interface_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " + \
+                                    interface_element[Module.DATA_ELEMENT_NAME_INDEX]
             # append temporary interface element to the list
             tmp_interface_element_list.append(tmp_interface_element)
 
@@ -83,8 +89,8 @@ class Module(object):
             interface_element_type, interface_element_name = tmp_interface_element.split(" ")
             # append collected data to interface element
             interface_element = []
-            interface_element.insert(Module.INTERFACE_ELEMENT_TYPE_INDEX, interface_element_type)
-            interface_element.insert(Module.INTERFACE_ELEMENT_NAME_INDEX, interface_element_name)
+            interface_element.insert(Module.DATA_ELEMENT_TYPE_INDEX, interface_element_type)
+            interface_element.insert(Module.DATA_ELEMENT_NAME_INDEX, interface_element_name)
             # append interface element to the list
             interface_element_list.append(interface_element)
 
@@ -100,13 +106,13 @@ class Module(object):
         # set module header
         module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
         # set module date
-        module = module + self.generation_date + "\n"
+        module = module + Module.generation_date + "\n"
 
         # set module comment
         module = module + " *\n"
 
         # set generic comment
-        module = module + " *   " + "This is source file of " + self.module_name + " module.\n"
+        module = module + " *   This is source file of " + self.module_name + " module.\n"
 
         # append header comments
         for header_comment in self.header_comment_list:
@@ -119,7 +125,7 @@ class Module(object):
 
         # set includes
         module = module + "#include \"" + self.module_name + ".h\"\n"
-        module = module + "#include \"basic_data_types.h\"\n"
+        module = module + "#include \"" + Module.module_appendix_name + ".h\"\n"
 
         # remove duplicates from include list
         self.include_list = list(dict.fromkeys(self.include_list))
@@ -130,6 +136,23 @@ class Module(object):
 
         # set separator line
         module = module + "\n"
+
+        # ********** CONSTANT DATA DEFINITION ********** #
+
+        # if any constant was appended
+        if len(self.module_constant_list) > 0:
+
+            # set constant data comment
+            module = module + "// Definition of constant data\n"
+
+            # append constant data
+            for constant_element in self.module_constant_list:
+                module = module + "const " + constant_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                         + constant_element[Module.DATA_ELEMENT_NAME_INDEX] + " = " \
+                         + constant_element[Module.DATA_ELEMENT_VALUE_INDEX] + ";\n"
+
+            # set separator line
+            module = module + "\n"
 
         # ********** FUNCTION HEADER ********** #
 
@@ -155,9 +178,9 @@ class Module(object):
 
         # append input interface
         for input_interface in self.input_interface_list:
-            module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " \
-                     + self.operation_name + "_input->" + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + input_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + input_interface[Module.DATA_ELEMENT_NAME_INDEX] + " = " \
+                     + self.operation_name + "_input->" + input_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -169,8 +192,8 @@ class Module(object):
 
         # append local interface
         for local_interface in self.local_interface_list:
-            module = module + self.indent + local_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + local_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + local_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + local_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -182,8 +205,8 @@ class Module(object):
 
         # append output interface
         for output_interface in self.output_interface_list:
-            module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + output_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + output_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -211,8 +234,8 @@ class Module(object):
         # collect output data into output data structure
         for output_interface in self.output_interface_list:
             module = module + self.indent + self.operation_name + "_output->" + \
-                     output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + " = " + \
-                     output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+                     output_interface[Module.DATA_ELEMENT_NAME_INDEX] + " = " + \
+                     output_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         module = module + "\n"
 
@@ -237,13 +260,13 @@ class Module(object):
         # set module header
         module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
         # set module date
-        module = module + self.generation_date + "\n"
+        module = module + Module.generation_date + "\n"
 
         # set module comment
         module = module + " *\n"
 
         # set generic comment
-        module = module + " *   " + "This is header file of " + self.module_name + " module.\n"
+        module = module + " *   This is header file of " + self.module_name + " module.\n"
 
         # append header comments
         for header_comment in self.header_comment_list:
@@ -261,7 +284,7 @@ class Module(object):
         # ********** MODULE INCLUDES ********** #
 
         # set includes
-        module = module + "#include \"basic_data_types.h\"\n\n"
+        module = module + "#include \"" + Module.module_appendix_name + ".h\"\n\n"
 
         # ********** INPUT INTERFACE TYPE ********** #
 
@@ -273,8 +296,8 @@ class Module(object):
 
         # append input interface
         for input_interface in self.input_interface_list:
-            module = module + self.indent + input_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + input_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + input_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + input_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         # set input interface type name
         module = module + "} " + self.operation_name + "_input_type;\n\n"
@@ -289,8 +312,8 @@ class Module(object):
 
         # append output interface
         for output_interface in self.output_interface_list:
-            module = module + self.indent + output_interface[Module.INTERFACE_ELEMENT_TYPE_INDEX] + " " \
-                     + output_interface[Module.INTERFACE_ELEMENT_NAME_INDEX] + ";\n"
+            module = module + self.indent + output_interface[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                     + output_interface[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
 
         # set output interface type name
         module = module + "} " + self.operation_name + "_output_type;\n\n"
@@ -313,6 +336,89 @@ class Module(object):
 
         # set header guard end
         module = module + "#endif " + "// " + self.module_name + "_H_\n\n"
+
+        # ********** MODULE END ********** #
+
+        # set module footer
+        module = module + "/*\n" + " * END OF MODULE\n" + " */\n"
+
+        # return string representation
+        return module
+
+    # Description
+    # This method returns string representation of module appendix file.
+    @staticmethod
+    def generate_module_appendix():
+
+        # ********** MODULE HEADER ********** #
+
+        # set module header
+        module = "/*\n" + " *   Generated with Mod Code Generator (MCG) Code Generator Component (CGC)\n" + " *   on "
+        # set module date
+        module = module + Module.generation_date + "\n"
+
+        # set module comment
+        module = module + " *\n"
+
+        # set generic comment
+        module = module + " *   This is header file of " + Module.module_appendix_name + " module.\n"
+
+        # set end of module header
+        module = module + " */\n\n"
+
+        # ********** HEADER GUARD ********** #
+
+        # set header guard
+        module = module + "#ifndef " + Module.module_appendix_name + "_H_\n"
+        module = module + "#define " + Module.module_appendix_name + "_H_\n\n"
+
+        # ********** DATA TYPES DEFINITION ********** #
+
+        # set data types comment
+        module = module + "// Definition of data types\n"
+
+        # append data types
+        module = module + "typedef signed char INT8;\n"
+        module = module + "typedef signed short INT16;\n"
+        module = module + "typedef signed int INT32;\n"
+        module = module + "typedef signed long long INT64;\n"
+        module = module + "typedef unsigned char UINT8;\n"
+        module = module + "typedef unsigned short UINT16;\n"
+        module = module + "typedef unsigned int UINT32;\n"
+        module = module + "typedef unsigned long long UINT64;\n"
+        module = module + "typedef float FLOAT32;\n"
+        module = module + "typedef double FLOAT64;\n"
+        module = module + "typedef UINT8 BOOL;\n\n"
+
+        # ********** BOOL DATA STATES DEFINITION ********** #
+
+        # set BOOL data states comment
+        module = module + "// Definition of BOOL data states\n"
+
+        # append BOOL data states
+        module = module + "#define TRUE 1\n"
+        module = module + "#define FALSE 0\n\n"
+
+        # ********** CONSTANT DATA DEFINITION ********** #
+
+        # if any constant was appended
+        if len(Module.module_appendix_constant_list) > 0:
+
+            # set constant data comment
+            module = module + "// Declaration of extern constant data\n"
+
+            # append constant data
+            for constant_element in Module.module_appendix_constant_list:
+                module = module + "extern const " + constant_element[Module.DATA_ELEMENT_TYPE_INDEX] + " " \
+                         + constant_element[Module.DATA_ELEMENT_NAME_INDEX] + ";\n"
+
+            # set separator line
+            module = module + "\n"
+
+        # ********** HEADER GUARD END ********** #
+
+        # set header guard end
+        module = module + "#endif " + "// " + Module.module_appendix_name + "_H_\n\n"
 
         # ********** MODULE END ********** #
 

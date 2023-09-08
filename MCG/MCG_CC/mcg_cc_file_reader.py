@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           24 JUN 2023
+#   DATE:           7 SEP 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -28,44 +28,122 @@
 #       along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
+from mcg_cc_activity_connection import ActivityConnection
+from mcg_cc_file_supporter import FileSupporter
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
-from mcg_cc_supporter import Supporter
-from mcg_cc_connection import Connection
 
 
 # Description:
 # This class allows to read module content from .exml files.
 class FileReader(object):
 
-    # indexes of interface element list
-    INTERFACE_ELEMENT_NAME_INDEX = 0
-    INTERFACE_ELEMENT_TYPE_INDEX = 1
+    # indexes of data element list
+    DATA_ELEMENT_TYPE_INDEX = 0
+    DATA_ELEMENT_NAME_INDEX = 1
+    DATA_ELEMENT_VALUE_INDEX = 2
 
     # indexes of return data
-    CONNECTION_LIST_INDEX = 0
-    INPUT_INTERFACE_LIST_INDEX = 1
-    OUTPUT_INTERFACE_LIST_INDEX = 2
-    LOCAL_INTERFACE_LIST_INDEX = 3
+    OPERATION_NAME_INDEX = 0
+    CONSTANT_LIST_INDEX = 1
+    INPUT_INTERFACE_LIST_INDEX = 2
+    OUTPUT_INTERFACE_LIST_INDEX = 3
+    LOCAL_INTERFACE_LIST_INDEX = 4
+    CONNECTION_LIST_INDEX = 5
 
     # Description:
     # This is class constructor.
     def __init__(self, file_finder_list):
 
         # initialize object data
-        self.module_file = file_finder_list[FileFinder.MODULE_FILE_INDEX]
         self.activity_file = file_finder_list[FileFinder.ACTIVITY_FILE_INDEX]
+        self.module_file = file_finder_list[FileFinder.MODULE_FILE_INDEX]
+        self.operation_name = "UNKNOWN_OPERATION_NAME"
+        self.constant_list = []
         self.connection_list = []
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_interface_list = []
 
     # Description:
-    # This method looks for interface details of module operation.
+    # This method looks for name of module operation.
+    def read_operation_name(self):
+
+        # record info
+        Logger.save_in_log_file("FileReader", "Looking for module operation name in .exml file", False)
+
+        # search for operation definition in module file
+        for i in range(0, len(self.module_file)):
+
+            # if operation section is found
+            if "<COMP relation=\"OwnedOperation\">" in self.module_file[i]:
+                # get operation name
+                self.operation_name = FileSupporter.get_name(self.module_file[i + 2])
+                # record info
+                Logger.save_in_log_file("FileReader", "Have found " + str(self.operation_name) + " operation name",
+                                        False)
+
+    # Description:
+    # This method looks for constant elements of module operation.
+    def read_constant_elements(self):
+
+        # record info
+        Logger.save_in_log_file("FileReader", "Looking for module constant elements in .exml file", False)
+
+        # search for constant definition in module file
+        for i in range(0, len(self.module_file)):
+
+            constant_name = "UNKNOWN_NAME"
+            constant_type = "UNKNOWN_TYPE"
+            constant_value = "UNKNOWN_VALUE"
+
+            # if constant section is found
+            if "<ID name=" in self.module_file[i] and "mc=\"Standard.Attribute\"" in self.module_file[i]:
+                # get constant name
+                constant_name = FileSupporter.get_name(self.module_file[i])
+
+                # search for constant value and type
+                for j in range(i, len(self.module_file)):
+
+                    # if constant value is found
+                    if "<ATT name=\"Value\"" in self.module_file[j]:
+                        # get constant value start position
+                        constant_value_start_position = self.module_file[j].find("[CDATA[")
+                        # get constant value end position
+                        constant_value_end_position = self.module_file[j].find("]]")
+                        # get constant value
+                        constant_value = self.module_file[j][constant_value_start_position+7:constant_value_end_position]
+
+                    # if constant type is found
+                    if "<ID name=" in self.module_file[j] and "mc=\"Standard.DataType\"" in self.module_file[j]:
+                        # get constant type
+                        constant_type = FileSupporter.get_name(self.module_file[j])
+
+                        # constant element
+                        constant_element = []
+
+                        # append constant type to constant element
+                        constant_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, constant_type)
+                        # append constant name to constant element
+                        constant_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, constant_name)
+                        # append constant value to constant element
+                        constant_element.insert(FileReader.DATA_ELEMENT_VALUE_INDEX, constant_value)
+                        # append constant element to constant list
+                        self.constant_list.append(constant_element)
+                        # record info
+                        Logger.save_in_log_file("FileReader",
+                                                "Have found constant " + str(constant_element) + " element",
+                                                False)
+
+                        # exit 'for j in range' loop
+                        break
+
+    # Description:
+    # This method looks for interface elements of module operation.
     def read_interface_elements(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Looking for module interface details in .exml file", False)
+        Logger.save_in_log_file("FileReader", "Looking for module interface elements in .exml file", False)
 
         # search for external interface details of operation in module file
         # i.e. operation input and output parameters
@@ -79,7 +157,7 @@ class FileReader(object):
             # if parameter section if found
             if "<ID name=" in self.module_file[i] and "mc=\"Standard.Parameter\"" in self.module_file[i]:
                 # get parameter name
-                parameter_name = Supporter.get_name(self.module_file[i])
+                parameter_name = FileSupporter.get_name(self.module_file[i])
 
                 # search for parameter input/output direction and type
                 for j in range(i, len(self.module_file)):
@@ -95,15 +173,15 @@ class FileReader(object):
                     # if parameter type is found
                     if "<ID name=" in self.module_file[j] and "mc=\"Standard.DataType\"" in self.module_file[j]:
                         # get parameter type
-                        parameter_type = Supporter.get_name(self.module_file[j])
+                        parameter_type = FileSupporter.get_name(self.module_file[j])
 
                         # interface element
                         interface_element = []
 
-                        # append parameter name to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, parameter_name)
                         # append parameter type to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, parameter_type)
+                        interface_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, parameter_type)
+                        # append parameter name to interface element
+                        interface_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, parameter_name)
 
                         # if it is input parameter
                         if parameter_direction == "INPUT":
@@ -125,12 +203,13 @@ class FileReader(object):
             local_name = "UNKNOWN_NAME"
             local_type = "UNKNOWN_TYPE"
 
-            # if local section if found
+            # if local section is found and it is not an attribute
             if "<OBJECT>" in self.activity_file[i] and \
                     "<ID name=" in self.activity_file[i+1] and \
-                    "mc=\"Standard.InstanceNode\"" in self.activity_file[i+1]:
+                    "mc=\"Standard.InstanceNode\"" in self.activity_file[i+1] and \
+                    "mc=\"Standard.Attribute\"" not in self.activity_file[i + 13]:
                 # get local name
-                local_name = Supporter.get_name(self.activity_file[i+1])
+                local_name = FileSupporter.get_name(self.activity_file[i+1])
 
                 # search for local direction and type
                 for j in range(i, len(self.activity_file)):
@@ -138,15 +217,15 @@ class FileReader(object):
                     # if local type is found
                     if "<ID name=" in self.activity_file[j] and "mc=\"Standard.DataType\"" in self.activity_file[j]:
                         # get local type
-                        local_type = Supporter.get_name(self.activity_file[j])
+                        local_type = FileSupporter.get_name(self.activity_file[j])
 
                         # interface element
                         interface_element = []
 
-                        # append local name to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_NAME_INDEX, local_name)
                         # append local type to interface element
-                        interface_element.insert(FileReader.INTERFACE_ELEMENT_TYPE_INDEX, local_type)
+                        interface_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, local_type)
+                        # append local name to interface element
+                        interface_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, local_name)
                         # append interface element to interface list
                         if interface_element not in self.local_interface_list:
                             self.local_interface_list.append(interface_element)
@@ -181,17 +260,21 @@ class FileReader(object):
                     (("mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]) or
                      ("mc=\"Standard.InstanceNode\"" in self.activity_file[i+1])):
 
-                # get source data name
-                source_data_name = Supporter.get_name(self.activity_file[i + 1])
-
-                # if data is parameter type
-                if "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]:
-                    # set parameter type
-                    source_data_type = Connection.PARAMETER
-                # if data is local type
+                # if it is local data represented by an attribute
+                if "mc=\"Standard.Attribute\"" in self.activity_file[i + 13]:
+                    # get source data name from attribute
+                    source_data_name = FileSupporter.get_name(self.activity_file[i + 13])
                 else:
-                    # set local type
-                    source_data_type = Connection.LOCAL
+                    # get source data name from instance node or activity parameter node
+                    source_data_name = FileSupporter.get_name(self.activity_file[i + 1])
+
+                # set data type depending on data section type
+                if "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]:
+                    # set parameter data type
+                    source_data_type = ActivityConnection.PARAMETER
+                else:
+                    # set local data type
+                    source_data_type = ActivityConnection.LOCAL
 
                 # assume that data element does not have target section
                 target_section_found = False
@@ -208,7 +291,7 @@ class FileReader(object):
                     if "<LINK relation=\"Target\">" in self.activity_file[j]:
 
                         # new connection instance
-                        connection = Connection()
+                        connection = ActivityConnection()
                         connection.source_name = source_data_name
                         connection.source_type = source_data_type
 
@@ -216,11 +299,11 @@ class FileReader(object):
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.InstanceNode\"" in self.activity_file[j + 2]:
                             # get target data name
-                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.LOCAL
+                            connection.target_type = ActivityConnection.LOCAL
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -231,11 +314,11 @@ class FileReader(object):
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[j + 2]:
                             # get target data name
-                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.PARAMETER
+                            connection.target_type = ActivityConnection.PARAMETER
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -246,15 +329,15 @@ class FileReader(object):
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.OpaqueAction\"" in self.activity_file[j + 2]:
                             # get target action name
-                            target_action_name = Supporter.get_name(self.activity_file[j + 2])
+                            target_action_name = FileSupporter.get_name(self.activity_file[j + 2])
                             # get target action uid
-                            target_action_uid = Supporter.get_uid(self.activity_file[j + 2])
+                            target_action_uid = FileSupporter.get_uid(self.activity_file[j + 2])
                             # set connection target name
                             connection.target_name = target_action_name
                             # set connection target uid
                             connection.target_uid = target_action_uid
                             # set connection target type
-                            connection.target_type = Connection.ACTION
+                            connection.target_type = ActivityConnection.ACTION
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -265,9 +348,9 @@ class FileReader(object):
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.InputPin\"" in self.activity_file[j + 2]:
                             # get target pin name
-                            target_pin_name = Supporter.get_name(self.activity_file[j + 2])
+                            target_pin_name = FileSupporter.get_name(self.activity_file[j + 2])
                             # get target pin uid
-                            target_pin_uid = Supporter.get_uid(self.activity_file[j + 2])
+                            target_pin_uid = FileSupporter.get_uid(self.activity_file[j + 2])
                             # find target operation name and uid
                             target_operation_name, target_operation_uid = self.find_operation(target_pin_uid)
                             # set connection target pin
@@ -277,7 +360,7 @@ class FileReader(object):
                             # set connection uid
                             connection.target_uid = target_operation_uid
                             # set connection type
-                            connection.target_type = Connection.OPERATION
+                            connection.target_type = ActivityConnection.OPERATION
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -311,18 +394,18 @@ class FileReader(object):
                      ("mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1])):
 
                 # get source interaction name
-                source_interaction_name = Supporter.get_name(self.activity_file[i+1])
+                source_interaction_name = FileSupporter.get_name(self.activity_file[i+1])
                 # get source interaction uid
-                source_interaction_uid = Supporter.get_uid(self.activity_file[i+1])
+                source_interaction_uid = FileSupporter.get_uid(self.activity_file[i+1])
 
                 # if interaction is action type
                 if "mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]:
                     # set action type
-                    source_interaction_type = Connection.ACTION
+                    source_interaction_type = ActivityConnection.ACTION
                 # if interaction is operation type
                 else:
                     # set operation type
-                    source_interaction_type = Connection.OPERATION
+                    source_interaction_type = ActivityConnection.OPERATION
 
                 # unknown output pin from operation
                 source_pin_name = "N/A"
@@ -342,19 +425,19 @@ class FileReader(object):
                     if "<ID name=" in self.activity_file[j] and "mc=\"Standard.OutputPin\"" in self.activity_file[j]:
 
                         # get source pin name
-                        source_pin_name = Supporter.get_name(self.activity_file[j])
+                        source_pin_name = FileSupporter.get_name(self.activity_file[j])
 
                     # if target reference if found
                     if "<LINK relation=\"Target\">" in self.activity_file[j]:
 
                         # new connection instance
-                        connection = Connection()
+                        connection = ActivityConnection()
                         connection.source_name = source_interaction_name
                         connection.source_uid = source_interaction_uid
                         connection.source_type = source_interaction_type
 
                         # if operation
-                        if connection.source_type == Connection.OPERATION:
+                        if connection.source_type == ActivityConnection.OPERATION:
                             # set connection source pin
                             connection.source_pin = source_pin_name
 
@@ -362,11 +445,11 @@ class FileReader(object):
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.InstanceNode\"" in self.activity_file[j + 2]:
                             # get target data name
-                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.LOCAL
+                            connection.target_type = ActivityConnection.LOCAL
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -377,11 +460,11 @@ class FileReader(object):
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[j + 2]:
                             # get target data name
-                            target_data_name = Supporter.get_name(self.activity_file[j + 2])
+                            target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
                             # set connection target name
                             connection.target_name = target_data_name
                             # set connection target type
-                            connection.target_type = Connection.PARAMETER
+                            connection.target_type = ActivityConnection.PARAMETER
                             # append connection to connection list
                             self.connection_list.append(connection)
                             # record info
@@ -390,7 +473,7 @@ class FileReader(object):
 
                     # if end of action target section is found
                     if "</COMP>" in self.activity_file[j] and \
-                            source_interaction_type == Connection.ACTION:
+                            source_interaction_type == ActivityConnection.ACTION:
                         # exit "for j in range" loop
                         break
 
@@ -399,7 +482,7 @@ class FileReader(object):
                             "</DEPENDENCIES>" in self.activity_file[j+1] and \
                             "</OBJECT>" in self.activity_file[j+2] and \
                             "</COMP>" in self.activity_file[j+3] and \
-                            source_interaction_type == Connection.OPERATION:
+                            source_interaction_type == ActivityConnection.OPERATION:
                         # exit "for j in range" loop
                         break
 
@@ -424,9 +507,9 @@ class FileReader(object):
                     "<ID name=" in self.activity_file[i + 1] and \
                     "mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1]:
                 # get operation name
-                operation_name = Supporter.get_name(self.activity_file[i + 1])
+                operation_name = FileSupporter.get_name(self.activity_file[i + 1])
                 # get operation uid
-                operation_uid = Supporter.get_uid(self.activity_file[i + 1])
+                operation_uid = FileSupporter.get_uid(self.activity_file[i + 1])
 
             # if input uid if found under above operation
             if "<OBJECT>" in self.activity_file[i] and \
@@ -446,6 +529,12 @@ class FileReader(object):
         # record info
         Logger.save_in_log_file("FileReader", "Reading module details from set of .exml files", True)
 
+        # search for operation name
+        self.read_operation_name()
+
+        # search for constant details
+        self.read_constant_elements()
+
         # search for interface details
         self.read_interface_elements()
 
@@ -457,10 +546,12 @@ class FileReader(object):
 
         # append collected data to file reader list
         file_reader_list = []
-        file_reader_list.insert(FileReader.CONNECTION_LIST_INDEX, self.connection_list)
+        file_reader_list.insert(FileReader.OPERATION_NAME_INDEX, self.operation_name)
+        file_reader_list.insert(FileReader.CONSTANT_LIST_INDEX, self.constant_list)
         file_reader_list.insert(FileReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
         file_reader_list.insert(FileReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
         file_reader_list.insert(FileReader.LOCAL_INTERFACE_LIST_INDEX, self.local_interface_list)
+        file_reader_list.insert(FileReader.CONNECTION_LIST_INDEX, self.connection_list)
 
         # return file reader list
         return file_reader_list
