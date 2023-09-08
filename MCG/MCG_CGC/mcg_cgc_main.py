@@ -51,7 +51,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CGC version
-    MCG_CGC_VERSION = "v0.4.0-alpha"
+    MCG_CGC_VERSION = "v0.5.0-in-dev"
 
     # Description:
     # This is main method, which display short notice and start code generation process.
