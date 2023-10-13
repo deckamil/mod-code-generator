@@ -5,7 +5,7 @@
 #       activity diagram, i.e. interaction together with its input and output data.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 SEP 2023
+#   DATE:           13 OCT 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,8 +47,8 @@ class ActivityNode(object):
     def __init__(self):
         # initialize object data
         self.input_data_list = []
-        self.name = "N/A"
-        self.uid = "N/A"
+        self.name = "UNKNOWN"
+        self.uid = "UNKNOWN"
         self.type = ActivityNode.UNKNOWN
         self.output_data_list = []
 

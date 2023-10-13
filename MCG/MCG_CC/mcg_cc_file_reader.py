@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 SEP 2023
+#   DATE:           13 OCT 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,6 +29,8 @@
 
 
 from mcg_cc_activity_connection import ActivityConnection
+from mcg_cc_activity_condtion import ActivityCondition
+from mcg_cc_activity_clause import ActivityClause
 from mcg_cc_file_supporter import FileSupporter
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
@@ -61,6 +63,7 @@ class FileReader(object):
         self.operation_name = "UNKNOWN_OPERATION_NAME"
         self.constant_list = []
         self.connection_list = []
+        self.condition_list = []
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_interface_list = []
@@ -260,6 +263,9 @@ class FileReader(object):
                     (("mc=\"Standard.ActivityParameterNode\"" in self.activity_file[i+1]) or
                      ("mc=\"Standard.InstanceNode\"" in self.activity_file[i+1])):
 
+                # get connection index
+                connection_index = i + 1
+
                 # if it is local data represented by an attribute
                 if "mc=\"Standard.Attribute\"" in self.activity_file[i + 13]:
                     # get source data name from attribute
@@ -292,6 +298,7 @@ class FileReader(object):
 
                         # new connection instance
                         connection = ActivityConnection()
+                        connection.index = connection_index
                         connection.source_name = source_data_name
                         connection.source_type = source_data_type
 
@@ -393,6 +400,8 @@ class FileReader(object):
                     (("mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]) or
                      ("mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1])):
 
+                # get connection index
+                connection_index = i + 1
                 # get source interaction name
                 source_interaction_name = FileSupporter.get_name(self.activity_file[i+1])
                 # get source interaction uid
@@ -432,6 +441,7 @@ class FileReader(object):
 
                         # new connection instance
                         connection = ActivityConnection()
+                        connection.index = connection_index
                         connection.source_name = source_interaction_name
                         connection.source_uid = source_interaction_uid
                         connection.source_type = source_interaction_type
@@ -492,6 +502,153 @@ class FileReader(object):
                         break
 
     # Description:
+    # This method looks for conditional elements of module operation.
+    def read_conditional_elements(self):
+
+        # record info
+        Logger.save_in_log_file("FileReader", "Looking for module conditional elements in .exml file", False)
+
+        # counts how many "<OBJECT>" and "/<OBJECT>" occurs within condition or clause sections
+        # when given counter is decremented back to 0 then it means end of given section
+        condition_object_counter = 0
+        clause_object_counter = 0
+
+        # allows to determine whether beginning of condition or clause section have been found
+        condition_found = False
+        clause_found = False
+
+        # new condition and clause instances
+        condition = ActivityCondition()
+        clause = ActivityClause()
+
+        # search for conditional elements in activity file
+        for i in range(0, len(self.activity_file)):
+
+            # if condition section is found
+            if "<OBJECT>" in self.activity_file[i-1] and \
+                    "<ID name=" in self.activity_file[i] and \
+                    "mc=\"Standard.ConditionalNode\"" in self.activity_file[i]:
+
+                # get condition name
+                condition_name = FileSupporter.get_name(self.activity_file[i])
+                # get condition uid
+                condition_uid = FileSupporter.get_uid(self.activity_file[i])
+
+                # new condition instance
+                condition = ActivityCondition()
+
+                # set condition start index
+                condition.start_index = i
+                # set condition name
+                condition.name = condition_name
+                # set condition uid
+                condition.uid = condition_uid
+
+                # new condition section is found, therefore enable counting of
+                # "<OBJECT>" and "/<OBJECT>" for condition element
+                condition_object_counter = 1
+                condition_found = True
+
+            # if clause section is found
+            if "<OBJECT>" in self.activity_file[i - 1] and \
+                    "<ID name=" in self.activity_file[i] and \
+                    "mc=\"Standard.Clause\"" in self.activity_file[i]:
+
+                # get decision start position
+                decision_start_position = self.activity_file[i+2].find("[CDATA[")
+                # get decision end position
+                decision_end_position = self.activity_file[i+2].find("]]")
+                # get clause decision
+                clause_decision = self.activity_file[i+2][decision_start_position + 7:decision_end_position]
+
+                # get clause uid
+                clause_uid = FileSupporter.get_uid(self.activity_file[i])
+
+                # new clause instance
+                clause = ActivityClause()
+
+                # set clause start index
+                clause.start_index = i
+                # set clause decision
+                clause.decision = clause_decision
+                # set clause uid
+                clause.uid = clause_uid
+
+                # new clause section is found, therefore enable counting of
+                # "<OBJECT>" and "/<OBJECT>" for clause element
+                clause_object_counter = 1
+                clause_found = True
+
+            # if new "<OBJECT>" then increment required counters
+            if ("<OBJECT>" in self.activity_file[i]) and condition_found:
+                condition_object_counter = condition_object_counter+1
+
+                if clause_found:
+                    clause_object_counter = clause_object_counter+1
+
+            # if new "</OBJECT>" then decrement required counters
+            if ("</OBJECT>" in self.activity_file[i]) and condition_found:
+                condition_object_counter = condition_object_counter-1
+
+                if clause_found:
+                    clause_object_counter = clause_object_counter-1
+
+            # if end of clause section is found
+            if (clause_object_counter == 0) and clause_found:
+
+                # disable counting of "<OBJECT>" and "/<OBJECT>" for clause element
+                clause_found = False
+                # set clause end index
+                clause.end_index = i
+                # append clause to clause list
+                condition.clause_list.append(clause)
+
+            # if end of condition section is found
+            if (condition_object_counter == 0) and condition_found:
+
+                # disable counting of "<OBJECT>" and "/<OBJECT>" for condition element
+                condition_found = False
+                # set condition end index
+                condition.end_index = i
+                # append condition to condition list
+                self.condition_list.append(condition)
+
+        # allocate connection elements to their clauses under conditional element
+        for condition in self.condition_list:
+
+            # for each clause
+            for clause in condition.clause_list:
+
+                # get clause start index
+                clause_start_index = clause.start_index
+                # get clause end index
+                clause_end_index = clause.end_index
+
+                # search fo connections that appear between start and end index
+                for connection in list(self.connection_list):
+
+                    # get connection index
+                    connection_index = connection.index
+                    # if connection appears between both indexes it menace
+                    # that the connection belong to given clause
+                    if (connection_index >= clause_start_index) and (connection_index <= clause_end_index):
+                        # append connection to clause connection list
+                        clause.connection_list.append(connection)
+                        # remove connection from original connection list
+                        self.connection_list.remove(connection)
+
+        # record info
+        for condition in self.condition_list:
+            Logger.save_in_log_file("FileReader", "Have found " + str(condition) + " element", False)
+
+            for clause in condition.clause_list:
+                Logger.save_in_log_file("FileReader", "Have found " + str(clause) + " element", False)
+
+                for connection in clause.connection_list:
+                    Logger.save_in_log_file("FileReader", "Have found that " + str(connection) +
+                                            " element belongs to clause", False)
+
+    # Description:
     # This method looks for operation on activity diagram, basing on uid of operation input pis.
     def find_operation(self, input_pin_uid):
 
@@ -543,6 +700,9 @@ class FileReader(object):
 
         # search for interaction targets
         self.read_interaction_targets()
+
+        # search for condition details
+        self.read_conditional_elements()
 
         # append collected data to file reader list
         file_reader_list = []
