@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           13 OCT 2023
+#   DATE:           15 OCT 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -52,6 +52,7 @@ class FileReader(object):
     OUTPUT_INTERFACE_LIST_INDEX = 3
     LOCAL_INTERFACE_LIST_INDEX = 4
     CONNECTION_LIST_INDEX = 5
+    CONDITION_LIST_INDEX = 6
 
     # Description:
     # This is class constructor.
@@ -60,13 +61,13 @@ class FileReader(object):
         # initialize object data
         self.activity_file = file_finder_list[FileFinder.ACTIVITY_FILE_INDEX]
         self.module_file = file_finder_list[FileFinder.MODULE_FILE_INDEX]
-        self.operation_name = "UNKNOWN_OPERATION_NAME"
+        self.operation_name = "UNKNOWN"
         self.constant_list = []
-        self.connection_list = []
-        self.condition_list = []
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_interface_list = []
+        self.connection_list = []
+        self.condition_list = []
 
     # Description:
     # This method looks for name of module operation.
@@ -96,9 +97,9 @@ class FileReader(object):
         # search for constant definition in module file
         for i in range(0, len(self.module_file)):
 
-            constant_name = "UNKNOWN_NAME"
-            constant_type = "UNKNOWN_TYPE"
-            constant_value = "UNKNOWN_VALUE"
+            constant_name = "UNKNOWN"
+            constant_type = "UNKNOWN"
+            constant_value = "UNKNOWN"
 
             # if constant section is found
             if "<ID name=" in self.module_file[i] and "mc=\"Standard.Attribute\"" in self.module_file[i]:
@@ -153,9 +154,9 @@ class FileReader(object):
         for i in range(0, len(self.module_file)):
 
             # parameter details
-            parameter_name = "UNKNOWN_NAME"
-            parameter_direction = "UNKNOWN_DIRECTION"
-            parameter_type = "UNKNOWN_TYPE"
+            parameter_name = "UNKNOWN"
+            parameter_direction = "UNKNOWN"
+            parameter_type = "UNKNOWN"
 
             # if parameter section if found
             if "<ID name=" in self.module_file[i] and "mc=\"Standard.Parameter\"" in self.module_file[i]:
@@ -203,8 +204,8 @@ class FileReader(object):
         for i in range(0, len(self.activity_file)):
 
             # local details
-            local_name = "UNKNOWN_NAME"
-            local_type = "UNKNOWN_TYPE"
+            local_name = "UNKNOWN"
+            local_type = "UNKNOWN"
 
             # if local section is found and it is not an attribute
             if "<OBJECT>" in self.activity_file[i] and \
@@ -298,8 +299,12 @@ class FileReader(object):
 
                         # new connection instance
                         connection = ActivityConnection()
+
+                        # set connection index
                         connection.index = connection_index
+                        # set connection source name
                         connection.source_name = source_data_name
+                        # set connection source type
                         connection.source_type = source_data_type
 
                         # if local data is target
@@ -417,7 +422,7 @@ class FileReader(object):
                     source_interaction_type = ActivityConnection.OPERATION
 
                 # unknown output pin from operation
-                source_pin_name = "N/A"
+                source_pin_name = "UNKNOWN"
 
                 # assume that interaction element does not have target section
                 target_section_found = False
@@ -441,9 +446,14 @@ class FileReader(object):
 
                         # new connection instance
                         connection = ActivityConnection()
+
+                        # ser connection index
                         connection.index = connection_index
+                        # set connection source name
                         connection.source_name = source_interaction_name
+                        # set connection source uid
                         connection.source_uid = source_interaction_uid
+                        # set connection source type
                         connection.source_type = source_interaction_type
 
                         # if operation
@@ -624,12 +634,12 @@ class FileReader(object):
                 # get clause end index
                 clause_end_index = clause.end_index
 
-                # search fo connections that appear between start and end index
+                # search for connections that appear between start and end index
                 for connection in list(self.connection_list):
 
                     # get connection index
                     connection_index = connection.index
-                    # if connection appears between both indexes it menace
+                    # if connection appears between both indexes it means
                     # that the connection belong to given clause
                     if (connection_index >= clause_start_index) and (connection_index <= clause_end_index):
                         # append connection to clause connection list
@@ -649,12 +659,12 @@ class FileReader(object):
                                             " element belongs to clause", False)
 
     # Description:
-    # This method looks for operation on activity diagram, basing on uid of operation input pis.
+    # This method looks for operation on activity diagram, basing on uid of operation input pins.
     def find_operation(self, input_pin_uid):
 
         # operation details
-        operation_name = "UNKNOWN_NAME"
-        operation_uid = "UNKNOWN_UID"
+        operation_name = "UNKNOWN"
+        operation_uid = "UNKNOWN"
 
         # search for operation in activity file
         for i in range(0, len(self.activity_file)):
@@ -712,6 +722,7 @@ class FileReader(object):
         file_reader_list.insert(FileReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
         file_reader_list.insert(FileReader.LOCAL_INTERFACE_LIST_INDEX, self.local_interface_list)
         file_reader_list.insert(FileReader.CONNECTION_LIST_INDEX, self.connection_list)
+        file_reader_list.insert(FileReader.CONDITION_LIST_INDEX, self.condition_list)
 
         # return file reader list
         return file_reader_list
