@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           15 OCT 2023
+#   DATE:           6 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,8 +29,7 @@
 
 
 from mcg_cc_activity_connection import ActivityConnection
-from mcg_cc_activity_condtion import ActivityCondition
-from mcg_cc_activity_clause import ActivityClause
+from mcg_cc_activity_collection import *
 from mcg_cc_file_supporter import FileSupporter
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
@@ -51,8 +50,8 @@ class FileReader(object):
     INPUT_INTERFACE_LIST_INDEX = 2
     OUTPUT_INTERFACE_LIST_INDEX = 3
     LOCAL_INTERFACE_LIST_INDEX = 4
-    CONNECTION_LIST_INDEX = 5
-    CONDITION_LIST_INDEX = 6
+    DIAGRAM_COLLECTION_INDEX = 5
+    CONDITION_COLLECTION_LIST_INDEX = 6
 
     # Description:
     # This is class constructor.
@@ -66,8 +65,9 @@ class FileReader(object):
         self.input_interface_list = []
         self.output_interface_list = []
         self.local_interface_list = []
-        self.connection_list = []
-        self.condition_list = []
+        self.total_connection_list = []
+        self.diagram_collection = ActivityDiagramCollection()
+        self.condition_collection_list = []
 
     # Description:
     # This method looks for name of module operation.
@@ -316,8 +316,8 @@ class FileReader(object):
                             connection.target_name = target_data_name
                             # set connection target type
                             connection.target_type = ActivityConnection.LOCAL
-                            # append connection to connection list
-                            self.connection_list.append(connection)
+                            # append connection to total connection list
+                            self.total_connection_list.append(connection)
                             # record info
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
@@ -331,8 +331,8 @@ class FileReader(object):
                             connection.target_name = target_data_name
                             # set connection target type
                             connection.target_type = ActivityConnection.PARAMETER
-                            # append connection to connection list
-                            self.connection_list.append(connection)
+                            # append connection to total connection list
+                            self.total_connection_list.append(connection)
                             # record info
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
@@ -350,8 +350,8 @@ class FileReader(object):
                             connection.target_uid = target_action_uid
                             # set connection target type
                             connection.target_type = ActivityConnection.ACTION
-                            # append connection to connection list
-                            self.connection_list.append(connection)
+                            # append connection to total connection list
+                            self.total_connection_list.append(connection)
                             # record info
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
@@ -373,8 +373,8 @@ class FileReader(object):
                             connection.target_uid = target_operation_uid
                             # set connection type
                             connection.target_type = ActivityConnection.OPERATION
-                            # append connection to connection list
-                            self.connection_list.append(connection)
+                            # append connection to total connection list
+                            self.total_connection_list.append(connection)
                             # record info
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
@@ -470,8 +470,8 @@ class FileReader(object):
                             connection.target_name = target_data_name
                             # set connection target type
                             connection.target_type = ActivityConnection.LOCAL
-                            # append connection to connection list
-                            self.connection_list.append(connection)
+                            # append connection to total connection list
+                            self.total_connection_list.append(connection)
                             # record info
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
@@ -485,8 +485,8 @@ class FileReader(object):
                             connection.target_name = target_data_name
                             # set connection target type
                             connection.target_type = ActivityConnection.PARAMETER
-                            # append connection to connection list
-                            self.connection_list.append(connection)
+                            # append connection to total connection list
+                            self.total_connection_list.append(connection)
                             # record info
                             Logger.save_in_log_file("FileReader", "Have found " + str(connection) + " connection",
                                                     False)
@@ -512,11 +512,11 @@ class FileReader(object):
                         break
 
     # Description:
-    # This method looks for conditional elements of module operation.
-    def read_conditional_elements(self):
+    # This method looks for condition elements of module operation.
+    def read_condition_elements(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Looking for module conditional elements in .exml file", False)
+        Logger.save_in_log_file("FileReader", "Looking for module condition elements in .exml file", False)
 
         # counts how many "<OBJECT>" and "/<OBJECT>" occurs within condition or clause sections
         # when given counter is decremented back to 0 then it means end of given section
@@ -527,9 +527,9 @@ class FileReader(object):
         condition_found = False
         clause_found = False
 
-        # new condition and clause instances
-        condition = ActivityCondition()
-        clause = ActivityClause()
+        # new condition and clause collection instances
+        condition = ActivityConditionCollection()
+        clause = ActivityClauseCollection()
 
         # search for conditional elements in activity file
         for i in range(0, len(self.activity_file)):
@@ -544,11 +544,9 @@ class FileReader(object):
                 # get condition uid
                 condition_uid = FileSupporter.get_uid(self.activity_file[i])
 
-                # new condition instance
-                condition = ActivityCondition()
+                # new condition collection instance
+                condition = ActivityConditionCollection()
 
-                # set condition start index
-                condition.start_index = i
                 # set condition name
                 condition.name = condition_name
                 # set condition uid
@@ -574,8 +572,8 @@ class FileReader(object):
                 # get clause uid
                 clause_uid = FileSupporter.get_uid(self.activity_file[i])
 
-                # new clause instance
-                clause = ActivityClause()
+                # new clause collection instance
+                clause = ActivityClauseCollection()
 
                 # set clause start index
                 clause.start_index = i
@@ -610,24 +608,42 @@ class FileReader(object):
                 clause_found = False
                 # set clause end index
                 clause.end_index = i
-                # append clause to clause list
-                condition.clause_list.append(clause)
+                # append clause to collection list
+                condition.collection_list.append(clause)
 
             # if end of condition section is found
             if (condition_object_counter == 0) and condition_found:
 
                 # disable counting of "<OBJECT>" and "/<OBJECT>" for condition element
                 condition_found = False
-                # set condition end index
-                condition.end_index = i
                 # append condition to condition list
-                self.condition_list.append(condition)
+                self.condition_collection_list.append(condition)
 
-        # allocate connection elements to their clauses under conditional element
-        for condition in self.condition_list:
+        # record info
+        for condition in self.condition_collection_list:
+            Logger.save_in_log_file("FileReader", "Have found " + str(condition) + " element", False)
+
+            for clause in condition.collection_list:
+                Logger.save_in_log_file("FileReader", "Have found " + str(clause) + " element", False)
+
+    # Description:
+    # This method allocates connections to their parental clauses under condition collection
+    def allocate_connections_to_clauses(self):
+
+        # record info
+        Logger.save_in_log_file("FileReader", "Allocating connections to clause elements", False)
+
+        # allocate connections to clause elements
+        for condition in self.condition_collection_list:
+
+            # record info
+            Logger.save_in_log_file("FileReader", "Allocating to " + str(condition) + " element of .exml file", False)
 
             # for each clause
-            for clause in condition.clause_list:
+            for clause in condition.collection_list:
+
+                # record info
+                Logger.save_in_log_file("FileReader", "Allocating to " + str(clause) + " element of .exml file", False)
 
                 # get clause start index
                 clause_start_index = clause.start_index
@@ -635,7 +651,7 @@ class FileReader(object):
                 clause_end_index = clause.end_index
 
                 # search for connections that appear between start and end index
-                for connection in list(self.connection_list):
+                for connection in list(self.total_connection_list):
 
                     # get connection index
                     connection_index = connection.index
@@ -643,20 +659,27 @@ class FileReader(object):
                     # that the connection belong to given clause
                     if (connection_index >= clause_start_index) and (connection_index <= clause_end_index):
                         # append connection to clause connection list
-                        clause.connection_list.append(connection)
+                        clause.collection_list.append(connection)
                         # remove connection from original connection list
-                        self.connection_list.remove(connection)
+                        self.total_connection_list.remove(connection)
+                        # record info
+                        Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) + " connection", False)
+
+    # Description:
+    # This method allocates connections to diagram collection
+    def allocate_connections_to_diagram(self):
 
         # record info
-        for condition in self.condition_list:
-            Logger.save_in_log_file("FileReader", "Have found " + str(condition) + " element", False)
+        Logger.save_in_log_file("FileReader", "Allocating connections to diagram element", False)
 
-            for clause in condition.clause_list:
-                Logger.save_in_log_file("FileReader", "Have found " + str(clause) + " element", False)
-
-                for connection in clause.connection_list:
-                    Logger.save_in_log_file("FileReader", "Have found that " + str(connection) +
-                                            " element belongs to clause", False)
+        # for each remaining connection that was not allocated to any other collection type
+        for connection in list(self.total_connection_list):
+            # append connection to diagram connection list
+            self.diagram_collection.collection_list.append(connection)
+            # remove connection from original connection list
+            self.total_connection_list.remove(connection)
+            # record info
+            Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) + " connection", False)
 
     # Description:
     # This method looks for operation on activity diagram, basing on uid of operation input pins.
@@ -699,10 +722,10 @@ class FileReader(object):
         # search for operation name
         self.read_operation_name()
 
-        # search for constant details
+        # search for constant elements
         self.read_constant_elements()
 
-        # search for interface details
+        # search for interface elements
         self.read_interface_elements()
 
         # search for data targets
@@ -711,8 +734,14 @@ class FileReader(object):
         # search for interaction targets
         self.read_interaction_targets()
 
-        # search for condition details
-        self.read_conditional_elements()
+        # search for condition elements
+        self.read_condition_elements()
+
+        # allocate connections to clauses
+        self.allocate_connections_to_clauses()
+
+        # allocate connections to diagram
+        self.allocate_connections_to_diagram()
 
         # append collected data to file reader list
         file_reader_list = []
@@ -721,8 +750,8 @@ class FileReader(object):
         file_reader_list.insert(FileReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
         file_reader_list.insert(FileReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
         file_reader_list.insert(FileReader.LOCAL_INTERFACE_LIST_INDEX, self.local_interface_list)
-        file_reader_list.insert(FileReader.CONNECTION_LIST_INDEX, self.connection_list)
-        file_reader_list.insert(FileReader.CONDITION_LIST_INDEX, self.condition_list)
+        file_reader_list.insert(FileReader.DIAGRAM_COLLECTION_INDEX, self.diagram_collection)
+        file_reader_list.insert(FileReader.CONDITION_COLLECTION_LIST_INDEX, self.condition_collection_list)
 
         # return file reader list
         return file_reader_list
