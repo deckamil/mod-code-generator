@@ -591,21 +591,21 @@ class FileReader(object):
 
     # Description:
     # This method allocates connections to their parental clauses under condition collection.
-    def allocate_connections_to_conditions(self):
+    def allocate_connections_to_clauses(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Allocating connections to condition elements", False)
+        Logger.save_in_log_file("FileReader", "Allocating connections to clause elements", False)
 
         # for each condition collection
         for condition_collection in self.condition_collection_list:
             # record info
-            Logger.save_in_log_file("FileReader", "Allocating to " + str(condition_collection) +
+            Logger.save_in_log_file("FileReader", "Allocating under " + str(condition_collection) +
                                     " element of .exml file", False)
 
             # for each clause collection
             for clause_collection in condition_collection.collection_list:
                 # record info
-                Logger.save_in_log_file("FileReader", "Allocating to " + str(clause_collection) +
+                Logger.save_in_log_file("FileReader", "Allocating under " + str(clause_collection) +
                                         " element of .exml file", False)
 
                 # get clause start and end index
@@ -692,8 +692,8 @@ class FileReader(object):
         # search for condition elements
         self.read_condition_elements()
 
-        # allocate connections to condition and diagram elements
-        self.allocate_connections_to_conditions()
+        # allocate connections to clause and diagram elements
+        self.allocate_connections_to_clauses()
         self.allocate_connections_to_diagram()
 
         # append collected data to file reader list

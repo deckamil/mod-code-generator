@@ -6,7 +6,7 @@
 #       on activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           6 DEC 2023
+#   DATE:           8 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -57,6 +57,7 @@ class ActivityDiagramCollection(ActivityBasicCollection):
         # initialize object data
         super().__init__()
         self.interaction_uid_list = []
+        self.node_list = []
 
     # Description:
     # This method returns string representation of the class.
@@ -99,6 +100,7 @@ class ActivityClauseCollection(ActivityConditionCollection):
         self.end_index = 0
         self.decision = "UNKNOWN"
         self.interaction_uid_list = []
+        self.node_list = []
 
     # Description:
     # This method returns string representation of the class.

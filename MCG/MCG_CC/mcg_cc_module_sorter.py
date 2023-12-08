@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 SEP 2023
+#   DATE:           8 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -49,74 +49,111 @@ class ModuleSorter(object):
     def __init__(self, file_reader_list):
 
         # initialize object data
-        self.connection_list = file_reader_list[FileReader.CONNECTION_LIST_INDEX]
+        self.diagram_collection = file_reader_list[FileReader.DIAGRAM_COLLECTION_INDEX]
+        self.condition_collection_list = file_reader_list[FileReader.CONDITION_COLLECTION_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
-        self.interaction_uid_list = []
         self.node_list = []
         self.dependency_list = []
         self.sorted_node_list = []
 
     # Description:
-    # This method looks for list of interactions that appear on activity diagram.
+    # This method looks for list of activity interactions.
     def find_interactions(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for interactions on activity diagram", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for diagram interactions", False)
 
-        # search for node interaction
-        for connection in self.connection_list:
-
-            # if action or operation is connection source
-            if connection.source_type == ActivityConnection.ACTION or connection.source_type == ActivityConnection.OPERATION:
-
-                # if new integration is found in connection
-                if connection.source_uid not in self.interaction_uid_list:
-                    # append interaction uid to interaction uid list
-                    self.interaction_uid_list.append(connection.source_uid)
-
-            # if action or operation is connection target
-            if connection.target_type == ActivityConnection.ACTION or connection.target_type == ActivityConnection.OPERATION:
-
-                # if new integration is found in connection
-                if connection.target_uid not in self.interaction_uid_list:
-                    # append interaction uid to interaction uid list
-                    self.interaction_uid_list.append(connection.target_uid)
+        # search for node interactions under diagram collection
+        self.find_interactions_from_collection(self.diagram_collection)
 
         # record info
-        for interaction_uid in self.interaction_uid_list:
+        Logger.save_in_log_file("ModuleSorter", "Looking for clause interactions", False)
+
+        # search for node interactions under clause collection
+        for condition_collection in self.condition_collection_list:
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
+            for clause_collection in condition_collection.collection_list:
+                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
+                self.find_interactions_from_collection(clause_collection)
+
+    # Description:
+    # This method looks for interactions from given collection.
+    @staticmethod
+    def find_interactions_from_collection(collection):
+
+        # record info
+        # Logger.save_in_log_file("ModuleSorter", "Looking under " + str(collection) + " element", False)
+
+        # search for node interaction
+        for connection in collection.collection_list:
+
+            # if action or operation is connection source
+            if connection.source_type == ActivityConnection.ACTION or \
+                    connection.source_type == ActivityConnection.OPERATION:
+
+                # if new integration is found in connection
+                if connection.source_uid not in collection.interaction_uid_list:
+                    # append interaction uid to interaction uid list
+                    collection.interaction_uid_list.append(connection.source_uid)
+
+            # if action or operation is connection target
+            if connection.target_type == ActivityConnection.ACTION or \
+                    connection.target_type == ActivityConnection.OPERATION:
+
+                # if new integration is found in connection
+                if connection.target_uid not in collection.interaction_uid_list:
+                    # append interaction uid to interaction uid list
+                    collection.interaction_uid_list.append(connection.target_uid)
+
+        # record info
+        for interaction_uid in collection.interaction_uid_list:
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(interaction_uid) + " interaction uid", False)
 
     # Description:
-    # This method looks for list of nodes that appear on activity diagram.
+    # This method looks for list of activity nodes.
     def find_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for nodes on activity diagram", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for diagram nodes", False)
+
+        # search for nodes under diagram collection
+        self.find_nodes_from_collection(self.diagram_collection)
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Looking for clause nodes", False)
+
+        # search for nodes under clause collection
+        for condition_collection in self.condition_collection_list:
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
+            for clause_collection in condition_collection.collection_list:
+                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
+                self.find_nodes_from_collection(clause_collection)
+
+    # Description:
+    # This method looks for nodes from given collection.
+    @staticmethod
+    def find_nodes_from_collection(collection):
 
         # search for nodes with interaction, i.e. nodes that represent either action or operation
-        for interaction_uid in self.interaction_uid_list:
+        for interaction_uid in collection.interaction_uid_list:
 
-            # create new node instance
+            # new node instance
             node = ActivityNode()
 
             # check source and target uid of each connection
-            for connection in self.connection_list:
+            for connection in collection.collection_list:
 
                 # if interaction is connection target then
                 # connection source is node input data
                 if interaction_uid == connection.target_uid:
-
-                    # get input data name
+                    # get input data and pin name
                     input_data_name = connection.source_name
-                    # get input pin name
                     input_pin_name = connection.target_pin
-                    # set input link
+                    # set input link and append it to node input data list
                     input_link = [input_data_name, input_pin_name]
-                    # append input link to node input data list
                     node.input_data_list.append(input_link)
-                    # set node name
+                    # set node name and uid
                     node.name = connection.target_name
-                    # set node uid
                     node.uid = connection.target_uid
 
                     # if action is connection target
@@ -131,52 +168,47 @@ class ModuleSorter(object):
                 # if interaction is connection source then
                 # connection target is node output data
                 if interaction_uid == connection.source_uid:
-                    # get output data name
+                    # get output data and pin name
                     output_data_name = connection.target_name
-                    # get output pin name
                     output_pin_name = connection.source_pin
-                    # set output link
+                    # set output link and append it to node output data list
                     output_link = [output_data_name, output_pin_name]
-                    # append output link to node output data list
                     node.output_data_list.append(output_link)
 
             # append node to node list
-            self.node_list.append(node)
+            collection.node_list.append(node)
 
         # search for nodes without interaction, i.e. nodes that represent connection between two data points
-        for connection in self.connection_list:
+        for connection in collection.collection_list:
 
             # if connection is between two data points
             if (connection.source_type == ActivityConnection.LOCAL or
                 connection.source_type == ActivityConnection.PARAMETER) and \
                     (connection.target_type == ActivityConnection.LOCAL or
                      connection.target_type == ActivityConnection.PARAMETER):
-
-                # create new node instance
+                # new node instance
                 node = ActivityNode()
-                # get input data name
+
+                # get input data and pin name
                 input_data_name = connection.source_name
-                # get input pin name
                 input_pin_name = connection.target_pin
-                # set input link
+                # set input link and append it to node input data list
                 input_link = [input_data_name, input_pin_name]
-                # append input link to node
                 node.input_data_list.append(input_link)
                 # set node type
                 node.type = ActivityNode.DATA
-                # get output data name
+                # get output data and pin name
                 output_data_name = connection.target_name
-                # get output pin name
                 output_pin_name = connection.source_pin
-                # set output link
+                # set output link and append it to node output data list
                 output_link = [output_data_name, output_pin_name]
-                # append output link to node output data list
                 node.output_data_list.append(output_link)
+
                 # append node to node list
-                self.node_list.append(node)
+                collection.node_list.append(node)
 
         # record info
-        for node in self.node_list:
+        for node in collection.node_list:
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
     # Description:
@@ -349,20 +381,20 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting module details from set of .exml files", True)
 
-        # find interactions of activity diagram
+        # find activity interactions
         self.find_interactions()
 
-        # find nodes of activity diagram
+        # find activity nodes
         self.find_nodes()
 
-        # find dependencies between nodes
-        self.find_dependencies()
+        # find activity dependencies
+        # self.find_dependencies()
 
         # sort nodes basing on their dependencies
-        self.sort_nodes()
+        # self.sort_nodes()
 
         # sort input data list
-        self.sort_input_data_list()
+        # self.sort_input_data_list()
 
         # append collected data to module sorter list
         module_sorter_list = []
