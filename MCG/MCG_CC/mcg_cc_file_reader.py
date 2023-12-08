@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           6 DEC 2023
+#   DATE:           8 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -111,11 +111,9 @@ class FileReader(object):
 
                     # if constant value is found
                     if "<ATT name=\"Value\"" in self.module_file[j]:
-                        # get constant value start position
-                        constant_value_start_position = self.module_file[j].find("[CDATA[")
-                        # get constant value end position
-                        constant_value_end_position = self.module_file[j].find("]]")
                         # get constant value
+                        constant_value_start_position = self.module_file[j].find("[CDATA[")
+                        constant_value_end_position = self.module_file[j].find("]]")
                         constant_value = self.module_file[j][constant_value_start_position+7:constant_value_end_position]
 
                     # if constant type is found
@@ -126,11 +124,9 @@ class FileReader(object):
                         # constant element
                         constant_element = []
 
-                        # append constant type to constant element
+                        # append constant type, name and value to constant element
                         constant_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, constant_type)
-                        # append constant name to constant element
                         constant_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, constant_name)
-                        # append constant value to constant element
                         constant_element.insert(FileReader.DATA_ELEMENT_VALUE_INDEX, constant_value)
                         # append constant element to constant list
                         self.constant_list.append(constant_element)
@@ -182,9 +178,8 @@ class FileReader(object):
                         # interface element
                         interface_element = []
 
-                        # append parameter type to interface element
+                        # append parameter type and name to interface element
                         interface_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, parameter_type)
-                        # append parameter name to interface element
                         interface_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, parameter_name)
 
                         # if it is input parameter
@@ -226,9 +221,8 @@ class FileReader(object):
                         # interface element
                         interface_element = []
 
-                        # append local type to interface element
+                        # append local type and name to interface element
                         interface_element.insert(FileReader.DATA_ELEMENT_TYPE_INDEX, local_type)
-                        # append local name to interface element
                         interface_element.insert(FileReader.DATA_ELEMENT_NAME_INDEX, local_name)
                         # append interface element to interface list
                         if interface_element not in self.local_interface_list:
@@ -300,11 +294,9 @@ class FileReader(object):
                         # new connection instance
                         connection = ActivityConnection()
 
-                        # set connection index
+                        # set connection index and source details
                         connection.index = connection_index
-                        # set connection source name
                         connection.source_name = source_data_name
-                        # set connection source type
                         connection.source_type = source_data_type
 
                         # if local data is target
@@ -312,9 +304,8 @@ class FileReader(object):
                                 "mc=\"Standard.InstanceNode\"" in self.activity_file[j + 2]:
                             # get target data name
                             target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
-                            # set connection target name
+                            # set connection target details
                             connection.target_name = target_data_name
-                            # set connection target type
                             connection.target_type = ActivityConnection.LOCAL
                             # append connection to connection list
                             self.connection_list.append(connection)
@@ -327,9 +318,8 @@ class FileReader(object):
                                 "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[j + 2]:
                             # get target data name
                             target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
-                            # set connection target name
+                            # set connection target details
                             connection.target_name = target_data_name
-                            # set connection target type
                             connection.target_type = ActivityConnection.PARAMETER
                             # append connection to connection list
                             self.connection_list.append(connection)
@@ -340,15 +330,12 @@ class FileReader(object):
                         # if local action is target
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.OpaqueAction\"" in self.activity_file[j + 2]:
-                            # get target action name
+                            # get target action name and uid
                             target_action_name = FileSupporter.get_name(self.activity_file[j + 2])
-                            # get target action uid
                             target_action_uid = FileSupporter.get_uid(self.activity_file[j + 2])
-                            # set connection target name
+                            # set connection target details
                             connection.target_name = target_action_name
-                            # set connection target uid
                             connection.target_uid = target_action_uid
-                            # set connection target type
                             connection.target_type = ActivityConnection.ACTION
                             # append connection to connection list
                             self.connection_list.append(connection)
@@ -359,19 +346,15 @@ class FileReader(object):
                         # if other operation is target
                         if "<ID name=" in self.activity_file[j + 2] and \
                                 "mc=\"Standard.InputPin\"" in self.activity_file[j + 2]:
-                            # get target pin name
+                            # get target pin name and pin uid
                             target_pin_name = FileSupporter.get_name(self.activity_file[j + 2])
-                            # get target pin uid
                             target_pin_uid = FileSupporter.get_uid(self.activity_file[j + 2])
-                            # find target operation name and uid
+                            # find target operation name and operation uid
                             target_operation_name, target_operation_uid = self.find_operation(target_pin_uid)
-                            # set connection target pin
+                            # set connection target details
                             connection.target_pin = target_pin_name
-                            # set connection target name
                             connection.target_name = target_operation_name
-                            # set connection uid
                             connection.target_uid = target_operation_uid
-                            # set connection type
                             connection.target_type = ActivityConnection.OPERATION
                             # append connection to connection list
                             self.connection_list.append(connection)
@@ -405,11 +388,9 @@ class FileReader(object):
                     (("mc=\"Standard.OpaqueAction\"" in self.activity_file[i + 1]) or
                      ("mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1])):
 
-                # get connection index
+                # get connection index, name and uid
                 connection_index = i + 1
-                # get source interaction name
                 source_interaction_name = FileSupporter.get_name(self.activity_file[i+1])
-                # get source interaction uid
                 source_interaction_uid = FileSupporter.get_uid(self.activity_file[i+1])
 
                 # if interaction is action type
@@ -437,7 +418,6 @@ class FileReader(object):
 
                     # if source pin is found
                     if "<ID name=" in self.activity_file[j] and "mc=\"Standard.OutputPin\"" in self.activity_file[j]:
-
                         # get source pin name
                         source_pin_name = FileSupporter.get_name(self.activity_file[j])
 
@@ -447,13 +427,10 @@ class FileReader(object):
                         # new connection instance
                         connection = ActivityConnection()
 
-                        # set connection index
+                        # set connection index and source details
                         connection.index = connection_index
-                        # set connection source name
                         connection.source_name = source_interaction_name
-                        # set connection source uid
                         connection.source_uid = source_interaction_uid
-                        # set connection source type
                         connection.source_type = source_interaction_type
 
                         # if operation
@@ -466,9 +443,8 @@ class FileReader(object):
                                 "mc=\"Standard.InstanceNode\"" in self.activity_file[j + 2]:
                             # get target data name
                             target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
-                            # set connection target name
+                            # set connection target details
                             connection.target_name = target_data_name
-                            # set connection target type
                             connection.target_type = ActivityConnection.LOCAL
                             # append connection to connection list
                             self.connection_list.append(connection)
@@ -481,9 +457,8 @@ class FileReader(object):
                                 "mc=\"Standard.ActivityParameterNode\"" in self.activity_file[j + 2]:
                             # get target data name
                             target_data_name = FileSupporter.get_name(self.activity_file[j + 2])
-                            # set connection target name
+                            # set connection target details
                             connection.target_name = target_data_name
-                            # set connection target type
                             connection.target_type = ActivityConnection.PARAMETER
                             # append connection to connection list
                             self.connection_list.append(connection)
@@ -538,18 +513,15 @@ class FileReader(object):
             if "<OBJECT>" in self.activity_file[i-1] and \
                     "<ID name=" in self.activity_file[i] and \
                     "mc=\"Standard.ConditionalNode\"" in self.activity_file[i]:
-
-                # get condition name
+                # get condition name and uid
                 condition_name = FileSupporter.get_name(self.activity_file[i])
-                # get condition uid
                 condition_uid = FileSupporter.get_uid(self.activity_file[i])
 
                 # new condition collection instance
                 condition_collection = ActivityConditionCollection()
 
-                # set condition name
+                # set condition name and uid
                 condition_collection.name = condition_name
-                # set condition uid
                 condition_collection.uid = condition_uid
 
                 # new condition section is found, therefore enable counting of
@@ -561,25 +533,18 @@ class FileReader(object):
             if "<OBJECT>" in self.activity_file[i - 1] and \
                     "<ID name=" in self.activity_file[i] and \
                     "mc=\"Standard.Clause\"" in self.activity_file[i]:
-
-                # get decision start position
-                decision_start_position = self.activity_file[i+2].find("[CDATA[")
-                # get decision end position
-                decision_end_position = self.activity_file[i+2].find("]]")
-                # get clause decision
-                clause_decision = self.activity_file[i+2][decision_start_position + 7:decision_end_position]
-
-                # get clause uid
+                # get clause decision and uid
+                clause_decision_start_position = self.activity_file[i+2].find("[CDATA[")
+                clause_decision_end_position = self.activity_file[i+2].find("]]")
+                clause_decision = self.activity_file[i+2][clause_decision_start_position + 7:clause_decision_end_position]
                 clause_uid = FileSupporter.get_uid(self.activity_file[i])
 
                 # new clause collection instance
                 clause_collection = ActivityClauseCollection()
 
-                # set clause start index
+                # set clause start index, decision and uid
                 clause_collection.start_index = i
-                # set clause decision
                 clause_collection.decision = clause_decision
-                # set clause uid
                 clause_collection.uid = clause_uid
 
                 # new clause section is found, therefore enable counting of
@@ -603,7 +568,6 @@ class FileReader(object):
 
             # if end of clause section is found
             if (clause_object_counter == 0) and clause_found:
-
                 # disable counting of "<OBJECT>" and "/<OBJECT>" for clause element
                 clause_found = False
                 # set clause end index
@@ -613,7 +577,6 @@ class FileReader(object):
 
             # if end of condition section is found
             if (condition_object_counter == 0) and condition_found:
-
                 # disable counting of "<OBJECT>" and "/<OBJECT>" for condition element
                 condition_found = False
                 # append condition collection to list
@@ -627,29 +590,26 @@ class FileReader(object):
                 Logger.save_in_log_file("FileReader", "Have found " + str(clause_collection) + " element", False)
 
     # Description:
-    # This method allocates connections to their parental clauses under condition collection
-    def allocate_connections_to_clauses(self):
+    # This method allocates connections to their parental clauses under condition collection.
+    def allocate_connections_to_conditions(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Allocating connections to clause elements", False)
+        Logger.save_in_log_file("FileReader", "Allocating connections to condition elements", False)
 
         # for each condition collection
         for condition_collection in self.condition_collection_list:
-
             # record info
             Logger.save_in_log_file("FileReader", "Allocating to " + str(condition_collection) +
                                     " element of .exml file", False)
 
             # for each clause collection
             for clause_collection in condition_collection.collection_list:
-
                 # record info
                 Logger.save_in_log_file("FileReader", "Allocating to " + str(clause_collection) +
                                         " element of .exml file", False)
 
-                # get clause start index
+                # get clause start and end index
                 clause_start_index = clause_collection.start_index
-                # get clause end index
                 clause_end_index = clause_collection.end_index
 
                 # search for connections that appear between start and end index
@@ -668,7 +628,7 @@ class FileReader(object):
                         Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) + " connection", False)
 
     # Description:
-    # This method allocates connections to diagram collection
+    # This method allocates connections to diagram collection.
     def allocate_connections_to_diagram(self):
 
         # record info
@@ -698,9 +658,8 @@ class FileReader(object):
             if "<OBJECT>" in self.activity_file[i] and \
                     "<ID name=" in self.activity_file[i + 1] and \
                     "mc=\"Standard.CallOperationAction\"" in self.activity_file[i + 1]:
-                # get operation name
+                # get operation name and uid
                 operation_name = FileSupporter.get_name(self.activity_file[i + 1])
-                # get operation uid
                 operation_uid = FileSupporter.get_uid(self.activity_file[i + 1])
 
             # if input uid if found under above operation
@@ -721,28 +680,20 @@ class FileReader(object):
         # record info
         Logger.save_in_log_file("FileReader", "Reading module details from set of .exml files", True)
 
-        # search for operation name
+        # search for module details
         self.read_operation_name()
-
-        # search for constant elements
         self.read_constant_elements()
-
-        # search for interface elements
         self.read_interface_elements()
 
-        # search for data targets
+        # search for connection details between module elements
         self.read_data_targets()
-
-        # search for interaction targets
         self.read_interaction_targets()
 
         # search for condition elements
         self.read_condition_elements()
 
-        # allocate connections to clauses
-        self.allocate_connections_to_clauses()
-
-        # allocate connections to diagram
+        # allocate connections to condition and diagram elements
+        self.allocate_connections_to_conditions()
         self.allocate_connections_to_diagram()
 
         # append collected data to file reader list
