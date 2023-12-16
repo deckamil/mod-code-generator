@@ -5,7 +5,7 @@
 #       responsible for reading of module content from .exml file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           8 DEC 2023
+#   DATE:           16 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -535,7 +535,7 @@ class FileReader(object):
                     "mc=\"Standard.Clause\"" in self.activity_file[i]:
                 # get clause decision and uid
                 clause_decision_start_position = self.activity_file[i+2].find("[CDATA[")
-                clause_decision_end_position = self.activity_file[i+2].find("]]")
+                clause_decision_end_position = self.activity_file[i+2].find("]]>")
                 clause_decision = self.activity_file[i+2][clause_decision_start_position + 7:clause_decision_end_position]
                 clause_uid = FileSupporter.get_uid(self.activity_file[i])
 
@@ -594,7 +594,7 @@ class FileReader(object):
     def allocate_connections_to_clauses(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Allocating connections to clause elements", False)
+        Logger.save_in_log_file("FileReader", "Allocating connections to clause element", False)
 
         # for each condition collection
         for condition_collection in self.condition_collection_list:

@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           8 DEC 2023
+#   DATE:           16 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -212,6 +212,46 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
     # Description:
+    # This method sorts clauses of each condition element.
+    def sort_clauses(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Sorting clauses of each condition element", False)
+
+        # for each condition collection
+        for condition_collection in self.condition_collection_list:
+            # record info
+            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_collection) + " element", False)
+            # set initial clause level number
+            clause_level_number = 0
+            # flag to distinguish if given clause level is found
+            clause_level_found = True
+
+            # repeat while clause level for given number is found
+            while clause_level_found:
+                # increment clause level number
+                clause_level_number = clause_level_number + 1
+                # get string format
+                clause_level_str = "[" + str(clause_level_number) + "] "
+                # assume that given clause level is not found
+                clause_level_found = False
+
+                # for each clause collection
+                for clause_collection in list(condition_collection.collection_list):
+                    # if matching clause level is found in clause decision
+                    if clause_collection.decision.find(clause_level_str) != -1:
+                        # remove clause from collection list
+                        condition_collection.collection_list.remove(clause_collection)
+                        # insert clause at position defined by clause level number
+                        condition_collection.collection_list.insert(clause_level_number-1, clause_collection)
+                        # set clause flag state
+                        clause_level_found = True
+
+            # record info
+            for clause_collection in condition_collection.collection_list:
+                Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_collection) + " element", False)
+
+    # Description:
     # This method finds dependencies between node, i.e. list of local data elements, which are inputs to node
     # interaction and are required to compute node output.
     def find_dependencies(self):
@@ -381,11 +421,12 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting module details from set of .exml files", True)
 
-        # find activity interactions
+        # find activity interactions and nodes
         self.find_interactions()
-
-        # find activity nodes
         self.find_nodes()
+
+        # sort clauses
+        self.sort_clauses()
 
         # find activity dependencies
         # self.find_dependencies()
