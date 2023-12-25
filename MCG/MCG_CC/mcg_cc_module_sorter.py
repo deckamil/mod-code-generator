@@ -147,8 +147,8 @@ class ModuleSorter(object):
                     # set input link and append it to node input data list
                     input_link = [input_data_name, input_pin_name]
                     node.input_data_list.append(input_link)
-                    # set node name and uid
-                    node.name = connection.target_name
+                    # set node interaction and uid
+                    node.interaction = connection.target_name
                     node.uid = connection.target_uid
 
                     # if action is connection target
@@ -249,6 +249,56 @@ class ModuleSorter(object):
                                                 str(node) + " node", False)
 
     # Description:
+    # This method looks for condition nodes that represent condition elements and adds them to diagram node list.
+    def find_condition_nodes(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Looking for condition nodes", False)
+
+        # for each condition collection
+        for condition_collection in self.condition_collection_list:
+            # record info
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
+
+            # new node instance
+            node = ActivityNode()
+
+            # set node interaction, uid and type
+            node.interaction = condition_collection.name
+            node.uid = condition_collection.uid
+            node.type = ActivityNode.CONDITION
+
+            # list to collect condition output data
+            condition_target_list = []
+
+            # for each clause collection
+            for clause_collection in condition_collection.collection_list:
+                # for each node in clause
+                for clause_node in clause_collection.node_list:
+                    # go through all output links
+                    for output_link in clause_node.output_data_list:
+                        # and add each data name to condition target list
+                        condition_target_list.append(output_link[ActivityNode.DATA_NAME_INDEX])
+
+            # remove duplicates from target list
+            condition_target_list = list(dict.fromkeys(condition_target_list))
+
+            # add output links from condition target list
+            for condition_target in condition_target_list:
+                # set output data and pin name
+                output_data_name = condition_target
+                output_pin_name = "NOT APPLICABLE"
+                # set output link and append it to node output data list
+                output_link = [output_data_name, output_pin_name]
+                node.output_data_list.append(output_link)
+
+            # record info
+            Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
+
+            # append node to diagram node list
+            self.diagram_collection.node_list.append(node)
+
+    # Description:
     # This method sorts clauses of each condition element.
     def sort_clauses(self):
 
@@ -287,60 +337,6 @@ class ModuleSorter(object):
             # record info
             for clause_collection in condition_collection.collection_list:
                 Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_collection) + " element", False)
-
-    # Description:
-    # This method defines and adds nodes that represent condition elements to diagram node list.
-    def add_condition_nodes(self):
-
-        # record info
-        Logger.save_in_log_file("ModuleSorter", "Adding condition nodes", False)
-
-        # for each condition collection
-        for condition_collection in self.condition_collection_list:
-            # record info
-            Logger.save_in_log_file("ModuleSorter", "Adding node for " + str(condition_collection) + " element", False)
-
-            # new node instance
-            node = ActivityNode()
-
-            # set node name, uid and type
-            node.name = condition_collection.name
-            node.uid = condition_collection.uid
-            node.type = ActivityNode.CONDITION
-
-            # list to collect condition output data
-            condition_target_list = []
-
-            # for each clause collection
-            for clause_collection in condition_collection.collection_list:
-                # record info
-                Logger.save_in_log_file("ModuleSorter", "Checking " + str(clause_collection) + " element for"
-                                        "input and output data", False)
-
-                # for each node in clause
-                for clause_node in clause_collection.node_list:
-                    # go through all output links
-                    for output_link in clause_node.output_data_list:
-                        # and add each data name to condition target list
-                        condition_target_list.append(output_link[ActivityNode.DATA_NAME_INDEX])
-
-            # remove duplicates from target list
-            condition_target_list = list(dict.fromkeys(condition_target_list))
-
-            # add output links from condition target list
-            for condition_target in condition_target_list:
-                # set output data and pin name
-                output_data_name = condition_target
-                output_pin_name = "NOT APPLICABLE"
-                # set output link and append it to node output data list
-                output_link = [output_data_name, output_pin_name]
-                node.output_data_list.append(output_link)
-
-            # record info
-            Logger.save_in_log_file("ModuleSorter", "Have added " + str(node) + " node", False)
-
-            # append node to diagram node list
-            self.diagram_collection.node_list.append(node)
 
     # Description:
     # This method sorts nodes basing on their dependencies from sublist under dependency list.
@@ -476,10 +472,10 @@ class ModuleSorter(object):
         self.find_nodes()
         self.find_dependencies()
 
-        # sort clauses, add condition nodes and find condition dependencies
-        self.sort_clauses()
-        self.add_condition_nodes()
+        # find condition nodes, dependencies and sort clauses
+        self.find_condition_nodes()
         # self.find_condition_dependencies()
+        self.sort_clauses()
 
         # sort nodes basing on their dependencies
         # self.sort_nodes()

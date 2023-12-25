@@ -48,7 +48,7 @@ class ActivityNode(object):
     def __init__(self):
         # initialize object data
         self.input_data_list = []
-        self.name = "UNKNOWN"
+        self.interaction = "UNKNOWN"
         self.uid = "UNKNOWN"
         self.type = ActivityNode.UNKNOWN
         self.dependency_list = []
@@ -60,21 +60,17 @@ class ActivityNode(object):
 
         if self.type == ActivityNode.OPERATION:
 
-            # append input marker
-            line = "$INPUTS$: "
-
             # append input data
+            line = "$INPUTS$: "
             for input_data in self.input_data_list:
                 line = line + input_data[ActivityNode.DATA_NAME_INDEX] + \
                        "->" + input_data[ActivityNode.PIN_NAME_INDEX] + " "
 
-            # append interaction name and uid
-            line = line + "$INTERACTION$: " + self.name + "() " + self.uid + " "
-
-            # append output marker and data
-            line = line + "$OUTPUT$: "
+            # append interaction and uid
+            line = line + "$OPERATION$: " + self.interaction + " " + self.uid + " "
 
             # append output data
+            line = line + "$OUTPUTS$: "
             for output_data in self.output_data_list:
                 line = line + output_data[ActivityNode.PIN_NAME_INDEX] + \
                        "->" + output_data[ActivityNode.DATA_NAME_INDEX] + " "
@@ -84,56 +80,35 @@ class ActivityNode(object):
 
         elif self.type == ActivityNode.ACTION:
 
-            # append input marker
-            line = "$INPUTS$: "
-
             # append input data
+            line = "$INPUTS$: "
             for input_data in self.input_data_list:
                 line = line + input_data[ActivityNode.DATA_NAME_INDEX] + " "
 
-            # append interaction name and uid
-            line = line + "$INTERACTION$: " + self.name + " " + self.uid + " "
+            # append interaction and uid
+            line = line + "$ACTION$: " + self.interaction + " " + self.uid + " "
 
-            # get output data
-            output_data = self.output_data_list[0]
-
-            # append output marker and data
-            line = line + "$OUTPUT$: " + output_data[ActivityNode.DATA_NAME_INDEX]
+            # append output data
+            line = line + "$OUTPUT$: " + self.output_data_list[0][ActivityNode.DATA_NAME_INDEX]
 
         elif self.type == ActivityNode.DATA:
 
-            # append input marker
-            line = "$INPUTS$: "
-
             # append input data
-            for input_data in self.input_data_list:
-                line = line + input_data[ActivityNode.DATA_NAME_INDEX] + " "
+            line = "$INPUT$: " + self.input_data_list[0][ActivityNode.DATA_NAME_INDEX] + " "
 
-            # append interaction name
-            line = line + "$INTERACTION$: ASSIGNMENT "
+            # append interaction
+            line = line + "$ASSIGNMENT$: "
 
-            # get output data
-            output_data = self.output_data_list[0]
-
-            # append output marker and data
-            line = line + "$OUTPUT$: " + output_data[ActivityNode.DATA_NAME_INDEX]
+            # append output data
+            line = line + "$OUTPUT$: " + self.output_data_list[0][ActivityNode.DATA_NAME_INDEX]
 
         elif self.type == ActivityNode.CONDITION:
 
-            # append input marker
-            line = "$INPUTS$: "
-
-            # append input data
-            for input_data in self.input_data_list:
-                line = line + input_data[ActivityNode.DATA_NAME_INDEX] + " "
-
-            # append interaction name and uid
-            line = line + "$INTERACTION$: " + "IF " + self.name + " " + self.uid + " "
-
-            # append output marker and data
-            line = line + "$OUTPUT$: "
+            # append interaction and uid
+            line = "$CONDITION$: " + self.interaction + " " + self.uid + " "
 
             # append output data
+            line = line + "$OUTPUTS$: "
             for output_data in self.output_data_list:
                 line = line + output_data[ActivityNode.DATA_NAME_INDEX] + " "
 
