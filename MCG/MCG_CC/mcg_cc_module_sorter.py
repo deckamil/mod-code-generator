@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           16 DEC 2023
+#   DATE:           25 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -52,8 +52,6 @@ class ModuleSorter(object):
         self.diagram_collection = file_reader_list[FileReader.DIAGRAM_COLLECTION_INDEX]
         self.condition_collection_list = file_reader_list[FileReader.CONDITION_COLLECTION_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
-        self.node_list = []
-        self.dependency_list = []
         self.sorted_node_list = []
 
     # Description:
@@ -80,9 +78,6 @@ class ModuleSorter(object):
     # This method looks for interactions from given collection.
     @staticmethod
     def find_interactions_from_collection(collection):
-
-        # record info
-        # Logger.save_in_log_file("ModuleSorter", "Looking under " + str(collection) + " element", False)
 
         # search for node interaction
         for connection in collection.collection_list:
@@ -212,6 +207,48 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
     # Description:
+    # This method looks for dependencies between nodes, i.e. list of local data elements, which are inputs to node
+    # interaction and are required to compute node output.
+    def find_dependencies(self):
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies between diagram nodes", False)
+
+        # search for node dependencies under diagram collection
+        self.find_dependencies_from_collection(self.diagram_collection)
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies between clause nodes", False)
+
+        # search for node dependencies under clause collection
+        for condition_collection in self.condition_collection_list:
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
+            for clause_collection in condition_collection.collection_list:
+                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
+                self.find_dependencies_from_collection(clause_collection)
+
+    # Description:
+    # This method looks for dependencies from given collection.
+    def find_dependencies_from_collection(self, collection):
+
+        # search for node dependencies
+        for node in collection.node_list:
+            # go through all local data elements for each node
+            for local_interface in self.local_interface_list:
+                # get local data name
+                local_data_name = local_interface[FileReader.DATA_ELEMENT_NAME_INDEX]
+                # go through all input links
+                for input_link in node.input_data_list:
+                    # if local data element is input to node
+                    if local_data_name == input_link[ActivityNode.DATA_NAME_INDEX]:
+                        # append name of local data element to dependency list
+                        node.dependency_list.append(local_data_name)
+                        # record info
+                        Logger.save_in_log_file("ModuleSorter", "Have found dependency on " +
+                                                str(node.dependency_list) + " in " +
+                                                str(node) + " node", False)
+
+    # Description:
     # This method sorts clauses of each condition element.
     def sort_clauses(self):
 
@@ -252,45 +289,58 @@ class ModuleSorter(object):
                 Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_collection) + " element", False)
 
     # Description:
-    # This method finds dependencies between node, i.e. list of local data elements, which are inputs to node
-    # interaction and are required to compute node output.
-    def find_dependencies(self):
+    # This method defines and adds nodes that represent condition elements to diagram node list.
+    def add_condition_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies between nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Adding condition nodes", False)
 
-        # each node will have dedicated sublist under dependency list
-        # the sublist starts with node itself under position 0 and local data elements, which are inputs to that
-        # node are appended under further positions of the sublist;
-        # as result, length of sublist express number of local data elements needed to compute node output;
-        # in special case, if some node does not need any local data element (e.g. only input interface elements
-        # are required to compute the node output) the length of sublist is equal to 1
+        # for each condition collection
+        for condition_collection in self.condition_collection_list:
+            # record info
+            Logger.save_in_log_file("ModuleSorter", "Adding node for " + str(condition_collection) + " element", False)
 
-        # find dependencies of each nodes
-        for node in self.node_list:
-            # dependency sublist with node at list beginning
-            dependency = [node]
-            # go through all local data elements for each node
-            for local_interface in self.local_interface_list:
-                # get local data name
-                local_data_name = local_interface[FileReader.DATA_ELEMENT_NAME_INDEX]
-                # go through all input links
-                for input_link in node.input_data_list:
-                    # if local data element is input to node
-                    if local_data_name == input_link[ActivityNode.DATA_NAME_INDEX]:
-                        # append name of local data element to dependency sublist
-                        dependency.append(local_data_name)
+            # new node instance
+            node = ActivityNode()
 
-            # append dependency to dependency list
-            self.dependency_list.append(dependency)
+            # set node name, uid and type
+            node.name = condition_collection.name
+            node.uid = condition_collection.uid
+            node.type = ActivityNode.CONDITION
 
-        # record info
-        for dependency in self.dependency_list:
-            # only if dependency for given node is found
-            if len(dependency) > 1:
-                Logger.save_in_log_file("ModuleSorter", "Have found dependency on " +
-                                        str(dependency[1:len(dependency)]) + " in " +
-                                        str(dependency[0]) + " node", False)
+            # list to collect condition output data
+            condition_target_list = []
+
+            # for each clause collection
+            for clause_collection in condition_collection.collection_list:
+                # record info
+                Logger.save_in_log_file("ModuleSorter", "Checking " + str(clause_collection) + " element for"
+                                        "input and output data", False)
+
+                # for each node in clause
+                for clause_node in clause_collection.node_list:
+                    # go through all output links
+                    for output_link in clause_node.output_data_list:
+                        # and add each data name to condition target list
+                        condition_target_list.append(output_link[ActivityNode.DATA_NAME_INDEX])
+
+            # remove duplicates from target list
+            condition_target_list = list(dict.fromkeys(condition_target_list))
+
+            # add output links from condition target list
+            for condition_target in condition_target_list:
+                # set output data and pin name
+                output_data_name = condition_target
+                output_pin_name = "NOT APPLICABLE"
+                # set output link and append it to node output data list
+                output_link = [output_data_name, output_pin_name]
+                node.output_data_list.append(output_link)
+
+            # record info
+            Logger.save_in_log_file("ModuleSorter", "Have added " + str(node) + " node", False)
+
+            # append node to diagram node list
+            self.diagram_collection.node_list.append(node)
 
     # Description:
     # This method sorts nodes basing on their dependencies from sublist under dependency list.
@@ -421,15 +471,15 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting module details from set of .exml files", True)
 
-        # find activity interactions and nodes
+        # find activity interactions, nodes and dependencies
         self.find_interactions()
         self.find_nodes()
+        self.find_dependencies()
 
-        # sort clauses
+        # sort clauses, add condition nodes and find condition dependencies
         self.sort_clauses()
-
-        # find activity dependencies
-        # self.find_dependencies()
+        self.add_condition_nodes()
+        # self.find_condition_dependencies()
 
         # sort nodes basing on their dependencies
         # self.sort_nodes()

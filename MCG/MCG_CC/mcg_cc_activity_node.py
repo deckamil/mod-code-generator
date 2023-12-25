@@ -5,7 +5,7 @@
 #       activity diagram, i.e. interaction together with its input and output data.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           13 OCT 2023
+#   DATE:           25 DEC 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,15 +32,16 @@
 # This class represents node on activity diagram, i.e. interaction together with its input and output data.
 class ActivityNode(object):
 
-    # indexes of interface element list
+    # Indexes of interface element list
     DATA_NAME_INDEX = 0
     PIN_NAME_INDEX = 1
 
-    # interaction types
+    # Node types
     UNKNOWN = 10
-    DATA = 30
-    ACTION = 40
-    OPERATION = 50
+    DATA = 20
+    ACTION = 30
+    OPERATION = 40
+    CONDITION = 50
 
     # Description:
     # This is class constructor.
@@ -50,16 +51,17 @@ class ActivityNode(object):
         self.name = "UNKNOWN"
         self.uid = "UNKNOWN"
         self.type = ActivityNode.UNKNOWN
+        self.dependency_list = []
         self.output_data_list = []
 
     # Description:
     # This method returns string representation of ActivityNode class.
     def __str__(self):
-        # append input marker
-        line = "$INPUTS$: "
 
-        # if node is operation type
         if self.type == ActivityNode.OPERATION:
+
+            # append input marker
+            line = "$INPUTS$: "
 
             # append input data
             for input_data in self.input_data_list:
@@ -78,10 +80,12 @@ class ActivityNode(object):
                        "->" + output_data[ActivityNode.DATA_NAME_INDEX] + " "
 
             # remove spare whitespace
-            line = line[0:len(line)-1]
+            line = line[0:len(line) - 1]
 
-        # if node is action type
         elif self.type == ActivityNode.ACTION:
+
+            # append input marker
+            line = "$INPUTS$: "
 
             # append input data
             for input_data in self.input_data_list:
@@ -96,8 +100,10 @@ class ActivityNode(object):
             # append output marker and data
             line = line + "$OUTPUT$: " + output_data[ActivityNode.DATA_NAME_INDEX]
 
-        # if there is no interaction, but only connection between two data points
-        else:
+        elif self.type == ActivityNode.DATA:
+
+            # append input marker
+            line = "$INPUTS$: "
 
             # append input data
             for input_data in self.input_data_list:
@@ -111,6 +117,32 @@ class ActivityNode(object):
 
             # append output marker and data
             line = line + "$OUTPUT$: " + output_data[ActivityNode.DATA_NAME_INDEX]
+
+        elif self.type == ActivityNode.CONDITION:
+
+            # append input marker
+            line = "$INPUTS$: "
+
+            # append input data
+            for input_data in self.input_data_list:
+                line = line + input_data[ActivityNode.DATA_NAME_INDEX] + " "
+
+            # append interaction name and uid
+            line = line + "$INTERACTION$: " + "IF " + self.name + " " + self.uid + " "
+
+            # append output marker and data
+            line = line + "$OUTPUT$: "
+
+            # append output data
+            for output_data in self.output_data_list:
+                line = line + output_data[ActivityNode.DATA_NAME_INDEX] + " "
+
+            # remove spare whitespace
+            line = line[0:len(line) - 1]
+
+        else:
+
+            line = "$UNKNOWN$"
 
         # return string representation
         return line
