@@ -252,7 +252,7 @@ class ModuleSorter(object):
     def find_condition_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for condition nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for condition-type nodes", False)
 
         # for each condition collection
         for condition_collection in self.condition_collection_list:
@@ -301,7 +301,7 @@ class ModuleSorter(object):
     def find_condition_dependencies(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of condition nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of condition-type nodes", False)
 
         # for each condition collection
         for condition_collection in self.condition_collection_list:
@@ -428,16 +428,22 @@ class ModuleSorter(object):
                 Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_collection) + " element", False)
 
     # Description:
-    # This method sorts nodes basing on their dependencies from sublist under dependency list.
-    def sort_nodes(self):
+    # This method sorts diagram nodes basing on their dependencies from under dependency list.
+    def sort_diagram_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting module nodes basing on their dependencies", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting diagram nodes basing on their dependencies", False)
 
-        # repeat while node list of diagram collection is not empty
+        # sort nodes under diagram collection
         while self.diagram_collection.node_list:
 
-            # sort diagram nodes
+            # sort diagram nodes basing on their dependencies
+            # first append nodes without dependencies to sorted node list and remove them from node list
+            # then look through outputs from sorted node and remove local data elements outputted by the
+            # sorted node from dependency list of any other node
+            # continue sorting until node list of diagram collection is not empty
+
+            # go through all diagram nodes
             for diagram_node in list(self.diagram_collection.node_list):
                 # if diagram node does not have any dependencies
                 if not diagram_node.dependency_list:
@@ -460,44 +466,44 @@ class ModuleSorter(object):
                             for clause_collection in condition_collection.collection_list:
                                 self.remove_data_from_collection_node_dependencies(output_data_name, clause_collection)
 
-                    # if sorted node represents condition node
-                    if diagram_node.type == ActivityNode.CONDITION:
-                        # find related condition collection and sort clause nodes
-                        for condition_collection in self.condition_collection_list:
-                            # if found related condition collection
-                            if diagram_node.uid == condition_collection.uid:
-                                # go through clause collections
-                                for clause_collection in condition_collection.collection_list:
+        # record info
+        for sorted_node in self.diagram_collection.sorted_node_list:
+            Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",
+                                    False)
 
-                                    # repeat while node list of clause collection is not empty
-                                    while clause_collection.node_list:
-
-                                        # sort clause nodes
-                                        for clause_node in list(clause_collection.node_list):
-                                            # if clause node does not have any dependencies
-                                            if not clause_node.dependency_list:
-                                                # remove clause node from node list and and append it to sorted
-                                                # node list
-                                                clause_collection.node_list.remove(clause_node)
-                                                clause_collection.sorted_node_list.append(clause_node)
-                                                # get output data list from sorted node
-                                                output_data_list = clause_node.output_data_list
-
-                                                # remove outputs of that node from dependency list of other nodes
-                                                for output_link in output_data_list:
-                                                    # get output data name
-                                                    output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
-                                                    # go thorough all nodes under clause collection and refresh their
-                                                    # dependency lists
-                                                    self.remove_data_from_collection_node_dependencies(output_data_name,
-                                                                                                       clause_collection)
+    # Description:
+    # This method sorts clause nodes basing on their dependencies from under dependency list.
+    def sort_clause_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorted diagram nodes", False)
-        for sorted_node in self.diagram_collection.sorted_node_list:
-            Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting clause nodes basing on their dependencies", False)
 
-        Logger.save_in_log_file("ModuleSorter", "Sorted clause nodes", False)
+        # sort nodes under diagram collection
+        for condition_collection in self.condition_collection_list:
+            for clause_collection in condition_collection.collection_list:
+                while clause_collection.node_list:
+
+                    # sort clause nodes basing on their dependencies
+                    # sorting process is the same as for diagram nodes
+
+                    # go through all clause nodes
+                    for clause_node in list(clause_collection.node_list):
+                        # if clause node does not have any dependencies
+                        if not clause_node.dependency_list:
+                            # remove clause node from node list and and append it to sorted node list
+                            clause_collection.node_list.remove(clause_node)
+                            clause_collection.sorted_node_list.append(clause_node)
+                            # get output data list from sorted node
+                            output_data_list = clause_node.output_data_list
+
+                            # remove outputs of that node from dependency list of other nodes
+                            for output_link in output_data_list:
+                                # get output data name
+                                output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
+                                # go thorough all nodes under clause collection and refresh their dependency lists
+                                self.remove_data_from_collection_node_dependencies(output_data_name, clause_collection)
+
+        # record info
         for condition_collection in self.condition_collection_list:
             Logger.save_in_log_file("ModuleSorter", "Sorted under " + str(condition_collection) + " element", False)
             for clause_collection in condition_collection.collection_list:
@@ -591,7 +597,8 @@ class ModuleSorter(object):
         self.sort_clauses()
 
         # sort nodes basing on their dependencies
-        self.sort_nodes()
+        self.sort_diagram_nodes()
+        self.sort_clause_nodes()
 
         # sort input data list
         # self.sort_input_data_list()
