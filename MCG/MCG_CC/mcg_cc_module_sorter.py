@@ -4,8 +4,8 @@
 #       This module contains definition of ModuleSorter class, which is responsible
 #       for finding and sorting of module nodes.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           5 JAN 2024
+#   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
+#   DATE:           7 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -52,7 +52,6 @@ class ModuleSorter(object):
         self.diagram_collection = file_reader_list[FileReader.DIAGRAM_COLLECTION_INDEX]
         self.condition_collection_list = file_reader_list[FileReader.CONDITION_COLLECTION_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
-        self.sorted_node_list = []
 
     # Description:
     # This method looks for list of activity interactions.
@@ -435,66 +434,90 @@ class ModuleSorter(object):
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting module nodes basing on their dependencies", False)
 
-        # sort nodes basing on their dependencies
-        # first append nodes without dependencies to sorted node list, i.e. look for each sublist on dependency
-        # list with length equal to 1, which means that given sublist contains node that does not consume any
-        # local data elements (or consume local data elements outputted by node, which was already appended to
-        # sorted node list at previous cycle);
-        # then remove local data element outputted by above node from each sublist under dependency list, which
-        # will lead to situation where some of sublist will have new length equal to 1;
-        # next repeat the cycle until all nodes are sorted
+        # repeat while node list of diagram collection is not empty
+        while self.diagram_collection.node_list:
 
-        # number of nodes to sort, i.e. length of dependency list
-        dependency_list_length = len(self.dependency_list)
-        # repeat until all nodes are sorted
-        while dependency_list_length > 0:
-            # go thorough each dependency sublist
-            for i in range(0, len(self.dependency_list)):
-                # if given node under dependency sublist does not have any further dependencies
-                if len(self.dependency_list[i]) == 1:
-                    # get dependency sublist
-                    dependency = self.dependency_list[i]
-                    # append node to sorted node list
-                    self.sorted_node_list.append(dependency[0])
-                    # remove dependency sublist from dependency list
-                    self.dependency_list.remove(dependency)
-                    # get output data list
-                    output_data_list = dependency[0].output_data_list
-                    # recalculate number of nodes to sort, i.e. length of dependency list
-                    dependency_list_length = len(self.dependency_list)
+            # sort diagram nodes
+            for diagram_node in list(self.diagram_collection.node_list):
+                # if diagram node does not have any dependencies
+                if not diagram_node.dependency_list:
+                    # remove diagram node from node list and append it to sorted node list
+                    self.diagram_collection.node_list.remove(diagram_node)
+                    self.diagram_collection.sorted_node_list.append(diagram_node)
+                    # get output data list from sorted node
+                    output_data_list = diagram_node.output_data_list
 
-                    # refresh each dependency sublist
-                    for j in range(0, len(self.dependency_list)):
-                        # if given node under dependency sublist DOES HAVE further dependencies
-                        if len(self.dependency_list[j]) > 1:
-                            # get dependency sublist
-                            dependency = self.dependency_list[j]
-                            # set initial index
-                            index = 1
-                            # chek local data elements under dependency sublist
-                            for k in range(index, len(dependency)):
-                                # if given node consumes local data elements, which comes from node, which
-                                # was appended above to sorted node list
-                                for output_link in output_data_list:
-                                    if output_link[ActivityNode.DATA_NAME_INDEX] == dependency[index]:
-                                        # remove local data element from dependency sublist
-                                        dependency.remove(dependency[index])
-                                        # decrement index for next iteration, as one dependence was removed
-                                        # therefore all next dependencies in dependency sublist were pushed by
-                                        # one position towards beginning of the sublist, e.g. [...,A,B,C] -> [...,B,C];
-                                        # A was removed and now B is under previous position of A so at next
-                                        # iteration the same index need to be checked to examine B;
-                                        index = index - 1
-                                        # exit "for output_link in" loop
-                                        break
-                                index = index + 1
+                    # remove outputs of that node from dependency list of other nodes
+                    for output_link in output_data_list:
+                        # get output data name
+                        output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
 
-                    # exit "for i in range" loop
-                    break
+                        # go thorough all nodes under diagram collection and refresh their dependency lists
+                        self.remove_data_from_collection_node_dependencies(output_data_name, self.diagram_collection)
+
+                        # go thorough all nodes under clause collection and refresh their dependency lists
+                        for condition_collection in self.condition_collection_list:
+                            for clause_collection in condition_collection.collection_list:
+                                self.remove_data_from_collection_node_dependencies(output_data_name, clause_collection)
+
+                    # if sorted node represents condition node
+                    if diagram_node.type == ActivityNode.CONDITION:
+                        # find related condition collection and sort clause nodes
+                        for condition_collection in self.condition_collection_list:
+                            # if found related condition collection
+                            if diagram_node.uid == condition_collection.uid:
+                                # go through clause collections
+                                for clause_collection in condition_collection.collection_list:
+
+                                    # repeat while node list of clause collection is not empty
+                                    while clause_collection.node_list:
+
+                                        # sort clause nodes
+                                        for clause_node in list(clause_collection.node_list):
+                                            # if clause node does not have any dependencies
+                                            if not clause_node.dependency_list:
+                                                # remove clause node from node list and and append it to sorted
+                                                # node list
+                                                clause_collection.node_list.remove(clause_node)
+                                                clause_collection.sorted_node_list.append(clause_node)
+                                                # get output data list from sorted node
+                                                output_data_list = clause_node.output_data_list
+
+                                                # remove outputs of that node from dependency list of other nodes
+                                                for output_link in output_data_list:
+                                                    # get output data name
+                                                    output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
+                                                    # go thorough all nodes under clause collection and refresh their
+                                                    # dependency lists
+                                                    self.remove_data_from_collection_node_dependencies(output_data_name,
+                                                                                                       clause_collection)
 
         # record info
-        for sorted_node in self.sorted_node_list:
+        Logger.save_in_log_file("ModuleSorter", "Sorted diagram nodes", False)
+        for sorted_node in self.diagram_collection.sorted_node_list:
             Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node", False)
+
+        Logger.save_in_log_file("ModuleSorter", "Sorted clause nodes", False)
+        for condition_collection in self.condition_collection_list:
+            Logger.save_in_log_file("ModuleSorter", "Sorted under " + str(condition_collection) + " element", False)
+            for clause_collection in condition_collection.collection_list:
+                Logger.save_in_log_file("ModuleSorter", "Sorted under " + str(clause_collection) + " element", False)
+                for sorted_node in clause_collection.sorted_node_list:
+                    Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node", False)
+
+    # Description
+    # This method removes given data name from dependency list of each node under related collection.
+    @staticmethod
+    def remove_data_from_collection_node_dependencies(data_name, collection):
+
+        # go through all nodes under given collection
+        for node in collection.node_list:
+            # check all dependencies of that node
+            for dependency in list(node.dependency_list):
+                # if given data is found on dependency list
+                if data_name == dependency:
+                    # remove dependency form dependency list
+                    node.dependency_list.remove(dependency)
 
     # Description:
     # This method sorts input data elements if interaction requires to point main data input.
@@ -568,14 +591,14 @@ class ModuleSorter(object):
         self.sort_clauses()
 
         # sort nodes basing on their dependencies
-        # self.sort_nodes()
+        self.sort_nodes()
 
         # sort input data list
         # self.sort_input_data_list()
 
         # append collected data to module sorter list
-        module_sorter_list = []
-        module_sorter_list.insert(ModuleSorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
+        # module_sorter_list = []
+        # module_sorter_list.insert(ModuleSorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
 
         # return module sorter list
-        return module_sorter_list
+        # return module_sorter_list

@@ -5,8 +5,8 @@
 #       and its child classes, which represent collections of related elements
 #       on activity diagram.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           8 DEC 2023
+#   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
+#   DATE:           7 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -47,7 +47,7 @@ class ActivityBasicCollection(object):
 
 
 # Description:
-# This class represents collection of diagram elements, that do not belong to any other specific collection type.
+# This class represents collection of diagram element, that do not belong to any other specific collection type.
 # The collection list is used to store list of connection that do not belong to any other collection type.
 class ActivityDiagramCollection(ActivityBasicCollection):
 
@@ -58,6 +58,7 @@ class ActivityDiagramCollection(ActivityBasicCollection):
         super().__init__()
         self.interaction_uid_list = []
         self.node_list = []
+        self.sorted_node_list = []
 
     # Description:
     # This method returns string representation of the class.
@@ -67,7 +68,7 @@ class ActivityDiagramCollection(ActivityBasicCollection):
 
 
 # Description:
-# This class represents collection of condition elements on activity diagram.
+# This class represents collection of condition element on activity diagram.
 # The collection list is used to store list of clauses that belong to condition element.
 class ActivityConditionCollection(ActivityBasicCollection):
 
@@ -87,7 +88,7 @@ class ActivityConditionCollection(ActivityBasicCollection):
 
 
 # Description:
-# This class represents collection of clause elements on activity diagram.
+# This class represents collection of clause element on activity diagram.
 # The collection list is used to store list of connections that belong to clause.
 class ActivityClauseCollection(ActivityConditionCollection):
 
@@ -101,6 +102,7 @@ class ActivityClauseCollection(ActivityConditionCollection):
         self.decision = "UNKNOWN"
         self.interaction_uid_list = []
         self.node_list = []
+        self.sorted_node_list = []
 
     # Description:
     # This method returns string representation of the class.
