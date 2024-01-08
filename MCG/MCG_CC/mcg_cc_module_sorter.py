@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           7 JAN 2024
+#   DATE:           8 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -61,7 +61,7 @@ class ModuleSorter(object):
         Logger.save_in_log_file("ModuleSorter", "Looking for diagram interactions", False)
 
         # search for node interactions under diagram collection
-        self.find_interactions_from_collection(self.diagram_collection)
+        ModuleSorter.find_interactions_from_collection(self.diagram_collection)
 
         # record info
         Logger.save_in_log_file("ModuleSorter", "Looking for clause interactions", False)
@@ -71,7 +71,7 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
             for clause_collection in condition_collection.collection_list:
                 Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
-                self.find_interactions_from_collection(clause_collection)
+                ModuleSorter.find_interactions_from_collection(clause_collection)
 
     # Description:
     # This method looks for interactions from given collection.
@@ -111,7 +111,7 @@ class ModuleSorter(object):
         Logger.save_in_log_file("ModuleSorter", "Looking for diagram nodes", False)
 
         # search for nodes under diagram collection
-        self.find_nodes_from_collection(self.diagram_collection)
+        ModuleSorter.find_nodes_from_collection(self.diagram_collection)
 
         # record info
         Logger.save_in_log_file("ModuleSorter", "Looking for clause nodes", False)
@@ -121,7 +121,7 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
             for clause_collection in condition_collection.collection_list:
                 Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
-                self.find_nodes_from_collection(clause_collection)
+                ModuleSorter.find_nodes_from_collection(clause_collection)
 
     # Description:
     # This method looks for nodes from given collection.
@@ -428,88 +428,77 @@ class ModuleSorter(object):
                 Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_collection) + " element", False)
 
     # Description:
-    # This method sorts diagram nodes basing on their dependencies from under dependency list.
-    def sort_diagram_nodes(self):
+    # This method sorts nodes basing on their dependencies under dependency list.
+    def sort_nodes(self):
+
+        # list of collections under which dependencies should be refreshed for each sorted node
+        collection_with_dependencies_to_refresh_list = []
 
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting diagram nodes basing on their dependencies", False)
 
-        # sort nodes under diagram collection
-        while self.diagram_collection.node_list:
+        # when diagram nodes are sorted then dependencies for both diagram and clause collections must be refreshed
+        collection_with_dependencies_to_refresh_list.clear()
+        collection_with_dependencies_to_refresh_list.append(self.diagram_collection)
+        for condition_collection in self.condition_collection_list:
+            for clause_collection in condition_collection.collection_list:
+                collection_with_dependencies_to_refresh_list.append(clause_collection)
 
-            # sort diagram nodes basing on their dependencies
-            # first append nodes without dependencies to sorted node list and remove them from node list
-            # then look through outputs from sorted node and remove local data elements outputted by the
-            # sorted node from dependency list of any other node
-            # continue sorting until node list of diagram collection is not empty
-
-            # go through all diagram nodes
-            for diagram_node in list(self.diagram_collection.node_list):
-                # if diagram node does not have any dependencies
-                if not diagram_node.dependency_list:
-                    # remove diagram node from node list and append it to sorted node list
-                    self.diagram_collection.node_list.remove(diagram_node)
-                    self.diagram_collection.sorted_node_list.append(diagram_node)
-                    # get output data list from sorted node
-                    output_data_list = diagram_node.output_data_list
-
-                    # remove outputs of that node from dependency list of other nodes
-                    for output_link in output_data_list:
-                        # get output data name
-                        output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
-
-                        # go thorough all nodes under diagram collection and refresh their dependency lists
-                        self.remove_data_from_collection_node_dependencies(output_data_name, self.diagram_collection)
-
-                        # go thorough all nodes under clause collection and refresh their dependency lists
-                        for condition_collection in self.condition_collection_list:
-                            for clause_collection in condition_collection.collection_list:
-                                self.remove_data_from_collection_node_dependencies(output_data_name, clause_collection)
-
-        # record info
-        for sorted_node in self.diagram_collection.sorted_node_list:
-            Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",
-                                    False)
-
-    # Description:
-    # This method sorts clause nodes basing on their dependencies from under dependency list.
-    def sort_clause_nodes(self):
+        # sort diagram nodes
+        ModuleSorter.sort_nodes_under_collection(self.diagram_collection, collection_with_dependencies_to_refresh_list)
 
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting clause nodes basing on their dependencies", False)
 
-        # sort nodes under diagram collection
+        # when clause nodes are sorted then dependencies only from that specific clause collection must be refreshed
         for condition_collection in self.condition_collection_list:
+            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_collection) + " element", False)
             for clause_collection in condition_collection.collection_list:
-                while clause_collection.node_list:
+                Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(clause_collection) + " element", False)
+                collection_with_dependencies_to_refresh_list.clear()
+                collection_with_dependencies_to_refresh_list.append(clause_collection)
 
-                    # sort clause nodes basing on their dependencies
-                    # sorting process is the same as for diagram nodes
+                # sort clause nodes
+                ModuleSorter.sort_nodes_under_collection(clause_collection, collection_with_dependencies_to_refresh_list)
 
-                    # go through all clause nodes
-                    for clause_node in list(clause_collection.node_list):
-                        # if clause node does not have any dependencies
-                        if not clause_node.dependency_list:
-                            # remove clause node from node list and and append it to sorted node list
-                            clause_collection.node_list.remove(clause_node)
-                            clause_collection.sorted_node_list.append(clause_node)
-                            # get output data list from sorted node
-                            output_data_list = clause_node.output_data_list
+    # Description:
+    # This method sorts nodes under given collection.
+    @staticmethod
+    def sort_nodes_under_collection(collection, collection_with_dependencies_to_refresh_list):
 
-                            # remove outputs of that node from dependency list of other nodes
-                            for output_link in output_data_list:
-                                # get output data name
-                                output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
-                                # go thorough all nodes under clause collection and refresh their dependency lists
-                                self.remove_data_from_collection_node_dependencies(output_data_name, clause_collection)
+        # sort nodes as long at node list is not empty
+        while collection.node_list:
+
+            # sort nodes basing on their dependencies
+            # first append nodes without dependencies to sorted node list and remove them from node list
+            # then look through outputs from sorted node and remove local data elements outputted by the
+            # sorted node from dependency list of other nodes under referenced collections to refresh
+
+            # go through all nodes under collection
+            for node in list(collection.node_list):
+                # if node does not have any dependencies
+                if not node.dependency_list:
+                    # remove it from node list and add to sorted node list
+                    collection.node_list.remove(node)
+                    collection.sorted_node_list.append(node)
+                    # get output data list from sorted node
+                    output_data_list = node.output_data_list
+
+                    # remove outputs of that node from dependency list of other nodes under referenced list of
+                    # collections to refresh
+                    for output_link in output_data_list:
+                        # get output data name
+                        output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
+                        # go through all collections to refresh
+                        for collection_with_dependencies_to_refresh in collection_with_dependencies_to_refresh_list:
+                            # go through all nodes under given collection and refresh their dependency list
+                            ModuleSorter.remove_data_from_collection_node_dependencies(output_data_name,
+                                                                                       collection_with_dependencies_to_refresh)
 
         # record info
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("ModuleSorter", "Sorted under " + str(condition_collection) + " element", False)
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Sorted under " + str(clause_collection) + " element", False)
-                for sorted_node in clause_collection.sorted_node_list:
-                    Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node", False)
+        for sorted_node in collection.sorted_node_list:
+            Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",
+                                    False)
 
     # Description
     # This method removes given data name from dependency list of each node under related collection.
@@ -597,8 +586,7 @@ class ModuleSorter(object):
         self.sort_clauses()
 
         # sort nodes basing on their dependencies
-        self.sort_diagram_nodes()
-        self.sort_clause_nodes()
+        self.sort_nodes()
 
         # sort input data list
         # self.sort_input_data_list()
