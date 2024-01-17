@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           8 JAN 2024
+#   DATE:           17 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -389,7 +389,7 @@ class ModuleSorter(object):
 
     # Description:
     # This method sorts clauses of each condition element.
-    def sort_clauses(self):
+    def sort_condition_clauses(self):
 
         # record info
         Logger.save_in_log_file("ModuleSorter", "Sorting clauses of each condition element", False)
@@ -514,12 +514,30 @@ class ModuleSorter(object):
                     # remove dependency form dependency list
                     node.dependency_list.remove(dependency)
 
-    # Description:
+    # Description
     # This method sorts input data elements if interaction requires to point main data input.
     def sort_input_data_list(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting nodes input data list", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting input data list under diagram nodes", False)
+
+        # sort input data nodes under diagram collection
+        ModuleSorter.sort_input_data_list_under_collection(self.diagram_collection)
+
+        # record info
+        Logger.save_in_log_file("ModuleSorter", "Sorting input data list under clause nodes", False)
+
+        # sort input data nodes under clause collection
+        for condition_collection in self.condition_collection_list:
+            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_collection) + " element", False)
+            for clause_collection in condition_collection.collection_list:
+                Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(clause_collection) + " element", False)
+                ModuleSorter.sort_input_data_list_under_collection(clause_collection)
+
+    # Description:
+    # This method sorts input data elements if interaction requires to point main data input.
+    @staticmethod
+    def sort_input_data_list_under_collection(collection):
 
         # some kind of actions require to distinguish which input data element should be
         # considered as main data element in order to compute correct results;
@@ -534,20 +552,20 @@ class ModuleSorter(object):
         # moved at beginning of input data list
 
         # repeat for all nodes from sorted node list
-        for sorted_node in self.sorted_node_list:
+        for sorted_node in collection.sorted_node_list:
 
             # if node is action type
             if sorted_node.type == ActivityNode.ACTION:
 
                 # and if action is input sensitive, i.e. requires to distinguish main input data
                 for input_sensitive_action in ModuleSorter.input_sensitive_action_list:
-                    if (sorted_node.name[0:3] == input_sensitive_action) or \
-                            (sorted_node.name[0:2] == input_sensitive_action):
+                    if (sorted_node.interaction[0:3] == input_sensitive_action) or \
+                            (sorted_node.interaction[0:2] == input_sensitive_action):
 
                         # get marker position
-                        marker_position = sorted_node.name.find("+")
+                        marker_position = sorted_node.interaction.find("+")
                         # get main input data name
-                        main_input_data_name = sorted_node.name[marker_position+1:len(sorted_node.name)]
+                        main_input_data_name = sorted_node.interaction[marker_position+1:len(sorted_node.interaction)]
 
                         # check each input link
                         for input_link in sorted_node.input_data_list:
@@ -583,13 +601,13 @@ class ModuleSorter(object):
         # find condition nodes, dependencies and sort clauses
         self.find_condition_nodes()
         self.find_condition_dependencies()
-        self.sort_clauses()
+        self.sort_condition_clauses()
 
         # sort nodes basing on their dependencies
         self.sort_nodes()
 
         # sort input data list
-        # self.sort_input_data_list()
+        self.sort_input_data_list()
 
         # append collected data to module sorter list
         # module_sorter_list = []
