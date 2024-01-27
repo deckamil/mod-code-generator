@@ -105,6 +105,17 @@ class ModuleConverter(object):
         ModuleConverter.configuration_file_disk.close()
 
     # Description:
+    # This method appends new line to configuration file.
+    def append_to_configuration_file(self, configuration_file_line, save_in_log_file):
+
+        # if there is demand to save configuration file line in log file
+        if save_in_log_file:
+            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+
+        # append configuration file line to configuration file
+        self.configuration_file.append(configuration_file_line)
+
+    # Description:
     # This method saves configuration in configuration file.
     def save_in_configuration_file(self):
 
@@ -130,16 +141,11 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting module name into configuration file", False)
 
         # append start marker of module name section to configuration file
-        self.configuration_file.append(str("$MODULE NAME START$"))
-        # get configuration file line
-        configuration_file_line = str(self.module_name)
-        # append configuration file line to configuration file
-        self.configuration_file.append(configuration_file_line)
+        self.append_to_configuration_file("$MODULE NAME START$", False)
+        # append module name to configuration file
+        self.append_to_configuration_file(self.module_name, True)
         # append end marker of module name section to configuration file
-        self.configuration_file.append(str("$MODULE NAME END$"))
-
-        # record info
-        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+        self.append_to_configuration_file("$MODULE NAME END$", False)
 
     # Description
     # This method converts module constants into configuration file.
@@ -149,7 +155,7 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting module constants into configuration file", False)
 
         # append start marker of module constant section to configuration file
-        self.configuration_file.append(str("$MODULE CONSTANTS START$"))
+        self.append_to_configuration_file("$MODULE CONSTANTS START$", False)
 
         # append constant details to configuration file
         for constant_element in self.constant_list:
@@ -163,14 +169,10 @@ class ModuleConverter(object):
             configuration_file_line = "type " + str(constant_element_type) + " name " + str(constant_element_name) + \
                                       " value " + str(constant_element_value)
             # append configuration file line to configuration file
-            self.configuration_file.append(configuration_file_line)
-
-            # record info
-            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line",
-                                    False)
+            self.append_to_configuration_file(configuration_file_line, True)
 
         # append end marker of module constant section to configuration file
-        self.configuration_file.append(str("$MODULE CONSTANTS END$"))
+        self.append_to_configuration_file("$MODULE CONSTANTS END$", False)
 
     # Description:
     # This method converts operation name into configuration file.
@@ -180,16 +182,11 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting operation name into configuration file", False)
 
         # append start marker of operation name section to configuration file
-        self.configuration_file.append(str("$OPERATION NAME START$"))
-        # get configuration file line
-        configuration_file_line = str(self.operation_name)
-        # append configuration file line to configuration file
-        self.configuration_file.append(configuration_file_line)
+        self.append_to_configuration_file("$OPERATION NAME START$", False)
+        # append operation name to configuration file
+        self.append_to_configuration_file(self.operation_name, True)
         # append end marker of operation name section to configuration file
-        self.configuration_file.append(str("$OPERATION NAME END$"))
-
-        # record info
-        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+        self.append_to_configuration_file("$OPERATION NAME END$", False)
 
     # Description:
     # This method converts specific interface type into configuration file.
@@ -204,10 +201,7 @@ class ModuleConverter(object):
             # get configuration file line
             configuration_file_line = "type " + str(interface_element_type) + " name " + str(interface_element_name)
             # append configuration file line to configuration file
-            self.configuration_file.append(configuration_file_line)
-
-            # record info
-            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+            self.append_to_configuration_file(configuration_file_line, True)
 
     # Description:
     # This method converts operation input interface, output interface and local interface elements
@@ -218,65 +212,59 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting operation input interface into configuration file", False)
 
         # append start marker of input interface section to configuration file
-        self.configuration_file.append(str("$INPUT INTERFACE START$"))
+        self.append_to_configuration_file("$INPUT INTERFACE START$", False)
         # append input interface details to configuration file
         self.convert_specific_interface(self.input_interface_list)
         # append end marker of input interface section to configuration file
-        self.configuration_file.append(str("$INPUT INTERFACE END$"))
+        self.append_to_configuration_file("$INPUT INTERFACE END$", False)
 
         # record info
         Logger.save_in_log_file("ModuleConverter", "Converting operation output interface into configuration file", False)
 
         # append start marker of output interface section to configuration file
-        self.configuration_file.append(str("$OUTPUT INTERFACE START$"))
+        self.append_to_configuration_file("$OUTPUT INTERFACE START$", False)
         # append output interface details to configuration file
         self.convert_specific_interface(self.output_interface_list)
         # append end marker of output interface section to configuration file
-        self.configuration_file.append(str("$OUTPUT INTERFACE END$"))
+        self.append_to_configuration_file("$OUTPUT INTERFACE END$", False)
 
         # record info
         Logger.save_in_log_file("ModuleConverter", "Converting operation local interface into configuration file", False)
 
         # append start marker of local interface section to configuration file
-        self.configuration_file.append(str("$LOCAL INTERFACE START$"))
+        self.append_to_configuration_file("$LOCAL INTERFACE START$", False)
         # append local interface details to configuration file
         self.convert_specific_interface(self.local_interface_list)
         # append end marker of local interface section to configuration file
-        self.configuration_file.append(str("$LOCAL INTERFACE END$"))
+        self.append_to_configuration_file("$LOCAL INTERFACE END$", False)
 
     # Description:
     # This method converts operation node from activity diagram into configuration file.
     def convert_operation_node(self, sorted_node):
 
-        # set operation invocation to conversion line
-        conversion_line = str("$OPE ") + str(sorted_node.interaction)
-        # append conversion line to configuration file
-        self.configuration_file.append(conversion_line)
-        # record info
-        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+        # set operation invocation to configuration file line
+        configuration_file_line = str("$OPE ") + str(sorted_node.interaction)
+        # append configuration file line to configuration file
+        self.append_to_configuration_file(configuration_file_line, True)
 
         # append input data links
         for input_link in sorted_node.input_data_list:
-            # set input link to conversion line
-            conversion_line = str("$INP ") + str(input_link[ActivityNode.DATA_NAME_INDEX]) + str("->") + \
-                              str(input_link[ActivityNode.PIN_NAME_INDEX])
-            # append conversion line to configuration file
-            self.configuration_file.append(conversion_line)
-            # record info
-            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+            # set input link to configuration file line
+            configuration_file_line = str("$INP ") + str(input_link[ActivityNode.DATA_NAME_INDEX]) + str("->") + \
+                                      str(input_link[ActivityNode.PIN_NAME_INDEX])
+            # append configuration file line to configuration file
+            self.append_to_configuration_file(configuration_file_line, True)
 
         # append output data links
         for output_link in sorted_node.output_data_list:
-            # set output link to conversion line
-            conversion_line = str("$OUT ") + str(output_link[ActivityNode.PIN_NAME_INDEX]) + str("->") + \
-                              str(output_link[ActivityNode.DATA_NAME_INDEX])
-            # append conversion line to configuration file
-            self.configuration_file.append(conversion_line)
-            # record info
-            Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+            # set output link to configuration file line
+            configuration_file_line = str("$OUT ") + str(output_link[ActivityNode.PIN_NAME_INDEX]) + str("->") + \
+                                      str(output_link[ActivityNode.DATA_NAME_INDEX])
+            # append configuration file line to configuration file
+            self.append_to_configuration_file(configuration_file_line, True)
 
         # append ending marker for operation
-        self.configuration_file.append(str("$OPE -end"))
+        self.append_to_configuration_file("$OPE -end", True)
 
     # Description:
     # This method converts specific action node from activity diagram with n-argument operator into configuration file.
@@ -284,25 +272,22 @@ class ModuleConverter(object):
 
         # get output link
         output_link = sorted_node.output_data_list[0]
-        # set beginning of action interaction to conversion line
-        conversion_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ")
+        # set beginning of action interaction to configuration file line
+        configuration_file_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ")
 
-        # search for all input data elements of sorted node and put them into conversion line
+        # search for all input data elements of sorted node and put them into configuration file line
         for input_link in sorted_node.input_data_list:
             # get input data name
             input_data_name = input_link[ActivityNode.DATA_NAME_INDEX]
-            # append input data element to conversion line
-            conversion_line = conversion_line + str(input_data_name)
-            # append operator to conversion line
-            conversion_line = conversion_line + str(" ") + str(operator) + str(" ")
+            # append input data element to configuration file line
+            configuration_file_line = configuration_file_line + str(input_data_name)
+            # append operator to configuration file line
+            configuration_file_line = configuration_file_line + str(" ") + str(operator) + str(" ")
 
         # remove spare operator and whitespace
-        conversion_line = conversion_line[0:len(conversion_line) - 3]
-        # append conversion line to configuration file
-        self.configuration_file.append(conversion_line)
-
-        # record info
-        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+        configuration_file_line = configuration_file_line[0:len(configuration_file_line) - 3]
+        # append configuration file line to configuration file
+        self.append_to_configuration_file(configuration_file_line, True)
 
     # Description:
     # This method converts specific action node from activity diagram with 1-argument operator into configuration file.
@@ -312,15 +297,12 @@ class ModuleConverter(object):
         input_link = sorted_node.input_data_list[0]
         # get output link
         output_link = sorted_node.output_data_list[0]
-        # set beginning of action interaction to conversion line
-        conversion_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ") + \
-                          str(operator) + str(input_link[ActivityNode.DATA_NAME_INDEX])
+        # set beginning of action interaction to configuration file line
+        configuration_file_line = str("$INS ") + str(output_link[ActivityNode.DATA_NAME_INDEX]) + str(" = ") + \
+                                  str(operator) + str(input_link[ActivityNode.DATA_NAME_INDEX])
 
-        # append conversion line to configuration file
-        self.configuration_file.append(conversion_line)
-
-        # record info
-        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+        # append configuration file line to configuration file
+        self.append_to_configuration_file(configuration_file_line, True)
 
     # Description:
     # This method converts action node from activity diagram into configuration file.
@@ -404,10 +386,7 @@ class ModuleConverter(object):
         # get configuration file line
         configuration_file_line = str("$INS ") + str(output_data_name) + " = " + str(input_data_name)
         # append configuration file line to configuration file
-        self.configuration_file.append(configuration_file_line)
-
-        # record info
-        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
+        self.append_to_configuration_file(configuration_file_line, True)
 
     # Description:
     # This method selects conversion for ordinary nodes.
@@ -459,11 +438,8 @@ class ModuleConverter(object):
                 clause_decision = self.convert_clause_decision(clause_collection_list[0].decision)
                 # get configuration file line
                 configuration_file_line = str("$IFC ") + str(clause_decision)
-                # record info
-                Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) +
-                                        " line", False)
                 # append configuration file line to configuration file
-                self.configuration_file.append(configuration_file_line)
+                self.append_to_configuration_file(configuration_file_line, True)
                 # convert ordinary nodes for first clause
                 for sorted_node in clause_collection_list[0].sorted_node_list:
                     self.convert_ordinary_node(sorted_node)
@@ -478,28 +454,20 @@ class ModuleConverter(object):
                         clause_decision = self.convert_clause_decision(clause.decision)
                         # get configuration file line
                         configuration_file_line = str("$EIF ") + str(clause_decision)
-                        # record info
-                        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) +
-                                                " line", False)
                         # append configuration file line to configuration file
-                        self.configuration_file.append(configuration_file_line)
+                        self.append_to_configuration_file(configuration_file_line, True)
                         # convert ordinary nodes for clause
                         for sorted_node in clause.sorted_node_list:
                             self.convert_ordinary_node(sorted_node)
 
-                # set else marker of last clause section
-                configuration_file_line = str("$ELS")
-                # append configuration file line to configuration file
-                self.configuration_file.append(configuration_file_line)
-                # record info
-                Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) +
-                                        " line", False)
+                # append else marker of last clause section
+                self.append_to_configuration_file("$ELS", True)
                 # convert ordinary nodes for last clause
                 for sorted_node in clause_collection_list[-1].sorted_node_list:
                     self.convert_ordinary_node(sorted_node)
 
-                # append ending marker for condition
-                self.configuration_file.append(str("$IFC -end"))
+                # append ending marker for last clause section
+                self.append_to_configuration_file("$IFC -end", True)
 
     # Description:
     # This method converts operation body into configuration file.
@@ -509,7 +477,7 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting operation body into configuration file", False)
 
         # append start marker of module body section to configuration file
-        self.configuration_file.append(str("$OPERATION BODY START$"))
+        self.append_to_configuration_file("$OPERATION BODY START$", False)
 
         # repeat for all sorted nodes from diagram collection
         for sorted_node in self.diagram_collection.sorted_node_list:
@@ -523,7 +491,7 @@ class ModuleConverter(object):
                 self.convert_ordinary_node(sorted_node)
 
         # append end marker of module body section to configuration file
-        self.configuration_file.append(str("$OPERATION BODY END$"))
+        self.append_to_configuration_file("$OPERATION BODY END$", False)
 
     # Description:
     # This method is responsible for conversion of module content into configuration file format.
@@ -533,7 +501,7 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Converting module content into configuration file", True)
 
         # append start marker of new module section to configuration file
-        self.configuration_file.append(str("$MODULE START$"))
+        self.append_to_configuration_file("$MODULE START$", False)
 
         # convert module name into configuration file.
         self.convert_module_name()
@@ -551,7 +519,7 @@ class ModuleConverter(object):
         self.convert_operation_body()
 
         # append end marker of new module section to configuration file
-        self.configuration_file.append(str("$MODULE END$"))
+        self.append_to_configuration_file("$MODULE END$", False)
 
         # record info
         Logger.save_in_log_file("ModuleConverter", "Saving conversion results into configuration file", False)
