@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           20 JAN 2024
+#   DATE:           27 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -37,9 +37,6 @@ from mcg_cc_logger import Logger
 # Description:
 # This class allows to find and sort module nodes.
 class ModuleSorter(object):
-
-    # indexes of sorter list
-    SORTED_NODE_LIST_INDEX = 0
 
     # list of action interaction that require to distinguish main data input
     input_sensitive_action_list = ["SUB", "DIV", "BLS", "BRS", "GT", "LT", "GE", "LE"]
@@ -361,6 +358,7 @@ class ModuleSorter(object):
                     clause_decision = clause_decision.replace(" AND ", "")
                     clause_decision = clause_decision.replace(" OR ", "")
                     clause_decision = clause_decision.replace(" NOT ", "")
+                    clause_decision = clause_decision.replace(" (NOT ", "")
                     # split decision to get list of data names that appear in clause decision
                     clause_decision_data_name_list = clause_decision.split()
 
@@ -593,10 +591,3 @@ class ModuleSorter(object):
 
         # sort input data list
         self.sort_input_data_list()
-
-        # append collected data to module sorter list
-        # module_sorter_list = []
-        # module_sorter_list.insert(ModuleSorter.SORTED_NODE_LIST_INDEX, self.sorted_node_list)
-
-        # return module sorter list
-        # return module_sorter_list

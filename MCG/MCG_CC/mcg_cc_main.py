@@ -5,8 +5,8 @@
 #       and it contains definition of Main class, which uses other MCG CC classes
 #       to convert model content from set of .exml files into configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           8 SEP 2023
+#   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
+#   DATE:           27 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -64,7 +64,7 @@ class Main(object):
         # display short notice
         print()
         print("Mod Code Generator (MCG)")
-        print("Copyright (C) 2021-2023 Kamil Deć github.com/deckamil")
+        print("Copyright (C) 2021-2024 Kamil Deć github.com/deckamil")
         print("This is Converter Component (CC) of Mod Code Generator (MCG)")
         print(Main.MCG_CC_VERSION)
         print()
@@ -134,23 +134,23 @@ class Main(object):
                 file_reader_list = file_reader.read_files()
 
                 # initialize file checker
-                file_checker = FileChecker(file_reader_list)
+                # file_checker = FileChecker(file_reader_list)
                 # check module content
-                file_checker.check_files()
+                # file_checker.check_files()
 
                 # check errors
-                ErrorHandler.check_errors()
+                # ErrorHandler.check_errors()
 
                 # initialize module sorter
                 module_sorter = ModuleSorter(file_reader_list)
                 # sort module content
-                module_sorter_list = module_sorter.sort_module()
+                module_sorter.sort_module()
 
                 # check errors
-                ErrorHandler.check_errors()
+                # ErrorHandler.check_errors()
 
                 # initialize module converter
-                module_converter = ModuleConverter(file_finder_list, file_reader_list, module_sorter_list)
+                module_converter = ModuleConverter(file_finder_list, file_reader_list)
                 # convert module content
                 module_converter.convert_module()
 

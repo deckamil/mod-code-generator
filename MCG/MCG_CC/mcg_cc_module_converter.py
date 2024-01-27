@@ -4,8 +4,8 @@
 #       This module contains definition of ModuleConverter class, which is responsible
 #       for conversion of module content into configuration file format.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 SEP 2023
+#   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
+#   DATE:           27 JAN 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -32,7 +32,6 @@ import datetime
 from mcg_cc_activity_node import ActivityNode
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_file_reader import FileReader
-from mcg_cc_module_sorter import ModuleSorter
 from mcg_cc_logger import Logger
 
 
@@ -46,7 +45,7 @@ class ModuleConverter(object):
 
     # Description:
     # This is class constructor.
-    def __init__(self, file_finder_list, file_reader_list, module_sorter_list):
+    def __init__(self, file_finder_list, file_reader_list):
 
         # initialize object data
         self.module_name = file_finder_list[FileFinder.MODULE_NAME_INDEX]
@@ -55,7 +54,8 @@ class ModuleConverter(object):
         self.input_interface_list = file_reader_list[FileReader.INPUT_INTERFACE_LIST_INDEX]
         self.output_interface_list = file_reader_list[FileReader.OUTPUT_INTERFACE_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
-        self.sorted_node_list = module_sorter_list[ModuleSorter.SORTED_NODE_LIST_INDEX]
+        self.diagram_collection = file_reader_list[FileReader.DIAGRAM_COLLECTION_INDEX]
+        self.condition_collection_list = file_reader_list[FileReader.CONDITION_COLLECTION_LIST_INDEX]
         self.configuration_file = []
 
     # Description:
@@ -249,7 +249,7 @@ class ModuleConverter(object):
     def convert_operation_node(self, sorted_node):
 
         # set operation invocation to conversion line
-        conversion_line = str("$OPE ") + str(sorted_node.name)
+        conversion_line = str("$OPE ") + str(sorted_node.interaction)
         # append conversion line to configuration file
         self.configuration_file.append(conversion_line)
         # record info
@@ -274,6 +274,9 @@ class ModuleConverter(object):
             self.configuration_file.append(conversion_line)
             # record info
             Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(conversion_line) + " line", False)
+
+        # append ending marker for operation
+        self.configuration_file.append(str("$OPE -end"))
 
     # Description:
     # This method converts specific action node from activity diagram with n-argument operator into configuration file.
@@ -326,64 +329,64 @@ class ModuleConverter(object):
         # depending on the type of action, covert node into configuration file.
 
         # arithmetic operators
-        if sorted_node.name[0:3] == "ADD":
+        if sorted_node.interaction[0:3] == "ADD":
             self.convert_specific_action_node_arity_n(sorted_node, "+")
 
-        elif sorted_node.name[0:3] == "SUB":
+        elif sorted_node.interaction[0:3] == "SUB":
             self.convert_specific_action_node_arity_n(sorted_node, "-")
 
-        elif sorted_node.name[0:3] == "MUL":
+        elif sorted_node.interaction[0:3] == "MUL":
             self.convert_specific_action_node_arity_n(sorted_node, "*")
 
-        elif sorted_node.name[0:3] == "DIV":
+        elif sorted_node.interaction[0:3] == "DIV":
             self.convert_specific_action_node_arity_n(sorted_node, "/")
 
         # logical operators
-        elif sorted_node.name[0:3] == "AND":
+        elif sorted_node.interaction[0:3] == "AND":
             self.convert_specific_action_node_arity_n(sorted_node, "&&")
 
-        elif sorted_node.name[0:2] == "OR":
+        elif sorted_node.interaction[0:2] == "OR":
             self.convert_specific_action_node_arity_n(sorted_node, "||")
 
-        elif sorted_node.name[0:3] == "NOT":
+        elif sorted_node.interaction[0:3] == "NOT":
             self.convert_specific_action_node_arity_1(sorted_node, "!")
 
         # bitwise operators
-        elif sorted_node.name[0:4] == "BAND":
+        elif sorted_node.interaction[0:4] == "BAND":
             self.convert_specific_action_node_arity_n(sorted_node, "&")
 
-        elif sorted_node.name[0:3] == "BOR":
+        elif sorted_node.interaction[0:3] == "BOR":
             self.convert_specific_action_node_arity_n(sorted_node, "|")
 
-        elif sorted_node.name[0:4] == "BXOR":
+        elif sorted_node.interaction[0:4] == "BXOR":
             self.convert_specific_action_node_arity_n(sorted_node, "^")
 
-        elif sorted_node.name[0:4] == "BNOT":
+        elif sorted_node.interaction[0:4] == "BNOT":
             self.convert_specific_action_node_arity_1(sorted_node, "~")
 
-        elif sorted_node.name[0:3] == "BLS":
+        elif sorted_node.interaction[0:3] == "BLS":
             self.convert_specific_action_node_arity_n(sorted_node, "<<")
 
-        elif sorted_node.name[0:3] == "BRS":
+        elif sorted_node.interaction[0:3] == "BRS":
             self.convert_specific_action_node_arity_n(sorted_node, ">>")
 
         # relational operators
-        elif sorted_node.name[0:2] == "EQ":
+        elif sorted_node.interaction[0:2] == "EQ":
             self.convert_specific_action_node_arity_n(sorted_node, "==")
 
-        elif sorted_node.name[0:2] == "NE":
+        elif sorted_node.interaction[0:2] == "NE":
             self.convert_specific_action_node_arity_n(sorted_node, "!=")
 
-        elif sorted_node.name[0:2] == "GT":
+        elif sorted_node.interaction[0:2] == "GT":
             self.convert_specific_action_node_arity_n(sorted_node, ">")
 
-        elif sorted_node.name[0:2] == "LT":
+        elif sorted_node.interaction[0:2] == "LT":
             self.convert_specific_action_node_arity_n(sorted_node, "<")
 
-        elif sorted_node.name[0:2] == "GE":
+        elif sorted_node.interaction[0:2] == "GE":
             self.convert_specific_action_node_arity_n(sorted_node, ">=")
 
-        elif sorted_node.name[0:2] == "LE":
+        elif sorted_node.interaction[0:2] == "LE":
             self.convert_specific_action_node_arity_n(sorted_node, "<=")
 
     # Description:
@@ -407,6 +410,98 @@ class ModuleConverter(object):
         Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) + " line", False)
 
     # Description:
+    # This method selects conversion for ordinary nodes.
+    def convert_ordinary_node(self, sorted_node):
+
+        # if node is operation type
+        if sorted_node.type == ActivityNode.OPERATION:
+            # convert operation node
+            self.convert_operation_node(sorted_node)
+        # if node is action type
+        elif sorted_node.type == ActivityNode.ACTION:
+            # convert action node
+            self.convert_action_node(sorted_node)
+        # if node is data type
+        elif sorted_node.type == ActivityNode.DATA:
+            # convert data node
+            self.convert_data_node(sorted_node)
+
+    # Description
+    # This method converts string that represents clause decision.
+    @staticmethod
+    def convert_clause_decision(clause_decision):
+
+        # remove clause level number with square bracket
+        clause_level_bracket_position = clause_decision.find("]")
+        clause_decision = clause_decision[clause_level_bracket_position + 1:len(clause_decision)]
+        # remove spaces at the beginning and at the end of clause decision
+        clause_decision = clause_decision.strip()
+        # converts logical operators
+        clause_decision = clause_decision.replace(" AND ", " && ")
+        clause_decision = clause_decision.replace(" OR ", " || ")
+        clause_decision = clause_decision.replace(" NOT ", " !")
+        clause_decision = clause_decision.replace(" (NOT ", " (!")
+
+        return clause_decision
+
+    # Description:
+    # This method converts special node that represents condition.
+    def convert_condition_node(self, condition_node):
+
+        # find condition collection for given condition node
+        for condition_collection in self.condition_collection_list:
+            # if uid identifier is the same
+            if condition_collection.uid == condition_node.uid:
+                # get clause collection list for given condition collection
+                clause_collection_list = condition_collection.collection_list
+
+                # convert decision of first clause section
+                clause_decision = self.convert_clause_decision(clause_collection_list[0].decision)
+                # get configuration file line
+                configuration_file_line = str("$IFC ") + str(clause_decision)
+                # record info
+                Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) +
+                                        " line", False)
+                # append configuration file line to configuration file
+                self.configuration_file.append(configuration_file_line)
+                # convert ordinary nodes for first clause
+                for sorted_node in clause_collection_list[0].sorted_node_list:
+                    self.convert_ordinary_node(sorted_node)
+
+                # when else if section is expected (condition has more clauses than only simple if and else)
+                if len(clause_collection_list) > 2:
+                    # get sublist for section with else if clauses
+                    elseif_clause_collection_sublist = clause_collection_list[1:len(clause_collection_list)-1]
+                    # for each clause in that section
+                    for clause in elseif_clause_collection_sublist:
+                        # convert clause decision
+                        clause_decision = self.convert_clause_decision(clause.decision)
+                        # get configuration file line
+                        configuration_file_line = str("$EIF ") + str(clause_decision)
+                        # record info
+                        Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) +
+                                                " line", False)
+                        # append configuration file line to configuration file
+                        self.configuration_file.append(configuration_file_line)
+                        # convert ordinary nodes for clause
+                        for sorted_node in clause.sorted_node_list:
+                            self.convert_ordinary_node(sorted_node)
+
+                # set else marker of last clause section
+                configuration_file_line = str("$ELS")
+                # append configuration file line to configuration file
+                self.configuration_file.append(configuration_file_line)
+                # record info
+                Logger.save_in_log_file("ModuleConverter", "Have converted to " + str(configuration_file_line) +
+                                        " line", False)
+                # convert ordinary nodes for last clause
+                for sorted_node in clause_collection_list[-1].sorted_node_list:
+                    self.convert_ordinary_node(sorted_node)
+
+                # append ending marker for condition
+                self.configuration_file.append(str("$IFC -end"))
+
+    # Description:
     # This method converts operation body into configuration file.
     def convert_operation_body(self):
 
@@ -416,21 +511,16 @@ class ModuleConverter(object):
         # append start marker of module body section to configuration file
         self.configuration_file.append(str("$OPERATION BODY START$"))
 
-        # repeat for all nodes from sorted node list
-        for sorted_node in self.sorted_node_list:
+        # repeat for all sorted nodes from diagram collection
+        for sorted_node in self.diagram_collection.sorted_node_list:
 
-            # if node is operation type
-            if sorted_node.type == ActivityNode.OPERATION:
-                # convert operation node
-                self.convert_operation_node(sorted_node)
-            # if node is action type
-            elif sorted_node.type == ActivityNode.ACTION:
-                # convert action node
-                self.convert_action_node(sorted_node)
-            # if node is data type
-            elif sorted_node.type == ActivityNode.DATA:
-                # convert data node
-                self.convert_data_node(sorted_node)
+            # if given node represents condition
+            if sorted_node.type == ActivityNode.CONDITION:
+                # converts condition node
+                self.convert_condition_node(sorted_node)
+            else:
+                # convert ordinary node
+                self.convert_ordinary_node(sorted_node)
 
         # append end marker of module body section to configuration file
         self.configuration_file.append(str("$OPERATION BODY END$"))
