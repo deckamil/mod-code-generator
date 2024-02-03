@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           27 JAN 2024
+#   DATE:           3 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -46,8 +46,8 @@ class ModuleSorter(object):
     def __init__(self, file_reader_list):
 
         # initialize object data
-        self.diagram_collection = file_reader_list[FileReader.DIAGRAM_COLLECTION_INDEX]
-        self.condition_collection_list = file_reader_list[FileReader.CONDITION_COLLECTION_LIST_INDEX]
+        self.diagram_layer = file_reader_list[FileReader.DIAGRAM_LAYER_INDEX]
+        self.condition_layer_list = file_reader_list[FileReader.CONDITION_LAYER_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
 
     # Description:
@@ -55,49 +55,49 @@ class ModuleSorter(object):
     def find_interactions(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for diagram interactions", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for diagram layer interactions", False)
 
-        # search for node interactions under diagram collection
-        ModuleSorter.find_interactions_from_collection(self.diagram_collection)
+        # search for node interactions under diagram layer
+        ModuleSorter.find_interactions_from_layer(self.diagram_layer)
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for clause interactions", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for clause layer interactions", False)
 
-        # search for node interactions under clause collection
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
-                ModuleSorter.find_interactions_from_collection(clause_collection)
+        # search for node interactions under clause layer
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_layer) + " layer", False)
+                ModuleSorter.find_interactions_from_layer(clause_layer)
 
     # Description:
-    # This method looks for interactions from given collection.
+    # This method looks for interactions from given layer.
     @staticmethod
-    def find_interactions_from_collection(collection):
+    def find_interactions_from_layer(layer):
 
         # search for node interaction
-        for connection in collection.collection_list:
+        for connection in layer.connection_list:
 
             # if action or operation is connection source
             if connection.source_type == ActivityConnection.ACTION or \
                     connection.source_type == ActivityConnection.OPERATION:
 
                 # if new integration is found in connection
-                if connection.source_uid not in collection.interaction_uid_list:
+                if connection.source_uid not in layer.interaction_uid_list:
                     # append interaction uid to interaction uid list
-                    collection.interaction_uid_list.append(connection.source_uid)
+                    layer.interaction_uid_list.append(connection.source_uid)
 
             # if action or operation is connection target
             if connection.target_type == ActivityConnection.ACTION or \
                     connection.target_type == ActivityConnection.OPERATION:
 
                 # if new integration is found in connection
-                if connection.target_uid not in collection.interaction_uid_list:
+                if connection.target_uid not in layer.interaction_uid_list:
                     # append interaction uid to interaction uid list
-                    collection.interaction_uid_list.append(connection.target_uid)
+                    layer.interaction_uid_list.append(connection.target_uid)
 
         # record info
-        for interaction_uid in collection.interaction_uid_list:
+        for interaction_uid in layer.interaction_uid_list:
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(interaction_uid) + " interaction uid", False)
 
     # Description:
@@ -105,34 +105,34 @@ class ModuleSorter(object):
     def find_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for diagram nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for diagram layer nodes", False)
 
-        # search for nodes under diagram collection
-        ModuleSorter.find_nodes_from_collection(self.diagram_collection)
+        # search for nodes under diagram layer
+        ModuleSorter.find_nodes_from_layer(self.diagram_layer)
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for clause nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for clause layer nodes", False)
 
-        # search for nodes under clause collection
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
-                ModuleSorter.find_nodes_from_collection(clause_collection)
+        # search for nodes under clause layer
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_layer) + " layer", False)
+                ModuleSorter.find_nodes_from_layer(clause_layer)
 
     # Description:
-    # This method looks for nodes from given collection.
+    # This method looks for nodes from given layer.
     @staticmethod
-    def find_nodes_from_collection(collection):
+    def find_nodes_from_layer(layer):
 
         # search for nodes with interaction, i.e. nodes that represent either action or operation
-        for interaction_uid in collection.interaction_uid_list:
+        for interaction_uid in layer.interaction_uid_list:
 
             # new node instance
             node = ActivityNode()
 
             # check source and target uid of each connection
-            for connection in collection.collection_list:
+            for connection in layer.connection_list:
 
                 # if interaction is connection target then
                 # connection source is node input data
@@ -167,10 +167,10 @@ class ModuleSorter(object):
                     node.output_data_list.append(output_link)
 
             # append node to node list
-            collection.node_list.append(node)
+            layer.node_list.append(node)
 
         # search for nodes without interaction, i.e. nodes that represent connection between two data points
-        for connection in collection.collection_list:
+        for connection in layer.connection_list:
 
             # if connection is between two data points
             if (connection.source_type == ActivityConnection.LOCAL or
@@ -196,10 +196,10 @@ class ModuleSorter(object):
                 node.output_data_list.append(output_link)
 
                 # append node to node list
-                collection.node_list.append(node)
+                layer.node_list.append(node)
 
         # record info
-        for node in collection.node_list:
+        for node in layer.node_list:
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
     # Description:
@@ -208,27 +208,27 @@ class ModuleSorter(object):
     def find_dependencies(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of diagram nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of diagram layer nodes", False)
 
-        # search for node dependencies under diagram collection
-        self.find_dependencies_from_collection(self.diagram_collection)
+        # search for node dependencies under diagram layer
+        self.find_dependencies_from_layer(self.diagram_layer)
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of clause nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of clause layer nodes", False)
 
-        # search for node dependencies under clause collection
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_collection) + " element", False)
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_collection) + " element", False)
-                self.find_dependencies_from_collection(clause_collection)
+        # search for node dependencies under clause layer
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("ModuleSorter", "Looking under " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("ModuleSorter", "Looking under " + str(clause_layer) + " layer", False)
+                self.find_dependencies_from_layer(clause_layer)
 
     # Description:
-    # This method looks for dependencies from given collection.
-    def find_dependencies_from_collection(self, collection):
+    # This method looks for dependencies from given layer.
+    def find_dependencies_from_layer(self, layer):
 
         # search for node dependencies
-        for node in collection.node_list:
+        for node in layer.node_list:
             # go through all local data elements for each node
             for local_interface in self.local_interface_list:
                 # get local data name
@@ -245,30 +245,30 @@ class ModuleSorter(object):
                                                 str(node) + " node", False)
 
     # Description:
-    # This method looks for condition nodes that represent condition elements and adds them to diagram node list.
+    # This method looks for condition nodes that represent condition layer and adds them to diagram node list.
     def find_condition_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for condition-type nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for condition type nodes", False)
 
-        # for each condition collection
-        for condition_collection in self.condition_collection_list:
+        # for each condition layer
+        for condition_layer in self.condition_layer_list:
 
             # new node instance
             node = ActivityNode()
 
             # set node interaction, uid and type
-            node.interaction = condition_collection.name
-            node.uid = condition_collection.uid
+            node.interaction = condition_layer.name
+            node.uid = condition_layer.uid
             node.type = ActivityNode.CONDITION
 
             # list to collect condition output data
             condition_target_list = []
 
-            # for each clause collection
-            for clause_collection in condition_collection.collection_list:
+            # for each clause layer
+            for clause_layer in condition_layer.clause_layer_list:
                 # for each node in clause
-                for clause_node in clause_collection.node_list:
+                for clause_node in clause_layer.node_list:
                     # go through all output links
                     for output_link in clause_node.output_data_list:
                         # and add each data name to condition target list
@@ -290,7 +290,7 @@ class ModuleSorter(object):
             Logger.save_in_log_file("ModuleSorter", "Have found " + str(node) + " node", False)
 
             # append node to diagram node list
-            self.diagram_collection.node_list.append(node)
+            self.diagram_layer.node_list.append(node)
 
     # Description:
     # This method looks for condition node dependencies, i.e. list of local data elements, which are inputs to condition
@@ -298,29 +298,29 @@ class ModuleSorter(object):
     def find_condition_dependencies(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of condition-type nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Looking for dependencies of condition type nodes", False)
 
-        # for each condition collection
-        for condition_collection in self.condition_collection_list:
+        # for each condition layer
+        for condition_layer in self.condition_layer_list:
             # temporary list of condition dependencies
             condition_dependency_list = []
 
-            # for each clause collection
-            for clause_collection in condition_collection.collection_list:
+            # for each clause layer
+            for clause_layer in condition_layer.clause_layer_list:
 
                 # find if node dependency, i.e. local input data element of the node, is generated by any
                 # other clause node; if local input data element is not generated by any other clause node
                 # then that local data element is local input to entire condition
 
                 # for each node in node list
-                for node_under_check in clause_collection.node_list:
+                for node_under_check in clause_layer.node_list:
                     # for each dependency in dependency list
                     for dependency in list(node_under_check.dependency_list):
 
                         # flag to distinguish if given dependency is found in output data list of any clause node
                         dependency_in_output_data_found = False
 
-                        for clause_node in clause_collection.node_list:
+                        for clause_node in clause_layer.node_list:
                             # for each output link in output data list
                             for output_link in clause_node.output_data_list:
                                 # if dependency is output from any clause node
@@ -346,7 +346,7 @@ class ModuleSorter(object):
                 # entire condition node
 
                 # get clause decision
-                clause_decision = clause_collection.decision
+                clause_decision = clause_layer.decision
                 # if this is not "else" clause
                 if "[else]" not in clause_decision:
                     # remove clause level number with square bracket
@@ -377,9 +377,9 @@ class ModuleSorter(object):
             condition_dependency_list = list(dict.fromkeys(condition_dependency_list))
 
             # find related condition node and add dependencies
-            for node in self.diagram_collection.node_list:
-                # if it is condition node and its uid match condition collection
-                if node.type == ActivityNode.CONDITION and node.uid == condition_collection.uid:
+            for node in self.diagram_layer.node_list:
+                # if it is condition node and its uid match condition layer
+                if node.type == ActivityNode.CONDITION and node.uid == condition_layer.uid:
                     # add dependencies to condition node
                     node.dependency_list = condition_dependency_list
                     # record info
@@ -388,16 +388,16 @@ class ModuleSorter(object):
                                             str(node) + " node", False)
 
     # Description:
-    # This method sorts clauses of each condition element.
+    # This method sorts clauses of each condition layer.
     def sort_condition_clauses(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting clauses of each condition element", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting clauses of each condition layer", False)
 
-        # for each condition collection
-        for condition_collection in self.condition_collection_list:
+        # for each condition layer
+        for condition_layer in self.condition_layer_list:
             # record info
-            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_collection) + " element", False)
+            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_layer) + " layer", False)
             # set initial clause level number
             clause_level_number = 0
             # flag to distinguish if given clause level is found
@@ -412,84 +412,83 @@ class ModuleSorter(object):
                 # assume that given clause level is not found
                 clause_level_found = False
 
-                # for each clause collection
-                for clause_collection in list(condition_collection.collection_list):
+                # for each clause layer
+                for clause_layer in list(condition_layer.clause_layer_list):
                     # if matching clause level is found in clause decision
-                    if clause_collection.decision.find(clause_level_str) != -1:
-                        # remove clause from collection list
-                        condition_collection.collection_list.remove(clause_collection)
+                    if clause_layer.decision.find(clause_level_str) != -1:
+                        # remove clause from clause layer list
+                        condition_layer.clause_layer_list.remove(clause_layer)
                         # insert clause at position defined by clause level number
-                        condition_collection.collection_list.insert(clause_level_number-1, clause_collection)
+                        condition_layer.clause_layer_list.insert(clause_level_number-1, clause_layer)
                         # set clause flag state
                         clause_level_found = True
 
             # record info
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_collection) + " element", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(clause_layer) + " layer", False)
 
     # Description:
     # This method sorts nodes basing on their dependencies under dependency list.
     def sort_nodes(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting diagram nodes basing on their dependencies", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting diagram layer nodes basing on their dependencies", False)
 
         # sort diagram nodes
-        ModuleSorter.sort_nodes_under_collection(self.diagram_collection)
+        ModuleSorter.sort_nodes_under_layer(self.diagram_layer)
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting clause nodes basing on their dependencies", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting clause layer nodes basing on their dependencies", False)
 
         # sort clause nodes
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_collection) + " element", False)
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(clause_collection) + " element", False)
-                ModuleSorter.sort_nodes_under_collection(clause_collection)
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(clause_layer) + " layer", False)
+                ModuleSorter.sort_nodes_under_layer(clause_layer)
 
     # Description:
-    # This method sorts nodes under given collection.
+    # This method sorts nodes under given layer.
     @staticmethod
-    def sort_nodes_under_collection(collection):
+    def sort_nodes_under_layer(layer):
 
         # sort nodes as long at node list is not empty
-        while collection.node_list:
+        while layer.node_list:
 
             # sort nodes basing on their dependencies
             # first append nodes without dependencies to sorted node list and remove them from node list
             # then look through outputs from sorted node and remove local data elements outputted by the
-            # sorted node from dependency list of other nodes under referenced collections to refresh
+            # sorted node from dependency list of other nodes under referenced layer
 
-            # go through all nodes under collection
-            for node in list(collection.node_list):
+            # go through all nodes under layer
+            for node in list(layer.node_list):
                 # if node does not have any dependencies
                 if not node.dependency_list:
                     # remove it from node list and add to sorted node list
-                    collection.node_list.remove(node)
-                    collection.sorted_node_list.append(node)
+                    layer.node_list.remove(node)
+                    layer.sorted_node_list.append(node)
                     # get output data list from sorted node
                     output_data_list = node.output_data_list
 
-                    # remove outputs of that node from dependency list of other nodes under referenced list of
-                    # collections to refresh
+                    # remove outputs of that node from dependency list of other nodes under referenced layer
                     for output_link in output_data_list:
                         # get output data name
                         output_data_name = output_link[ActivityNode.DATA_NAME_INDEX]
-                        # go through all nodes under given collection and refresh their dependency list
-                        ModuleSorter.remove_data_from_collection_node_dependencies(output_data_name, collection)
+                        # go through all nodes under given layer and refresh their dependency list
+                        ModuleSorter.remove_data_from_layer_node_dependencies(output_data_name, layer)
 
         # record info
-        for sorted_node in collection.sorted_node_list:
+        for sorted_node in layer.sorted_node_list:
             Logger.save_in_log_file("ModuleSorter", "Have sorted " + str(sorted_node) + " node",
                                     False)
 
     # Description
-    # This method removes given data name from dependency list of each node under related collection.
+    # This method removes given data name from dependency list of each node under related layer.
     @staticmethod
-    def remove_data_from_collection_node_dependencies(data_name, collection):
+    def remove_data_from_layer_node_dependencies(data_name, layer):
 
-        # go through all nodes under given collection
-        for node in collection.node_list:
+        # go through all nodes under given layer
+        for node in layer.node_list:
             # check all dependencies of that node
             for dependency in list(node.dependency_list):
                 # if given data is found on dependency list
@@ -502,25 +501,25 @@ class ModuleSorter(object):
     def sort_input_data_list(self):
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting input data list under diagram nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting input data list under diagram layer nodes", False)
 
-        # sort input data nodes under diagram collection
-        ModuleSorter.sort_input_data_list_under_collection(self.diagram_collection)
+        # sort input data nodes under diagram layer
+        ModuleSorter.sort_input_data_list_under_layer(self.diagram_layer)
 
         # record info
-        Logger.save_in_log_file("ModuleSorter", "Sorting input data list under clause nodes", False)
+        Logger.save_in_log_file("ModuleSorter", "Sorting input data list under clause layer nodes", False)
 
-        # sort input data nodes under clause collection
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_collection) + " element", False)
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(clause_collection) + " element", False)
-                ModuleSorter.sort_input_data_list_under_collection(clause_collection)
+        # sort input data nodes under clause layer
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("ModuleSorter", "Sorting under " + str(clause_layer) + " layer", False)
+                ModuleSorter.sort_input_data_list_under_layer(clause_layer)
 
     # Description:
     # This method sorts input data elements if interaction requires to point main data input.
     @staticmethod
-    def sort_input_data_list_under_collection(collection):
+    def sort_input_data_list_under_layer(layer):
 
         # some kind of actions require to distinguish which input data element should be
         # considered as main data element in order to compute correct results;
@@ -535,7 +534,7 @@ class ModuleSorter(object):
         # moved at beginning of input data list
 
         # repeat for all nodes from sorted node list
-        for sorted_node in collection.sorted_node_list:
+        for sorted_node in layer.sorted_node_list:
 
             # if node is action type
             if sorted_node.type == ActivityNode.ACTION:

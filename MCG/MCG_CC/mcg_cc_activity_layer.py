@@ -1,12 +1,11 @@
-#   FILE:           mcg_cc_activity_collection.py
+#   FILE:           mcg_cc_activity_layer.py
 #
 #   DESCRIPTION:
-#       TThis module contains definition of ActivityBasicCollection class
-#       and its child classes, which represent collections of related elements
-#       on activity diagram.
+#       TThis module contains definition of classes, which collect data and artefacts
+#       from different layers of activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           7 JAN 2024
+#   DATE:           3 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -30,32 +29,14 @@
 
 
 # Description:
-# This class represents basic collection type of related elements on activity diagram.
-class ActivityBasicCollection(object):
+# This class collects data and artefacts that belongs directly to layer of activity diagram.
+class ActivityDiagramLayer(object):
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        self.collection_list = []
-
-    # Description:
-    # This method returns string representation of the class.
-    def __str__(self):
-        line = "$UNKNOWN BASIC COLLECTION$"
-        return line
-
-
-# Description:
-# This class represents collection of diagram element, that do not belong to any other specific collection type.
-# The collection list is used to store list of connection that do not belong to any other collection type.
-class ActivityDiagramCollection(ActivityBasicCollection):
-
-    # Description:
-    # This is class constructor.
-    def __init__(self):
-        # initialize object data
-        super().__init__()
+        self.connection_list = []
         self.interaction_uid_list = []
         self.node_list = []
         self.sorted_node_list = []
@@ -63,43 +44,42 @@ class ActivityDiagramCollection(ActivityBasicCollection):
     # Description:
     # This method returns string representation of the class.
     def __str__(self):
-        line = "$DIAGRAM COLLECTION$"
+        line = "$DIAGRAM$"
         return line
 
 
 # Description:
-# This class represents collection of condition element on activity diagram.
-# The collection list is used to store list of clauses that belong to condition element.
-class ActivityConditionCollection(ActivityBasicCollection):
+# This class collects data and artefacts that belongs to layer of condition element on activity diagram.
+class ActivityConditionLayer(object):
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        super().__init__()
         self.name = "UNKNOWN"
         self.uid = "UNKNOWN"
+        self.clause_layer_list = []
 
     # Description:
     # This method returns string representation of the class.
     def __str__(self):
-        line = "$CONDITION COLLECTION$: " + self.name + " " + self.uid
+        line = "$CONDITION$: " + self.name + " " + self.uid
         return line
 
 
 # Description:
-# This class represents collection of clause element on activity diagram.
-# The collection list is used to store list of connections that belong to clause.
-class ActivityClauseCollection(ActivityConditionCollection):
+# This class collects data and artefacts that belongs to layer of clause element on activity diagram.
+class ActivityClauseLayer(object):
 
     # Description:
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        super().__init__()
+        self.decision = "UNKNOWN"
+        self.uid = "UNKNOWN"
         self.start_index = 0
         self.end_index = 0
-        self.decision = "UNKNOWN"
+        self.connection_list = []
         self.interaction_uid_list = []
         self.node_list = []
         self.sorted_node_list = []
@@ -107,5 +87,5 @@ class ActivityClauseCollection(ActivityConditionCollection):
     # Description:
     # This method returns string representation of the class.
     def __str__(self):
-        line = "$CLAUSE COLLECTION$: " + self.decision + " " + self.uid
+        line = "$CLAUSE$: " + self.decision + " " + self.uid
         return line

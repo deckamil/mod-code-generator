@@ -4,8 +4,8 @@
 #       This module contains definition of FileReader class, which is
 #       responsible for reading of module content from .exml file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           16 DEC 2023
+#   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
+#   DATE:           3 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -29,7 +29,7 @@
 
 
 from mcg_cc_activity_connection import ActivityConnection
-from mcg_cc_activity_collection import *
+from mcg_cc_activity_layer import *
 from mcg_cc_file_supporter import FileSupporter
 from mcg_cc_file_finder import FileFinder
 from mcg_cc_logger import Logger
@@ -50,8 +50,8 @@ class FileReader(object):
     INPUT_INTERFACE_LIST_INDEX = 2
     OUTPUT_INTERFACE_LIST_INDEX = 3
     LOCAL_INTERFACE_LIST_INDEX = 4
-    DIAGRAM_COLLECTION_INDEX = 5
-    CONDITION_COLLECTION_LIST_INDEX = 6
+    DIAGRAM_LAYER_INDEX = 5
+    CONDITION_LAYER_LIST_INDEX = 6
 
     # Description:
     # This is class constructor.
@@ -66,8 +66,8 @@ class FileReader(object):
         self.output_interface_list = []
         self.local_interface_list = []
         self.connection_list = []
-        self.diagram_collection = ActivityDiagramCollection()
-        self.condition_collection_list = []
+        self.diagram_layer = ActivityDiagramLayer()
+        self.condition_layer_list = []
 
     # Description:
     # This method looks for name of module operation.
@@ -487,11 +487,11 @@ class FileReader(object):
                         break
 
     # Description:
-    # This method looks for condition elements of module operation.
-    def read_condition_elements(self):
+    # This method looks for condition and clause layers of module operation.
+    def read_condition_and_clause_layer(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Looking for module condition elements in .exml file", False)
+        Logger.save_in_log_file("FileReader", "Looking for module condition and clause layers in .exml file", False)
 
         # counts how many "<OBJECT>" and "/<OBJECT>" occurs within condition or clause sections
         # when given counter is decremented back to 0 then it means end of given section
@@ -502,9 +502,9 @@ class FileReader(object):
         condition_found = False
         clause_found = False
 
-        # new condition and clause collection instances
-        condition_collection = ActivityConditionCollection()
-        clause_collection = ActivityClauseCollection()
+        # new condition and clause layer instances
+        condition_layer = ActivityConditionLayer()
+        clause_layer = ActivityClauseLayer()
 
         # search for conditional elements in activity file
         for i in range(0, len(self.activity_file)):
@@ -517,12 +517,12 @@ class FileReader(object):
                 condition_name = FileSupporter.get_name(self.activity_file[i])
                 condition_uid = FileSupporter.get_uid(self.activity_file[i])
 
-                # new condition collection instance
-                condition_collection = ActivityConditionCollection()
+                # new condition layer instance
+                condition_layer = ActivityConditionLayer()
 
                 # set condition name and uid
-                condition_collection.name = condition_name
-                condition_collection.uid = condition_uid
+                condition_layer.name = condition_name
+                condition_layer.uid = condition_uid
 
                 # new condition section is found, therefore enable counting of
                 # "<OBJECT>" and "/<OBJECT>" for condition element
@@ -539,13 +539,13 @@ class FileReader(object):
                 clause_decision = self.activity_file[i+2][clause_decision_start_position + 7:clause_decision_end_position]
                 clause_uid = FileSupporter.get_uid(self.activity_file[i])
 
-                # new clause collection instance
-                clause_collection = ActivityClauseCollection()
+                # new clause layer instance
+                clause_layer = ActivityClauseLayer()
 
                 # set clause start index, decision and uid
-                clause_collection.start_index = i
-                clause_collection.decision = clause_decision
-                clause_collection.uid = clause_uid
+                clause_layer.start_index = i
+                clause_layer.decision = clause_decision
+                clause_layer.uid = clause_uid
 
                 # new clause section is found, therefore enable counting of
                 # "<OBJECT>" and "/<OBJECT>" for clause element
@@ -571,46 +571,42 @@ class FileReader(object):
                 # disable counting of "<OBJECT>" and "/<OBJECT>" for clause element
                 clause_found = False
                 # set clause end index
-                clause_collection.end_index = i
-                # append clause collection to list
-                condition_collection.collection_list.append(clause_collection)
+                clause_layer.end_index = i
+                # append clause to clause layer list
+                condition_layer.clause_layer_list.append(clause_layer)
 
             # if end of condition section is found
             if (condition_object_counter == 0) and condition_found:
                 # disable counting of "<OBJECT>" and "/<OBJECT>" for condition element
                 condition_found = False
-                # append condition collection to list
-                self.condition_collection_list.append(condition_collection)
+                # append condition to condition layer list
+                self.condition_layer_list.append(condition_layer)
 
         # record info
-        for condition_collection in self.condition_collection_list:
-            Logger.save_in_log_file("FileReader", "Have found " + str(condition_collection) + " element", False)
-
-            for clause_collection in condition_collection.collection_list:
-                Logger.save_in_log_file("FileReader", "Have found " + str(clause_collection) + " element", False)
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("FileReader", "Have found " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("FileReader", "Have found " + str(clause_layer) + " layer", False)
 
     # Description:
-    # This method allocates connections to their parental clauses under condition collection.
-    def allocate_connections_to_clauses(self):
+    # This method allocates connections to clause layer.
+    def allocate_connections_to_clause_layer(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Allocating connections to clause element", False)
+        Logger.save_in_log_file("FileReader", "Allocating connections to clause layer", False)
 
-        # for each condition collection
-        for condition_collection in self.condition_collection_list:
-            # record info
-            Logger.save_in_log_file("FileReader", "Allocating under " + str(condition_collection) +
-                                    " element of .exml file", False)
-
-            # for each clause collection
-            for clause_collection in condition_collection.collection_list:
-                # record info
-                Logger.save_in_log_file("FileReader", "Allocating under " + str(clause_collection) +
-                                        " element of .exml file", False)
+        # for each condition layer
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("FileReader", "Allocating under " + str(condition_layer) +
+                                    " layer of .exml file", False)
+            # for each clause layer
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("FileReader", "Allocating under " + str(clause_layer) +
+                                        " layer of .exml file", False)
 
                 # get clause start and end index
-                clause_start_index = clause_collection.start_index
-                clause_end_index = clause_collection.end_index
+                clause_start_index = clause_layer.start_index
+                clause_end_index = clause_layer.end_index
 
                 # search for connections that appear between start and end index
                 for connection in list(self.connection_list):
@@ -620,28 +616,26 @@ class FileReader(object):
                     # if connection appears between both indexes it means
                     # that the connection belong to given clause
                     if (connection_index >= clause_start_index) and (connection_index <= clause_end_index):
-                        # append connection to collection list
-                        clause_collection.collection_list.append(connection)
-                        # remove connection from connection list
+                        # allocate connection to diagram layer
+                        clause_layer.connection_list.append(connection)
                         self.connection_list.remove(connection)
-                        # record info
-                        Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) + " connection", False)
+                        Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) +
+                                                " connection", False)
 
     # Description:
-    # This method allocates connections to diagram collection.
-    def allocate_connections_to_diagram(self):
+    # This method allocates connections to diagram layer.
+    def allocate_connections_to_diagram_layer(self):
 
         # record info
-        Logger.save_in_log_file("FileReader", "Allocating connections to diagram element", False)
+        Logger.save_in_log_file("FileReader", "Allocating connections to diagram layer", False)
 
-        # for each remaining connection that was not allocated to any other collection type
+        # for each remaining connection that was not allocated to any other layer
         for connection in list(self.connection_list):
-            # append connection to collection list
-            self.diagram_collection.collection_list.append(connection)
-            # remove connection from connection list
+            # allocate connection to diagram layer
+            self.diagram_layer.connection_list.append(connection)
             self.connection_list.remove(connection)
-            # record info
-            Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) + " connection", False)
+            Logger.save_in_log_file("FileReader", "Have allocated " + str(connection) +
+                                    " connection", False)
 
     # Description:
     # This method looks for operation on activity diagram, basing on uid of operation input pins.
@@ -689,12 +683,12 @@ class FileReader(object):
         self.read_data_targets()
         self.read_interaction_targets()
 
-        # search for condition elements
-        self.read_condition_elements()
+        # search for all condition and clause layers
+        self.read_condition_and_clause_layer()
 
-        # allocate connections to clause and diagram elements
-        self.allocate_connections_to_clauses()
-        self.allocate_connections_to_diagram()
+        # allocate connections to clause and diagram layers
+        self.allocate_connections_to_clause_layer()
+        self.allocate_connections_to_diagram_layer()
 
         # append collected data to file reader list
         file_reader_list = []
@@ -703,8 +697,8 @@ class FileReader(object):
         file_reader_list.insert(FileReader.INPUT_INTERFACE_LIST_INDEX, self.input_interface_list)
         file_reader_list.insert(FileReader.OUTPUT_INTERFACE_LIST_INDEX, self.output_interface_list)
         file_reader_list.insert(FileReader.LOCAL_INTERFACE_LIST_INDEX, self.local_interface_list)
-        file_reader_list.insert(FileReader.DIAGRAM_COLLECTION_INDEX, self.diagram_collection)
-        file_reader_list.insert(FileReader.CONDITION_COLLECTION_LIST_INDEX, self.condition_collection_list)
+        file_reader_list.insert(FileReader.DIAGRAM_LAYER_INDEX, self.diagram_layer)
+        file_reader_list.insert(FileReader.CONDITION_LAYER_LIST_INDEX, self.condition_layer_list)
 
         # return file reader list
         return file_reader_list

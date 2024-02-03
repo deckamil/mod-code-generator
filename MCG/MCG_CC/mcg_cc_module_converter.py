@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           27 JAN 2024
+#   DATE:           3 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -53,8 +53,8 @@ class ModuleConverter(object):
         self.input_interface_list = file_reader_list[FileReader.INPUT_INTERFACE_LIST_INDEX]
         self.output_interface_list = file_reader_list[FileReader.OUTPUT_INTERFACE_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
-        self.diagram_collection = file_reader_list[FileReader.DIAGRAM_COLLECTION_INDEX]
-        self.condition_collection_list = file_reader_list[FileReader.CONDITION_COLLECTION_LIST_INDEX]
+        self.diagram_layer = file_reader_list[FileReader.DIAGRAM_LAYER_INDEX]
+        self.condition_layer_list = file_reader_list[FileReader.CONDITION_LAYER_LIST_INDEX]
         self.configuration_file = []
 
     # Description:
@@ -419,29 +419,29 @@ class ModuleConverter(object):
     # This method converts special node that represents condition.
     def convert_condition_node(self, condition_node):
 
-        # find condition collection for given condition node
-        for condition_collection in self.condition_collection_list:
+        # find condition layer for given condition node
+        for condition_layer in self.condition_layer_list:
             # if uid identifier is the same
-            if condition_collection.uid == condition_node.uid:
-                # get clause collection list for given condition collection
-                clause_collection_list = condition_collection.collection_list
+            if condition_layer.uid == condition_node.uid:
+                # get clause layer list for given condition layer
+                clause_layer_list = condition_layer.clause_layer_list
 
                 # convert decision of first clause section
-                clause_decision = self.convert_clause_decision(clause_collection_list[0].decision)
+                clause_decision = self.convert_clause_decision(clause_layer_list[0].decision)
                 # get configuration file line
                 configuration_file_line = str("$IFC ") + str(clause_decision)
                 # append configuration file line to configuration file
                 self.append_to_configuration_file(configuration_file_line, True)
                 # convert ordinary nodes for first clause
-                for sorted_node in clause_collection_list[0].sorted_node_list:
+                for sorted_node in clause_layer_list[0].sorted_node_list:
                     self.convert_ordinary_node(sorted_node)
 
                 # when else if section is expected (condition has more clauses than only simple if and else)
-                if len(clause_collection_list) > 2:
+                if len(clause_layer_list) > 2:
                     # get sublist for section with else if clauses
-                    elseif_clause_collection_sublist = clause_collection_list[1:len(clause_collection_list) - 1]
+                    elseif_clause_layer_sublist = clause_layer_list[1:len(clause_layer_list) - 1]
                     # for each clause in that section
-                    for clause in elseif_clause_collection_sublist:
+                    for clause in elseif_clause_layer_sublist:
                         # convert clause decision
                         clause_decision = self.convert_clause_decision(clause.decision)
                         # get configuration file line
@@ -455,7 +455,7 @@ class ModuleConverter(object):
                 # append else marker of last clause section
                 self.append_to_configuration_file("$ELS", True)
                 # convert ordinary nodes for last clause
-                for sorted_node in clause_collection_list[-1].sorted_node_list:
+                for sorted_node in clause_layer_list[-1].sorted_node_list:
                     self.convert_ordinary_node(sorted_node)
 
                 # append ending marker for last clause section
@@ -471,8 +471,8 @@ class ModuleConverter(object):
         # append start marker of module body section to configuration file
         self.append_to_configuration_file("$OPERATION BODY START$", False)
 
-        # repeat for all sorted nodes from diagram collection
-        for sorted_node in self.diagram_collection.sorted_node_list:
+        # repeat for all sorted nodes from diagram layer
+        for sorted_node in self.diagram_layer.sorted_node_list:
 
             # if given node represents condition
             if sorted_node.type == ActivityNode.CONDITION:
