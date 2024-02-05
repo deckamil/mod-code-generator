@@ -5,7 +5,7 @@
 #       for finding and sorting of module nodes.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           3 FEB 2024
+#   DATE:           5 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -359,6 +359,12 @@ class ModuleSorter(object):
                     clause_decision = clause_decision.replace(" OR ", "")
                     clause_decision = clause_decision.replace(" NOT ", "")
                     clause_decision = clause_decision.replace(" (NOT ", "")
+                    clause_decision = clause_decision.replace(" EQ ", "")
+                    clause_decision = clause_decision.replace(" NE ", "")
+                    clause_decision = clause_decision.replace(" GT ", "")
+                    clause_decision = clause_decision.replace(" LT ", "")
+                    clause_decision = clause_decision.replace(" GE ", "")
+                    clause_decision = clause_decision.replace(" LE ", "")
                     # split decision to get list of data names that appear in clause decision
                     clause_decision_data_name_list = clause_decision.split()
 
