@@ -5,8 +5,8 @@
 #       and it contains definition of Main class, which uses other MCG CGC classes
 #       to generate C code from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           8 SEP 2023
+#   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
+#   DATE:           8 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -61,7 +61,7 @@ class Main(object):
         # display short notice
         print()
         print("Mod Code Generator (MCG)")
-        print("Copyright (C) 2022-2023 Kamil Deć github.com/deckamil")
+        print("Copyright (C) 2022-2024 Kamil Deć github.com/deckamil")
         print("This is Code Generator Component (CGC) of Mod Code Generator (MCG)")
         print(Main.MCG_CGC_VERSION)
         print()
@@ -118,11 +118,11 @@ class Main(object):
         ErrorHandler.check_errors()
 
         # get content of the configuration file
-        config_file = ConfigChecker.get_config_file()
+        # config_file = ConfigChecker.get_config_file()
         # generate code from the configuration file
-        ConfigConverter.generate_code_from_config_file(config_file)
+        # ConfigConverter.generate_code_from_config_file(config_file)
         # check errors
-        ErrorHandler.check_errors()
+        # ErrorHandler.check_errors()
 
         # save log file footer
         Logger.save_log_file_footer()
