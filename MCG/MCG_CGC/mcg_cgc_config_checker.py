@@ -5,7 +5,7 @@
 #       responsible for verification of the configuration file data.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
-#   DATE:           8 FEB 2024
+#   DATE:           25 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -552,6 +552,20 @@ class ConfigChecker(object):
         operation_body_section = ConfigChecker.config_file[operation_body_start_index:
                                                            operation_body_end_index]
 
+        # get first line of operation body section
+        operation_body_first_line = operation_body_section[0]
+
+        # if first line contains unexpected operation body marker
+        if (operation_body_first_line.find("$EIF ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$ELS") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$INP ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$OUT ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$OPE -end") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$IFC -end") == ConfigChecker.BASE_MARKER_POSITION):
+
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+1, "")
+
         # get last line of operation body section
         operation_body_last_line = operation_body_section[-1]
 
@@ -567,6 +581,35 @@ class ConfigChecker(object):
 
             # record error
             ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_end_index, "")
+
+        # check corrects of operation call definition
+        for i in range(0, len(operation_body_section)-1):
+
+            # if operation call marker is found and next line does not contain operation input interface marker
+            if ((operation_body_section[i].find("$OPE ") == ConfigChecker.BASE_MARKER_POSITION) and
+                    (operation_body_section[i].find("$OPE -end") != ConfigChecker.BASE_MARKER_POSITION) and
+                    (operation_body_section[i+1].find("$INP ") != ConfigChecker.BASE_MARKER_POSITION)):
+
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+i+2, "")
+
+            # if operation input interface marker is found and next line does not contain
+            # operation input interface marker or operation output interface marker
+            if ((operation_body_section[i].find("$INP ") == ConfigChecker.BASE_MARKER_POSITION) and
+                    ((operation_body_section[i+1].find("$INP ") != ConfigChecker.BASE_MARKER_POSITION) and
+                     (operation_body_section[i+1].find("$OUT ") != ConfigChecker.BASE_MARKER_POSITION))):
+
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+i+2, "")
+
+            # if operation output interface marker is found and next line does not contain
+            # operation output interface marker or operation call end marker
+            if ((operation_body_section[i].find("$OUT ") == ConfigChecker.BASE_MARKER_POSITION) and
+                    ((operation_body_section[i+1].find("$OUT ") != ConfigChecker.BASE_MARKER_POSITION) and
+                     (operation_body_section[i+1].find("$OPE -end") != ConfigChecker.BASE_MARKER_POSITION))):
+
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+i+2, "")
 
     # Description:
     # This method checks correctness of module end section in the configuration file.

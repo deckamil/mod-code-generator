@@ -5,7 +5,7 @@
 #       for conversion of module content into configuration file format.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           5 FEB 2024
+#   DATE:           25 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -234,7 +234,7 @@ class ModuleConverter(object):
     # This method converts operation node from activity diagram into configuration file.
     def convert_operation_node(self, sorted_node):
 
-        # append operation invocation to configuration file
+        # append operation call to configuration file
         configuration_file_line = str("$OPE ") + str(sorted_node.interaction)
         self.append_to_configuration_file(configuration_file_line, True)
 
