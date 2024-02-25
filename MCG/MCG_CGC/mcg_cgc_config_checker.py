@@ -4,8 +4,8 @@
 #       This module contains definition of ConfigChecker class, which is
 #       responsible for verification of the configuration file data.
 #
-#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           29 AUG 2023
+#   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
+#   DATE:           25 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -72,13 +72,9 @@ class ConfigChecker(object):
     MAIN_CHECK_FOOTER = 500
     MAIN_END_CHECKING = 600
 
-    # body verification state
-    body_checker_state = ""
-
-    # possible body operation checker states
-    BODY_NO_CHECK = 1500
-    BODY_CHECK_INPUT_INTERFACE = 1600
-    BODY_CHECK_OUTPUT_INTERFACE = 1700
+    # indexes of beginning and ending of operation body section in the configuration file
+    OPERATION_BODY_START_INDEX = 0
+    OPERATION_BODY_END_INDEX = 0
 
     # Description:
     # This method sets path to the configuration file.
@@ -116,7 +112,6 @@ class ConfigChecker(object):
 
         # set entry state
         ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_HEADER
-        ConfigChecker.body_checker_state = ConfigChecker.BODY_NO_CHECK
 
         # continue checking until verification of the configuration file is completed
         while ConfigChecker.main_checker_state != ConfigChecker.MAIN_END_CHECKING:
@@ -496,6 +491,8 @@ class ConfigChecker(object):
             if ConfigChecker.config_file[ConfigChecker.file_index] == "$OPERATION BODY START$":
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
+                # set operation body start index
+                ConfigChecker.OPERATION_BODY_START_INDEX = ConfigChecker.file_index
                 # move to next state
                 ConfigChecker.main_checker_state = ConfigChecker.MAIN_CHECK_OPERATION_BODY
 
@@ -509,46 +506,31 @@ class ConfigChecker(object):
         # otherwise for operation body check
         else:
 
-            # if instruction marker is found
-            if ConfigChecker.config_file[ConfigChecker.file_index].find("$INS ") == \
-                    ConfigChecker.BASE_MARKER_POSITION:
+            # if valid operation body marker is found
+            if (ConfigChecker.config_file[ConfigChecker.file_index].find("$INS ") ==
+                ConfigChecker.BASE_MARKER_POSITION) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("$IFC ") ==
+                     ConfigChecker.BASE_MARKER_POSITION) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("$EIF ") ==
+                     ConfigChecker.BASE_MARKER_POSITION) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("$ELS") ==
+                     ConfigChecker.BASE_MARKER_POSITION) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("$OPE ") ==
+                     ConfigChecker.BASE_MARKER_POSITION) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("$INP ") ==
+                     ConfigChecker.BASE_MARKER_POSITION) or \
+                    (ConfigChecker.config_file[ConfigChecker.file_index].find("$OUT ") ==
+                     ConfigChecker.BASE_MARKER_POSITION):
                 # increment file index and repeat same state process
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
 
-            # or if operation marker is found:
-            elif ConfigChecker.config_file[ConfigChecker.file_index].find("$OPE ") == \
-                    ConfigChecker.BASE_MARKER_POSITION:
-                # increment file index
-                ConfigChecker.file_index = ConfigChecker.file_index + 1
-                # move to next sub-state
-                ConfigChecker.body_checker_state = ConfigChecker.BODY_CHECK_INPUT_INTERFACE
-
-            # or if body operation input interface check state is entered
-            elif ConfigChecker.body_checker_state == ConfigChecker.BODY_CHECK_INPUT_INTERFACE:
-
-                # if input interface marker is found
-                if ConfigChecker.config_file[ConfigChecker.file_index].find("$INP ") == \
-                        ConfigChecker.BASE_MARKER_POSITION:
-                    # increment file index and repeat same state process
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                else:
-                    # move to next sub-state
-                    ConfigChecker.body_checker_state = ConfigChecker.BODY_CHECK_OUTPUT_INTERFACE
-
-            # or if body operation output interface check state is entered
-            elif ConfigChecker.body_checker_state == ConfigChecker.BODY_CHECK_OUTPUT_INTERFACE:
-
-                # if output interface marker is found
-                if ConfigChecker.config_file[ConfigChecker.file_index].find("$OUT ") == \
-                        ConfigChecker.BASE_MARKER_POSITION:
-                    # increment file index and repeat same state process
-                    ConfigChecker.file_index = ConfigChecker.file_index + 1
-                else:
-                    # no further body operation check
-                    ConfigChecker.body_checker_state = ConfigChecker.BODY_NO_CHECK
-
             # or if operation body end is found
             elif ConfigChecker.config_file[ConfigChecker.file_index] == "$OPERATION BODY END$":
+                # set operation body end index
+                ConfigChecker.OPERATION_BODY_END_INDEX = ConfigChecker.file_index
+                # run detailed check on operation body content
+                ConfigChecker.check_operation_body_details(ConfigChecker.OPERATION_BODY_START_INDEX,
+                                                           ConfigChecker.OPERATION_BODY_END_INDEX)
                 # increment file index
                 ConfigChecker.file_index = ConfigChecker.file_index + 1
                 # move to next state
@@ -560,6 +542,74 @@ class ConfigChecker(object):
                 ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, ConfigChecker.file_index + 1, "")
                 # skip part of the configuration file and find next module section
                 ConfigChecker.main_checker_state = ConfigChecker.MAIN_SKIP_TO_NEXT_SECTION
+
+    # Description:
+    # This method provides detailed check on operation body section in the configuration file.
+    @staticmethod
+    def check_operation_body_details(operation_body_start_index, operation_body_end_index):
+
+        # get operation body section of config file
+        operation_body_section = ConfigChecker.config_file[operation_body_start_index:
+                                                           operation_body_end_index]
+
+        # get first line of operation body section
+        operation_body_first_line = operation_body_section[0]
+
+        # if first line contains unexpected operation body marker
+        if (operation_body_first_line.find("$EIF ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$ELS") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$INP ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$OUT ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$OPE -end") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_first_line.find("$IFC -end") == ConfigChecker.BASE_MARKER_POSITION):
+
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+1, "")
+
+        # get last line of operation body section
+        operation_body_last_line = operation_body_section[-1]
+
+        # if last line contains unexpected operation body marker
+        if (operation_body_last_line.find("$EIF ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_last_line.find("$ELS") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_last_line.find("$INP ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                (operation_body_last_line.find("$OUT ") == ConfigChecker.BASE_MARKER_POSITION) or \
+                ((operation_body_last_line.find("$OPE ") == ConfigChecker.BASE_MARKER_POSITION) and
+                 (operation_body_last_line.find("$OPE -end") != ConfigChecker.BASE_MARKER_POSITION)) or \
+                ((operation_body_last_line.find("$IFC ") == ConfigChecker.BASE_MARKER_POSITION) and
+                 (operation_body_last_line.find("$IFC -end") != ConfigChecker.BASE_MARKER_POSITION)):
+
+            # record error
+            ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_end_index, "")
+
+        # check corrects of operation call definition
+        for i in range(0, len(operation_body_section)-1):
+
+            # if operation call marker is found and next line does not contain operation input interface marker
+            if ((operation_body_section[i].find("$OPE ") == ConfigChecker.BASE_MARKER_POSITION) and
+                    (operation_body_section[i].find("$OPE -end") != ConfigChecker.BASE_MARKER_POSITION) and
+                    (operation_body_section[i+1].find("$INP ") != ConfigChecker.BASE_MARKER_POSITION)):
+
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+i+2, "")
+
+            # if operation input interface marker is found and next line does not contain
+            # operation input interface marker or operation output interface marker
+            if ((operation_body_section[i].find("$INP ") == ConfigChecker.BASE_MARKER_POSITION) and
+                    ((operation_body_section[i+1].find("$INP ") != ConfigChecker.BASE_MARKER_POSITION) and
+                     (operation_body_section[i+1].find("$OUT ") != ConfigChecker.BASE_MARKER_POSITION))):
+
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+i+2, "")
+
+            # if operation output interface marker is found and next line does not contain
+            # operation output interface marker or operation call end marker
+            if ((operation_body_section[i].find("$OUT ") == ConfigChecker.BASE_MARKER_POSITION) and
+                    ((operation_body_section[i+1].find("$OUT ") != ConfigChecker.BASE_MARKER_POSITION) and
+                     (operation_body_section[i+1].find("$OPE -end") != ConfigChecker.BASE_MARKER_POSITION))):
+
+                # record error
+                ErrorHandler.record_error(ErrorHandler.CHK_ERR_FAULTY_BODY, operation_body_start_index+i+2, "")
 
     # Description:
     # This method checks correctness of module end section in the configuration file.

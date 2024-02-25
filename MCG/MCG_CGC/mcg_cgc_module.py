@@ -4,8 +4,8 @@
 #       This module contains definition of Module class, which represents module
 #       source code and module header to be generated from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2023
+#   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
+#   DATE:           13 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -37,8 +37,12 @@ class Module(object):
     DATA_ELEMENT_NAME_INDEX = 1
     DATA_ELEMENT_VALUE_INDEX = 2
 
-    # indent used in module definition
-    indent = "    "
+    # operation body indent levels
+    INDENT_LEVEL_1 = "    "
+    INDENT_LEVEL_2 = "        "
+
+    # default indent used in module definition
+    indent = INDENT_LEVEL_1
 
     # class data used to generate additional module appendix
     module_appendix_name = "mcg_appendix"
@@ -224,7 +228,7 @@ class Module(object):
                 module = module + "\n"
             else:
                 # add new body line
-                module = module + self.indent + operation_body + ";\n"
+                module = module + operation_body + "\n"
 
         # ********** COLLECT OUTPUT DATA ********** #
 

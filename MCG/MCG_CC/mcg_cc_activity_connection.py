@@ -5,7 +5,7 @@
 #       between two model elements on activity diagram.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 SEP 2023
+#   DATE:           13 OCT 2023
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -43,13 +43,14 @@ class ActivityConnection(object):
     # This is class constructor.
     def __init__(self):
         # initialize object data
-        self.source_pin = "N/A"
-        self.source_name = "N/A"
-        self.source_uid = "N/A"
+        self.index = 0
+        self.source_pin = "UNKNOWN"
+        self.source_name = "UNKNOWN"
+        self.source_uid = "UNKNOWN"
         self.source_type = ActivityConnection.UNKNOWN
-        self.target_pin = "N/A"
-        self.target_name = "N/A"
-        self.target_uid = "N/A"
+        self.target_pin = "UNKNOWN"
+        self.target_name = "UNKNOWN"
+        self.target_uid = "UNKNOWN"
         self.target_type = ActivityConnection.UNKNOWN
 
     # Description:
