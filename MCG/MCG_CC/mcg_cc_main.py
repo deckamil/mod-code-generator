@@ -6,7 +6,7 @@
 #       to convert model content from set of .exml files into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           27 JAN 2024
+#   DATE:           26 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -134,12 +134,12 @@ class Main(object):
                 file_reader_list = file_reader.read_files()
 
                 # initialize file checker
-                # file_checker = FileChecker(file_reader_list)
+                file_checker = FileChecker(file_reader_list)
                 # check module content
-                # file_checker.check_files()
+                file_checker.check_files()
 
                 # check errors
-                # ErrorHandler.check_errors()
+                ErrorHandler.check_errors()
 
                 # initialize module sorter
                 module_sorter = ModuleSorter(file_reader_list)
@@ -147,7 +147,7 @@ class Main(object):
                 module_sorter.sort_module()
 
                 # check errors
-                # ErrorHandler.check_errors()
+                ErrorHandler.check_errors()
 
                 # initialize module converter
                 module_converter = ModuleConverter(file_finder_list, file_reader_list)

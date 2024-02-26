@@ -4,8 +4,8 @@
 #       This module contains definition of FileChecker class, which is
 #       responsible for checking of model module content from .exml file.
 #
-#   COPYRIGHT:      Copyright (C) 2021-2023 Kamil Deć github.com/deckamil
-#   DATE:           7 SEP 2023
+#   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
+#   DATE:           26 FEB 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -55,7 +55,8 @@ class FileChecker(object):
     def __init__(self, file_reader_list):
 
         # initialize object data
-        self.connection_list = file_reader_list[FileReader.CONNECTION_LIST_INDEX]
+        self.diagram_layer = file_reader_list[FileReader.DIAGRAM_LAYER_INDEX]
+        self.condition_layer_list = file_reader_list[FileReader.CONDITION_LAYER_LIST_INDEX]
         self.input_interface_list = file_reader_list[FileReader.INPUT_INTERFACE_LIST_INDEX]
         self.output_interface_list = file_reader_list[FileReader.OUTPUT_INTERFACE_LIST_INDEX]
         self.local_interface_list = file_reader_list[FileReader.LOCAL_INTERFACE_LIST_INDEX]
@@ -65,10 +66,28 @@ class FileChecker(object):
     def check_connection_errors(self):
 
         # record info
-        Logger.save_in_log_file("FileChecker", "Looking for connection errors in .exml file", False)
+        Logger.save_in_log_file("FileChecker", "Looking for diagram layer connection errors", False)
 
-        # check action types in connections
-        for connection in self.connection_list:
+        # search for connection errors under diagram layer
+        FileChecker.check_connection_actions_from_layer(self.diagram_layer)
+
+        # record info
+        Logger.save_in_log_file("FileChecker", "Looking for clause layer connection errors", False)
+
+        # search for connection errors under clause layer
+        for condition_layer in self.condition_layer_list:
+            Logger.save_in_log_file("FileChecker", "Looking under " + str(condition_layer) + " layer", False)
+            for clause_layer in condition_layer.clause_layer_list:
+                Logger.save_in_log_file("FileChecker", "Looking under " + str(clause_layer) + " layer", False)
+                FileChecker.check_connection_actions_from_layer(clause_layer)
+
+    # Description:
+    # This method looks for connection errors related with actions from given layer.
+    @staticmethod
+    def check_connection_actions_from_layer(layer):
+
+        # check action types
+        for connection in layer.connection_list:
             # if action is connection source
             if connection.source_type == ActivityConnection.ACTION:
 
@@ -116,7 +135,7 @@ class FileChecker(object):
     def check_interface_errors(self):
 
         # record info
-        Logger.save_in_log_file("FileChecker", "Looking for interface errors in .exml file", False)
+        Logger.save_in_log_file("FileChecker", "Looking for module interface errors", False)
 
         # check interface element types in input interface
         for interface_element in self.input_interface_list:
