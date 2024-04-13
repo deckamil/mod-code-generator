@@ -5,7 +5,7 @@
 #       generate source code modules from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
-#   DATE:           13 FEB 2024
+#   DATE:           13 APR 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -333,6 +333,8 @@ class ConfigConverter(object):
 
                         # change indent level
                         indent = Module.INDENT_LEVEL_1
+                        # append end of previous conditional branch
+                        module.operation_body_list.append(indent + "}")
                         # get branch decision
                         branch_decision = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
                         # append branch decision
@@ -347,6 +349,8 @@ class ConfigConverter(object):
 
                         # change indent level
                         indent = Module.INDENT_LEVEL_1
+                        # append end of previous conditional branch
+                        module.operation_body_list.append(indent + "}")
                         # append branch
                         module.operation_body_list.append(indent + "else {")
                         # append new line command
