@@ -4,8 +4,8 @@
 #       This module contains definition of ConfigConverter class, which allows to
 #       generate source code modules from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           30 AUG 2023
+#   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
+#   DATE:           13 APR 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -229,6 +229,9 @@ class ConfigConverter(object):
                 # name of invoked operation
                 operation_name = ""
 
+                # set indent level
+                indent = Module.INDENT_LEVEL_1
+
                 # continue reading of body elements until end of body section is reached
                 while config_file[file_index] != "$OPERATION BODY END$":
 
@@ -242,15 +245,16 @@ class ConfigConverter(object):
 
                     # if body line contains instruction
                     if "$INS " in line:
+
                         # get instruction
                         instruction = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
                         # append instruction
-                        module.operation_body_list.append(instruction)
+                        module.operation_body_list.append(indent + instruction + ";")
                         # append new line command
                         module.operation_body_list.append("$NEW_LINE$")
 
                     # if body line contains operation call
-                    elif "$OPE " in line:
+                    elif "$OPE " in line and "$OPE -end" not in line:
 
                         # get operation name
                         operation_name = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
@@ -286,13 +290,14 @@ class ConfigConverter(object):
                         # split to input data and pin
                         input_data, input_pin = input_interface_link.split("->")
                         # append operation input interface write to instruction
-                        module.operation_body_list.append(operation_name + "_input." + input_pin + " = " + input_data)
+                        module.operation_body_list.append(indent + operation_name + "_input." + input_pin +
+                                                          " = " + input_data + ";")
 
                         # if that was last input interface write for given operation call
                         if "$INP " not in config_file[file_index+1]:
                             # append operation instruction to instruction
-                            module.operation_body_list.append(operation_name + "(&" + operation_name + "_input,&" +
-                                                              operation_name + "_output)")
+                            module.operation_body_list.append(indent + operation_name + "(&" + operation_name +
+                                                              "_input,&" + operation_name + "_output);")
 
                     # if body line contains output interface read
                     elif "$OUT " in line:
@@ -302,12 +307,66 @@ class ConfigConverter(object):
                         # split to output pin and data
                         output_pin, output_data = output_interface_link.split("->")
                         # append operation output interface read to instruction
-                        module.operation_body_list.append(output_data + " = " + operation_name + "_output." + output_pin)
+                        module.operation_body_list.append(indent + output_data + " = " + operation_name +
+                                                          "_output." + output_pin + ";")
 
-                        # if that was last output interface read for given operation call
-                        if "$OUT " not in config_file[file_index + 1]:
-                            # append new line command
-                            module.operation_body_list.append("$NEW_LINE$")
+                    # if body line contains end of operation call
+                    elif "$OPE -end" in line:
+
+                        # append new line command
+                        module.operation_body_list.append("$NEW_LINE$")
+
+                    # if body line contains conditional IF branch
+                    elif "$IFC " in line and "$IFC -end" not in line:
+
+                        # get branch decision
+                        branch_decision = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # append branch decision
+                        module.operation_body_list.append(indent + "if(" + branch_decision + ") {")
+                        # append new line command
+                        module.operation_body_list.append("$NEW_LINE$")
+                        # change indent level
+                        indent = Module.INDENT_LEVEL_2
+
+                    # if body line contains conditional ELSE IF branch
+                    elif "$EIF " in line:
+
+                        # change indent level
+                        indent = Module.INDENT_LEVEL_1
+                        # append end of previous conditional branch
+                        module.operation_body_list.append(indent + "}")
+                        # get branch decision
+                        branch_decision = line[ConfigConverter.BODY_DATA_POSITION_IN_CFG:len(line)]
+                        # append branch decision
+                        module.operation_body_list.append(indent + "else if(" + branch_decision + ") {")
+                        # append new line command
+                        module.operation_body_list.append("$NEW_LINE$")
+                        # change indent level
+                        indent = Module.INDENT_LEVEL_2
+
+                    # if body line contains ELSE branch
+                    elif "$ELS" in line:
+
+                        # change indent level
+                        indent = Module.INDENT_LEVEL_1
+                        # append end of previous conditional branch
+                        module.operation_body_list.append(indent + "}")
+                        # append branch
+                        module.operation_body_list.append(indent + "else {")
+                        # append new line command
+                        module.operation_body_list.append("$NEW_LINE$")
+                        # change indent level
+                        indent = Module.INDENT_LEVEL_2
+
+                    # if body line contains end of conditional branch
+                    elif "$IFC -end" in line:
+
+                        # change indent level
+                        indent = Module.INDENT_LEVEL_1
+                        # append conditional branch end
+                        module.operation_body_list.append(indent + "}")
+                        # append new line command
+                        module.operation_body_list.append("$NEW_LINE$")
 
                     # increment file index
                     file_index = file_index + 1

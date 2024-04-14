@@ -5,8 +5,8 @@
 #       and it contains definition of Main class, which uses other MCG CGC classes
 #       to generate C code from the configuration file.
 #
-#   COPYRIGHT:      Copyright (C) 2022-2023 Kamil Deć github.com/deckamil
-#   DATE:           8 SEP 2023
+#   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
+#   DATE:           14 APR 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -51,7 +51,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CGC version
-    MCG_CGC_VERSION = "v0.4.0-alpha"
+    MCG_CGC_VERSION = "v0.5.0-alpha"
 
     # Description:
     # This is main method, which display short notice and start code generation process.
@@ -61,7 +61,7 @@ class Main(object):
         # display short notice
         print()
         print("Mod Code Generator (MCG)")
-        print("Copyright (C) 2022-2023 Kamil Deć github.com/deckamil")
+        print("Copyright (C) 2022-2024 Kamil Deć github.com/deckamil")
         print("This is Code Generator Component (CGC) of Mod Code Generator (MCG)")
         print(Main.MCG_CGC_VERSION)
         print()
