@@ -6,7 +6,7 @@
 #       to convert model content from set of .exml files into configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2021-2024 Kamil Deć github.com/deckamil
-#   DATE:           26 FEB 2024
+#   DATE:           14 APR 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -54,7 +54,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CC version
-    MCG_CC_VERSION = "v0.5.0-in-dev"
+    MCG_CC_VERSION = "v0.5.0-alpha"
 
     # Description:
     # This is main method, which display short notice and start conversion process.

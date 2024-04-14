@@ -6,7 +6,7 @@
 #       to generate C code from the configuration file.
 #
 #   COPYRIGHT:      Copyright (C) 2022-2024 Kamil Deć github.com/deckamil
-#   DATE:           13 FEB 2024
+#   DATE:           14 APR 2024
 #
 #   LICENSE:
 #       This file is part of Mod Code Generator (MCG).
@@ -51,7 +51,7 @@ class Main(object):
     OUTPUT_DIR_PATH_INDEX = 2
 
     # MCG CGC version
-    MCG_CGC_VERSION = "v0.5.0-in-dev"
+    MCG_CGC_VERSION = "v0.5.0-alpha"
 
     # Description:
     # This is main method, which display short notice and start code generation process.
